@@ -132,11 +132,11 @@ startScripts {
 /**
  * Allows easy integration with eclipse
  */
-eclipse {
-	classpath {
-		defaultOutputDir = sourceSets.main.output.classesDir
-	}
-}
+//eclipse {
+//	classpath {
+//		defaultOutputDir = sourceSets.main.output.classesDir
+//	}
+//}
 
 
 /**
