@@ -70,371 +70,363 @@ import opendial.utils.XMLUtils;
 
 public class EditorTab extends JComponent {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	// logger
-	final static Logger log = Logger.getLogger("OpenDial");
+    // logger
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	public static final String TAB_TITLE = " Domain editor ";
-	public static final String TAB_TIP = "User-friendly editor for dialogue domains";
+    public static final String TAB_TITLE = " Domain editor ";
+    public static final String TAB_TIP = "User-friendly editor for dialogue domains";
 
-	// the frame including the tab
-	private GUIFrame frame;
+    // the frame including the tab
+    private GUIFrame frame;
 
-	// list of XML source files
-	private DomainFilesModel listModel;
+    // list of XML source files
+    private DomainFilesModel listModel;
 
-	// file (to be) shown on screen
-	private File shownFile;
+    // file (to be) shown on screen
+    private File shownFile;
 
-	// the domain editor
-	public JEditorPane editor;
+    // the domain editor
+    public JEditorPane editor;
 
-	// ===================================
-	// EDITOR CONSTRUCTION
-	// ===================================
+    // ===================================
+    // EDITOR CONSTRUCTION
+    // ===================================
 
-	/**
-	 * Creates the editor tab inside the given frame. The tab contains a small column
-	 * with the XML files associated with the domain. At the center of the window is
-	 * an editor panel to modify the domain.
-	 * 
-	 * @param frame the GUI frame
-	 */
-	public EditorTab(GUIFrame frame) {
-		setLayout(new BorderLayout());
+    /**
+     * Creates the editor tab inside the given frame. The tab contains a small column
+     * with the XML files associated with the domain. At the center of the window is
+     * an editor panel to modify the domain.
+     *
+     * @param frame the GUI frame
+     */
+    public EditorTab(GUIFrame frame) {
+        setLayout(new BorderLayout());
 
-		this.frame = frame;
+        this.frame = frame;
 
-		listModel = new DomainFilesModel();
+        listModel = new DomainFilesModel();
 
-		JList<String> listBox = new JList<String>(listModel);
-		listBox.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		ListListener listener = new ListListener();
-		listBox.addListSelectionListener(listener);
-		listBox.setBorder(BorderFactory.createTitledBorder("XML File(s):"));
-		listBox.addMouseListener(frame.new ClickListener());
+        JList<String> listBox = new JList<String>(listModel);
+        listBox.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        ListListener listener = new ListListener();
+        listBox.addListSelectionListener(listener);
+        listBox.setBorder(BorderFactory.createTitledBorder("XML File(s):"));
+        listBox.addMouseListener(frame.new ClickListener());
 
-		editor = new JEditorPane();
-		// Instantiate a XMLEditorKit
-		DomainEditorKit kit = new DomainEditorKit();
-		editor.setEditorKit(kit);
+        editor = new JEditorPane();
+        // Instantiate a XMLEditorKit
+        DomainEditorKit kit = new DomainEditorKit();
+        editor.setEditorKit(kit);
 
-		JScrollPane scroller = new JScrollPane(editor);
+        JScrollPane scroller = new JScrollPane(editor);
 
-		JSplitPane topPanel =
-				new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, listBox, scroller);
-		topPanel.setDividerLocation(200);
+        JSplitPane topPanel =
+                new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, listBox, scroller);
+        topPanel.setDividerLocation(200);
 
-		// Create undo/redo actions and add it to the text component
-		Action undoredo = new UndoRedoAction();
-		editor.getActionMap().put("Undo", undoredo);
-		editor.getActionMap().put("Redo", undoredo);
+        // Create undo/redo actions and add it to the text component
+        Action undoredo = new UndoRedoAction();
+        editor.getActionMap().put("Undo", undoredo);
+        editor.getActionMap().put("Redo", undoredo);
 
-		// Bind the undo and redo actions
-		int mask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-		KeyStroke undoKey = KeyStroke.getKeyStroke(KeyEvent.VK_Z, mask);
-		KeyStroke redoKey = KeyStroke.getKeyStroke(KeyEvent.VK_Y, mask);
-		editor.getInputMap().put(undoKey, "Undo");
-		editor.getInputMap().put(redoKey, "Redo");
+        // Bind the undo and redo actions
+        int mask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        KeyStroke undoKey = KeyStroke.getKeyStroke(KeyEvent.VK_Z, mask);
+        KeyStroke redoKey = KeyStroke.getKeyStroke(KeyEvent.VK_Y, mask);
+        editor.getInputMap().put(undoKey, "Undo");
+        editor.getInputMap().put(redoKey, "Redo");
 
-		add(topPanel);
-		refresh();
+        add(topPanel);
+        refresh();
 
-	}
+    }
 
-	// ===================================
-	// EDITOR UPDATE
-	// ===================================
+    // ===================================
+    // EDITOR UPDATE
+    // ===================================
 
-	/**
-	 * Refreshes the dialogue domain shown in the tab
-	 */
-	public void refresh() {
-		Domain updatedDomain = frame.getSystem().getDomain();
-		if (updatedDomain.isEmpty()) {
-			editor.setEnabled(false);
-			editor.setToolTipText("No dialogue domain is selected");
-		}
-		else {
-			editor.setEnabled(true);
-			editor.setToolTipText(null);
-		}
-		if (listModel.isChanged(updatedDomain)) {
-			listModel.updateDomain(updatedDomain);
-			if (!listModel.isEmpty() && !listModel.containsFile(shownFile)) {
-				shownFile = updatedDomain.getSourceFile();
-				rereadFile();
-			}
-		}
-	}
+    /**
+     * Refreshes the dialogue domain shown in the tab
+     */
+    public void refresh() {
+        Domain updatedDomain = frame.getSystem().getDomain();
+        if (updatedDomain.isEmpty()) {
+            editor.setEnabled(false);
+            editor.setToolTipText("No dialogue domain is selected");
+        } else {
+            editor.setEnabled(true);
+            editor.setToolTipText(null);
+        }
+        if (listModel.isChanged(updatedDomain)) {
+            listModel.updateDomain(updatedDomain);
+            if (!listModel.isEmpty() && !listModel.containsFile(shownFile)) {
+                shownFile = updatedDomain.getSourceFile();
+                rereadFile();
+            }
+        }
+    }
 
-	/**
-	 * Displays a comment as a balloon tip.
-	 * 
-	 * @param msg the message to display
-	 */
-	public void displayComment(String msg) {
-		Color msgColor = (msg.contains("error")) ? new Color(250, 230, 230)
-				: new Color(230, 250, 230);
-		BalloonTipStyle style = new RoundedBalloonStyle(5, 5, msgColor, Color.BLACK);
-		BalloonTip tip = new BalloonTip(frame.getMenu(), msg, style, false);
-		tip.setVisible(true);
-		new Thread(() -> {
-			try {
-				Thread.sleep(2000);
-			}
-			catch (Exception e) {
-			}
-			tip.closeBalloon();
-		}).start();
-	}
+    /**
+     * Displays a comment as a balloon tip.
+     *
+     * @param msg the message to display
+     */
+    public void displayComment(String msg) {
+        Color msgColor = (msg.contains("error")) ? new Color(250, 230, 230)
+                : new Color(230, 250, 230);
+        BalloonTipStyle style = new RoundedBalloonStyle(5, 5, msgColor, Color.BLACK);
+        BalloonTip tip = new BalloonTip(frame.getMenu(), msg, style, false);
+        tip.setVisible(true);
+        new Thread(() -> {
+            try {
+                Thread.sleep(2000);
+            } catch (Exception e) {
+            }
+            tip.closeBalloon();
+        }).start();
+    }
 
-	/**
-	 * Reads the xml file in the object variable 'shownFile' and displays its content
-	 * in the editor pane.
-	 */
-	protected void rereadFile() {
-		try {
-			editor.read(
-					new InputStreamReader(XMLUtils.getXMLDocumentStream(shownFile.getPath()), XMLUtils.XML_CHARSET) // throw RuntimeException
-					, shownFile);
+    /**
+     * Reads the xml file in the object variable 'shownFile' and displays its content
+     * in the editor pane.
+     */
+    protected void rereadFile() {
+        try {
+            editor.read(
+                    new InputStreamReader(XMLUtils.getXMLDocumentStream(shownFile.getPath()), XMLUtils.XML_CHARSET) // throw RuntimeException
+                    , shownFile);
 
-			// Set the font style (default 13).
-			editor.setFont(new Font("Verdana", Font.PLAIN, 13));
+            // Set the font style (default 13).
+            editor.setFont(new Font("Verdana", Font.PLAIN, 13));
 
-			// Set the tab size
-			editor.getDocument().putProperty(PlainDocument.tabSizeAttribute,
-					new Integer(2));
+            // Set the tab size
+            editor.getDocument().putProperty(PlainDocument.tabSizeAttribute,
+                    new Integer(2));
 
-			Document doc = editor.getDocument();
-			doc.addDocumentListener(new XMLListener());
-			doc.addUndoableEditListener(
-					(UndoRedoAction) editor.getActionMap().get("Undo"));
-			editor.requestFocus();
-			editor.requestFocusInWindow();
+            Document doc = editor.getDocument();
+            doc.addDocumentListener(new XMLListener());
+            doc.addUndoableEditListener(
+                    (UndoRedoAction) editor.getActionMap().get("Undo"));
+            editor.requestFocus();
+            editor.requestFocusInWindow();
 
-		}
-		catch (RuntimeException e) {
-			log.severe("cannot open xml file: " + e);
-		} catch (IOException e) {
-			log.severe("cannot read xml file: " + e);
-		}
-	}
+        } catch (RuntimeException e) {
+            log.severe("cannot open xml file: " + e);
+        } catch (IOException e) {
+            log.severe("cannot read xml file: " + e);
+        }
+    }
 
-	/**
-	 * Sets the text in the editor (erasing the previous content).
-	 * 
-	 * @param text the text to write in the editor.
-	 */
-	public void setText(String text) {
-		Document doc = editor.getEditorKit().createDefaultDocument();
-		editor.setDocument(doc);
-		editor.setText(text);
-		frame.setSavedFlag(false);
-	}
+    /**
+     * Sets the text in the editor (erasing the previous content).
+     *
+     * @param text the text to write in the editor.
+     */
+    public void setText(String text) {
+        Document doc = editor.getEditorKit().createDefaultDocument();
+        editor.setDocument(doc);
+        editor.setText(text);
+        frame.setSavedFlag(false);
+    }
 
-	// ===================================
-	// GETTERS
-	// ===================================
+    // ===================================
+    // GETTERS
+    // ===================================
 
-	/**
-	 * Returns the text currently in the editor pane.
-	 * 
-	 * @return the text
-	 */
-	public String getText() {
-		return editor.getText();
-	}
+    /**
+     * Returns the text currently in the editor pane.
+     *
+     * @return the text
+     */
+    public String getText() {
+        return editor.getText();
+    }
 
-	/**
-	 * Returns the file currently shown in the editor pane.
-	 * 
-	 * @return the file object
-	 */
-	public File getShownFile() {
-		return shownFile;
-	}
+    /**
+     * Returns the file currently shown in the editor pane.
+     *
+     * @return the file object
+     */
+    public File getShownFile() {
+        return shownFile;
+    }
 
-	/**
-	 * Returns the files in the left column of the editor tab.
-	 * 
-	 * @return the list of available domain files.
-	 */
-	public List<File> getFiles() {
-		return new ArrayList<File>(listModel.xmlFiles.values());
-	}
+    /**
+     * Returns the files in the left column of the editor tab.
+     *
+     * @return the list of available domain files.
+     */
+    public List<File> getFiles() {
+        return new ArrayList<File>(listModel.xmlFiles.values());
+    }
 
-	// ===================================
-	// HELPER CLASSES
-	// ===================================
+    // ===================================
+    // HELPER CLASSES
+    // ===================================
 
-	/**
-	 * List model containing the domain files (in the left column of the editor tab).
-	 *
-	 */
-	@SuppressWarnings("serial")
-	final class DomainFilesModel extends DefaultListModel<String> {
+    /**
+     * List model containing the domain files (in the left column of the editor tab).
+     */
+    @SuppressWarnings("serial")
+    final class DomainFilesModel extends DefaultListModel<String> {
 
-		// the xml files
-		Map<String, File> xmlFiles;
+        // the xml files
+        Map<String, File> xmlFiles;
 
-		/**
-		 * Creates a empty model
-		 */
-		public DomainFilesModel() {
-			super();
-			xmlFiles = new LinkedHashMap<String, File>();
-		}
+        /**
+         * Creates a empty model
+         */
+        public DomainFilesModel() {
+            super();
+            xmlFiles = new LinkedHashMap<String, File>();
+        }
 
-		/**
-		 * Returns true if the model contains the given file, and false otherwise.
-		 * 
-		 * @param file the file to check
-		 * @return true if the model contains the file, else false
-		 */
-		public boolean containsFile(File file) {
-			return (file == null) ? false : xmlFiles.containsKey(file.getName());
-		}
+        /**
+         * Returns true if the model contains the given file, and false otherwise.
+         *
+         * @param file the file to check
+         * @return true if the model contains the file, else false
+         */
+        public boolean containsFile(File file) {
+            return (file == null) ? false : xmlFiles.containsKey(file.getName());
+        }
 
-		/**
-		 * Returns true if the model needs to be updated given the provided domain,
-		 * and false otherwise
-		 * 
-		 * @param domain the (possibly updated) domain
-		 * @return true if an update is necessary, false otherwise
-		 */
-		public boolean isChanged(Domain domain) {
-			return !xmlFiles.values().contains(domain.getSourceFile())
-					|| !xmlFiles.values().containsAll(domain.getImportedFiles())
-					|| xmlFiles.size() != domain.getImportedFiles().size() + 1;
-		}
+        /**
+         * Returns true if the model needs to be updated given the provided domain,
+         * and false otherwise
+         *
+         * @param domain the (possibly updated) domain
+         * @return true if an update is necessary, false otherwise
+         */
+        public boolean isChanged(Domain domain) {
+            return !xmlFiles.values().contains(domain.getSourceFile())
+                    || !xmlFiles.values().containsAll(domain.getImportedFiles())
+                    || xmlFiles.size() != domain.getImportedFiles().size() + 1;
+        }
 
-		/**
-		 * Updates the model with the updated domain
-		 * 
-		 * @param domain the dialogue domain
-		 */
-		public void updateDomain(Domain domain) {
-			xmlFiles.clear();
-			super.removeAllElements();
-			if (!domain.isEmpty()) {
-				File srcFile = domain.getSourceFile();
-				xmlFiles.put(srcFile.getName(), srcFile);
-				for (File importedFile : domain.getImportedFiles()) {
-					xmlFiles.put(importedFile.getName(), importedFile);
-				}
-				xmlFiles.keySet().stream().forEach(f -> addElement(f));
-			}
-		}
+        /**
+         * Updates the model with the updated domain
+         *
+         * @param domain the dialogue domain
+         */
+        public void updateDomain(Domain domain) {
+            xmlFiles.clear();
+            super.removeAllElements();
+            if (!domain.isEmpty()) {
+                File srcFile = domain.getSourceFile();
+                xmlFiles.put(srcFile.getName(), srcFile);
+                for (File importedFile : domain.getImportedFiles()) {
+                    xmlFiles.put(importedFile.getName(), importedFile);
+                }
+                xmlFiles.keySet().stream().forEach(f -> addElement(f));
+            }
+        }
 
-		/**
-		 * Returns the file at the given index in the domain
-		 * 
-		 * @param index the index in the list
-		 * @return the corresponding file
-		 */
-		public File getFileAt(int index) {
-			String filename = super.getElementAt(index);
-			if (xmlFiles.containsKey(filename)) {
-				return xmlFiles.get(filename);
-			}
-			throw new RuntimeException("file not found in model: " + filename);
-		}
+        /**
+         * Returns the file at the given index in the domain
+         *
+         * @param index the index in the list
+         * @return the corresponding file
+         */
+        public File getFileAt(int index) {
+            String filename = super.getElementAt(index);
+            if (xmlFiles.containsKey(filename)) {
+                return xmlFiles.get(filename);
+            }
+            throw new RuntimeException("file not found in model: " + filename);
+        }
 
-	}
+    }
 
-	/**
-	 * Action class to handle undo/redo operations in the editor pane
-	 *
-	 */
-	@SuppressWarnings("serial")
-	final class UndoRedoAction extends AbstractAction
-			implements UndoableEditListener {
+    /**
+     * Action class to handle undo/redo operations in the editor pane
+     */
+    @SuppressWarnings("serial")
+    final class UndoRedoAction extends AbstractAction
+            implements UndoableEditListener {
 
-		// the undo manager
-		UndoManager undo;
+        // the undo manager
+        UndoManager undo;
 
-		/**
-		 * Creates the action (and an undo manager)
-		 */
-		public UndoRedoAction() {
-			super();
-			undo = new UndoManager();
-		}
+        /**
+         * Creates the action (and an undo manager)
+         */
+        public UndoRedoAction() {
+            super();
+            undo = new UndoManager();
+        }
 
-		/**
-		 * Performs an undo if an undo command was executed, and a redo if a redo
-		 * command was executed
-		 */
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			try {
-				if (e.getActionCommand().equals("z")) {
-					if (undo != null && undo.canUndo()) {
-						undo.undo();
-					}
-				}
-				else if (e.getActionCommand().equals("y")) {
-					if (undo != null && undo.canRedo()) {
-						undo.redo();
-					}
-				}
-			}
-			catch (CannotUndoException | CannotRedoException ex) {
-			}
-		}
+        /**
+         * Performs an undo if an undo command was executed, and a redo if a redo
+         * command was executed
+         */
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                if (e.getActionCommand().equals("z")) {
+                    if (undo != null && undo.canUndo()) {
+                        undo.undo();
+                    }
+                } else if (e.getActionCommand().equals("y")) {
+                    if (undo != null && undo.canRedo()) {
+                        undo.redo();
+                    }
+                }
+            } catch (CannotUndoException | CannotRedoException ex) {
+            }
+        }
 
-		/**
-		 * Performs the edit
-		 */
-		@Override
-		public void undoableEditHappened(UndoableEditEvent e) {
-			undo.addEdit(e.getEdit());
-		}
+        /**
+         * Performs the edit
+         */
+        @Override
+        public void undoableEditHappened(UndoableEditEvent e) {
+            undo.addEdit(e.getEdit());
+        }
 
-	}
+    }
 
-	/**
-	 * Listener for the list of XML files. Refreshes the editor pane with the
-	 * selected file
-	 *
-	 */
-	final class ListListener implements ListSelectionListener {
+    /**
+     * Listener for the list of XML files. Refreshes the editor pane with the
+     * selected file
+     */
+    final class ListListener implements ListSelectionListener {
 
-		@Override
-		public void valueChanged(ListSelectionEvent e) {
-			@SuppressWarnings("unchecked")
-			JList<String> jl = (JList<String>) e.getSource();
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            @SuppressWarnings("unchecked")
+            JList<String> jl = (JList<String>) e.getSource();
 
-			int selected = jl.getSelectedIndex();
-			if (selected >= 0 && !e.getValueIsAdjusting()) {
-				shownFile = listModel.getFileAt(selected);
-				rereadFile();
-			}
-		}
-	}
+            int selected = jl.getSelectedIndex();
+            if (selected >= 0 && !e.getValueIsAdjusting()) {
+                shownFile = listModel.getFileAt(selected);
+                rereadFile();
+            }
+        }
+    }
 
-	/**
-	 * Listener for the document. Set the flag as unsaved if the domain is being
-	 * modified.
-	 */
-	class XMLListener implements DocumentListener {
+    /**
+     * Listener for the document. Set the flag as unsaved if the domain is being
+     * modified.
+     */
+    class XMLListener implements DocumentListener {
 
-		@Override
-		public void insertUpdate(DocumentEvent e) {
-			frame.setSavedFlag(false);
-		}
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            frame.setSavedFlag(false);
+        }
 
-		@Override
-		public void removeUpdate(DocumentEvent e) {
-			frame.setSavedFlag(false);
-		}
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            frame.setSavedFlag(false);
+        }
 
-		@Override
-		public void changedUpdate(DocumentEvent e) {
-		}
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+        }
 
-	}
+    }
 
 }

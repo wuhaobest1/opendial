@@ -3,25 +3,24 @@
 <domain>
 
 
-
-	<model type="update" trigger="u_u">
-
-
-		<rule>
-			<case>
-				<condition>
-					<if var="u_u" value="brilliant" />
-				</condition>
-				<effect prob="exp(-1/(theta_6+theta_7))">
-					<set var="a_u" value="Approval" />
-				</effect>
-				<effect prob="exp(-1/theta_8)">
-					<set var="a_u" value="Irony" />
-				</effect>
-			</case>
-		</rule>
+    <model type="update" trigger="u_u">
 
 
-	</model>
+        <rule>
+            <case>
+                <condition>
+                    <if var="u_u" value="brilliant"/>
+                </condition>
+                <effect prob="exp(-1/(theta_6+theta_7))">
+                    <set var="a_u" value="Approval"/>
+                </effect>
+                <effect prob="exp(-1/theta_8)">
+                    <set var="a_u" value="Irony"/>
+                </effect>
+            </case>
+        </rule>
+
+
+    </model>
 
 </domain>

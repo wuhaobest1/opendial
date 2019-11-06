@@ -73,443 +73,421 @@ import org.xml.sax.helpers.DefaultHandler;
  * Utility functions for manipulating XML content
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public class XMLUtils {
 
-	// logger
-	final static Logger log = Logger.getLogger("OpenDial");
-	
-	public static Charset XML_CHARSET = StandardCharsets.UTF_8;
+    // logger
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	/**
-	 * Opens the XML document stream.
-	 * 
-	 * The XML document could be a real file
-	 *  or a resource in the JAR file. 
-	 * 
-	 * @param filename the filename
-	 * @return the XML document
-	 * @throws RuntimeException if neither the file nor the resource could be found
-	 */
-	public static InputStream getXMLDocumentStream(String filename) {
-		InputStream is = null;
-		if (new File(filename).exists()) {
-			try {
-				is = new FileInputStream(filename);
-			}
-			catch (IOException e) {
-				log.warning(e.getMessage());
-				throw new RuntimeException(e.getMessage());
-			}
-		}
-		else {
-			String resource = toResourcePath(filename);
-			is = XMLUtils.class
-					.getResourceAsStream(resource);
-			if (is == null) {
-				throw new RuntimeException("Resource cannot be found: "+resource+" ("+ filename+")");
-			}
-		}
-		return is;
-	}
+    public static Charset XML_CHARSET = StandardCharsets.UTF_8;
 
-	/**
-	 * Opens the XML document referenced by the filename, and returns it
-	 * 
-	 * @param filename the filename
-	 * @return the XML document
-	 */
-	public static Document getXMLDocument(String filename) {
-		InputStream is = getXMLDocumentStream(filename);
+    /**
+     * Opens the XML document stream.
+     * <p>
+     * The XML document could be a real file
+     * or a resource in the JAR file.
+     *
+     * @param filename the filename
+     * @return the XML document
+     * @throws RuntimeException if neither the file nor the resource could be found
+     */
+    public static InputStream getXMLDocumentStream(String filename) {
+        InputStream is = null;
+        if (new File(filename).exists()) {
+            try {
+                is = new FileInputStream(filename);
+            } catch (IOException e) {
+                log.warning(e.getMessage());
+                throw new RuntimeException(e.getMessage());
+            }
+        } else {
+            String resource = toResourcePath(filename);
+            is = XMLUtils.class
+                    .getResourceAsStream(resource);
+            if (is == null) {
+                throw new RuntimeException("Resource cannot be found: " + resource + " (" + filename + ")");
+            }
+        }
+        return is;
+    }
 
-		return getXMLDocument(new InputSource(new InputStreamReader(is, XML_CHARSET)));
-	}
-	
-	public static String toResourcePath(String filename) {
-			String resource = "/"	// prepend '/' to be an 'absolute' path (i.e. not relative to XMLUtils.class package)
-					+ filename	
-					  .replace("//", "/")	// some resources have the // sequence 
-					  .replace('\\', '/')	// transform windows path into /-path
-					 ;
-			return resource;
-	}
-	
-	public static boolean existResource(String filename) {
-		URL url = XMLUtils.class
-				.getResource(toResourcePath(filename));
-		return url!=null;
-	}
-	
-	
-	
+    /**
+     * Opens the XML document referenced by the filename, and returns it
+     *
+     * @param filename the filename
+     * @return the XML document
+     */
+    public static Document getXMLDocument(String filename) {
+        InputStream is = getXMLDocumentStream(filename);
 
-	/**
-	 * Opens the XML document referenced by the input source, and returns it
-	 * 
-	 * @param is the input source
-	 * @return the XML document
-	 */
-	public static Document getXMLDocument(InputSource is) {
-		log.fine("parsing file: " + is);
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        return getXMLDocument(new InputSource(new InputStreamReader(is, XML_CHARSET)));
+    }
 
-		try {
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			builder.setErrorHandler(new XMLErrorHandler());
-			Document doc = builder.parse(is);
-			// log.info("XML parsing of file: " + filename + " successful!");
-			return doc;
-		}
-		catch (SAXException e) {
-			// log.warning("Reading aborted: \n" + e.getMessage());
-			throw new RuntimeException(e.getMessage());
-		}
-		catch (ParserConfigurationException e) {
-			log.warning(e.getMessage());
-			throw new RuntimeException(e.getMessage());
-		}
-		catch (IOException e) {
-			log.warning(e.getMessage());
-			throw new RuntimeException(e.getMessage());
-		}
-	}
+    public static String toResourcePath(String filename) {
+        String resource = "/"    // prepend '/' to be an 'absolute' path (i.e. not relative to XMLUtils.class package)
+                + filename
+                .replace("//", "/")    // some resources have the // sequence
+                .replace('\\', '/')    // transform windows path into /-path
+                ;
+        return resource;
+    }
 
-	/**
-	 * Serialises the XML node into a string.
-	 * 
-	 * @param node the XML node
-	 * @return the corresponding string
-	 */
-	public static String serialise(Node node) {
-		try {
-			DOMImplementationRegistry registry =
-					DOMImplementationRegistry.newInstance();
-			DOMImplementationLS lsImpl =
-					(DOMImplementationLS) registry.getDOMImplementation("LS");
-			LSSerializer serializer = lsImpl.createLSSerializer();
-			return serializer.writeToString(node);
-		}
-		catch (Exception e) {
-			log.fine("could not serialise XML node: " + e);
-			return "";
-		}
-	}
+    public static boolean existResource(String filename) {
+        URL url = XMLUtils.class
+                .getResource(toResourcePath(filename));
+        return url != null;
+    }
 
-	/**
-	 * Creates a new XML, empty document
-	 * 
-	 * @return the empty XML document
-	 */
-	public static Document newXMLDocument() {
 
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    /**
+     * Opens the XML document referenced by the input source, and returns it
+     *
+     * @param is the input source
+     * @return the XML document
+     */
+    public static Document getXMLDocument(InputSource is) {
+        log.fine("parsing file: " + is);
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
-		try {
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			builder.setErrorHandler(new XMLErrorHandler());
-			Document doc = builder.newDocument();
-			return doc;
-		}
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            builder.setErrorHandler(new XMLErrorHandler());
+            Document doc = builder.parse(is);
+            // log.info("XML parsing of file: " + filename + " successful!");
+            return doc;
+        } catch (SAXException e) {
+            // log.warning("Reading aborted: \n" + e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        } catch (ParserConfigurationException e) {
+            log.warning(e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        } catch (IOException e) {
+            log.warning(e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
+    }
 
-		catch (ParserConfigurationException e) {
-			log.warning(e.getMessage());
-			throw new RuntimeException("cannot create XML file");
-		}
-	}
+    /**
+     * Serialises the XML node into a string.
+     *
+     * @param node the XML node
+     * @return the corresponding string
+     */
+    public static String serialise(Node node) {
+        try {
+            DOMImplementationRegistry registry =
+                    DOMImplementationRegistry.newInstance();
+            DOMImplementationLS lsImpl =
+                    (DOMImplementationLS) registry.getDOMImplementation("LS");
+            LSSerializer serializer = lsImpl.createLSSerializer();
+            return serializer.writeToString(node);
+        } catch (Exception e) {
+            log.fine("could not serialise XML node: " + e);
+            return "";
+        }
+    }
 
-	/**
-	 * Writes the XML document to the particular file specified as argument
-	 * 
-	 * @param doc the document
-	 * @param filename the path to the file in which to write the XML data writing
-	 *            operation fails
-	 */
-	public static void writeXMLDocument(Document doc, String filename) {
-		try {
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			Transformer transformer;
-			transformer = transformerFactory.newTransformer();
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(new File(filename));
-			transformer.transform(source, result);
-			log.fine("writing operation to " + filename + " successful!");
-		}
-		catch (TransformerConfigurationException e) {
-			log.warning(e.getMessage());
-		}
-		catch (TransformerException e) {
-			log.warning(e.getMessage());
-		}
-	}
+    /**
+     * Creates a new XML, empty document
+     *
+     * @return the empty XML document
+     */
+    public static Document newXMLDocument() {
 
-	/**
-	 * Writes the XML document as a raw string
-	 * 
-	 * @param doc the document
-	 */
-	public static String writeXMLString(Document doc) {
-		try {
-			TransformerFactory tf = TransformerFactory.newInstance();
-			Transformer transformer = tf.newTransformer();
-			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			StringWriter writer = new StringWriter();
-			transformer.transform(new DOMSource(doc), new StreamResult(writer));
-			return writer.getBuffer().toString();
-		}
-		catch (TransformerConfigurationException e) {
-			log.warning(e.getMessage());
-		}
-		catch (TransformerException e) {
-			log.warning(e.getMessage());
-		}
-		return "";
-	}
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
-	public static Document loadXMLFromString(String xml)
-			throws ParserConfigurationException, SAXException, IOException {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		InputSource is = new InputSource(new StringReader(xml));
-		return builder.parse(is);
-	}
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            builder.setErrorHandler(new XMLErrorHandler());
+            Document doc = builder.newDocument();
+            return doc;
+        } catch (ParserConfigurationException e) {
+            log.warning(e.getMessage());
+            throw new RuntimeException("cannot create XML file");
+        }
+    }
 
-	/**
-	 * Returns the main node of the XML document
-	 * 
-	 * @param doc the XML document
-	 * @return the main node
-	 */
-	public static Node getMainNode(Document doc) {
-		for (int i = 0; i < doc.getChildNodes().getLength(); i++) {
-			Node node = doc.getChildNodes().item(i);
-			if (!node.getNodeName().equals("#text")
-					&& !node.getNodeName().equals("#comment")) {
-				return node;
-			}
-		}
-		throw new RuntimeException("main node in XML file could not be retrieved");
-	}
+    /**
+     * Writes the XML document to the particular file specified as argument
+     *
+     * @param doc      the document
+     * @param filename the path to the file in which to write the XML data writing
+     *                 operation fails
+     */
+    public static void writeXMLDocument(Document doc, String filename) {
+        try {
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer;
+            transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new File(filename));
+            transformer.transform(source, result);
+            log.fine("writing operation to " + filename + " successful!");
+        } catch (TransformerConfigurationException e) {
+            log.warning(e.getMessage());
+        } catch (TransformerException e) {
+            log.warning(e.getMessage());
+        }
+    }
 
-	/**
-	 * Extract the settings from the XML file.
-	 * 
-	 * @param settingsFile the file containing the settings
-	 * @return the resulting list of properties
-	 */
-	public static Properties extractMapping(String settingsFile) {
-		try {
-			Document doc = XMLUtils.getXMLDocument(settingsFile);
-			Properties mapping = extractMapping(XMLUtils.getMainNode(doc));
-			return mapping;
-		}
-		catch (RuntimeException e) {
-			log.warning("error extracting the settings: " + e);
-			return new Properties();
-		}
-	}
+    /**
+     * Writes the XML document as a raw string
+     *
+     * @param doc the document
+     */
+    public static String writeXMLString(Document doc) {
+        try {
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer = tf.newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            StringWriter writer = new StringWriter();
+            transformer.transform(new DOMSource(doc), new StreamResult(writer));
+            return writer.getBuffer().toString();
+        } catch (TransformerConfigurationException e) {
+            log.warning(e.getMessage());
+        } catch (TransformerException e) {
+            log.warning(e.getMessage());
+        }
+        return "";
+    }
 
-	/**
-	 * Extract the settings from the XML node.
-	 * 
-	 * @param mainNode the XML node containing the settings
-	 * @return the resulting list of properties
-	 */
-	public static Properties extractMapping(Node mainNode) {
+    public static Document loadXMLFromString(String xml)
+            throws ParserConfigurationException, SAXException, IOException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        InputSource is = new InputSource(new StringReader(xml));
+        return builder.parse(is);
+    }
 
-		Properties settings = new Properties();
+    /**
+     * Returns the main node of the XML document
+     *
+     * @param doc the XML document
+     * @return the main node
+     */
+    public static Node getMainNode(Document doc) {
+        for (int i = 0; i < doc.getChildNodes().getLength(); i++) {
+            Node node = doc.getChildNodes().item(i);
+            if (!node.getNodeName().equals("#text")
+                    && !node.getNodeName().equals("#comment")) {
+                return node;
+            }
+        }
+        throw new RuntimeException("main node in XML file could not be retrieved");
+    }
 
-		NodeList firstElements = mainNode.getChildNodes();
-		for (int j = 0; j < firstElements.getLength(); j++) {
+    /**
+     * Extract the settings from the XML file.
+     *
+     * @param settingsFile the file containing the settings
+     * @return the resulting list of properties
+     */
+    public static Properties extractMapping(String settingsFile) {
+        try {
+            Document doc = XMLUtils.getXMLDocument(settingsFile);
+            Properties mapping = extractMapping(XMLUtils.getMainNode(doc));
+            return mapping;
+        } catch (RuntimeException e) {
+            log.warning("error extracting the settings: " + e);
+            return new Properties();
+        }
+    }
 
-			Node node = firstElements.item(j);
+    /**
+     * Extract the settings from the XML node.
+     *
+     * @param mainNode the XML node containing the settings
+     * @return the resulting list of properties
+     */
+    public static Properties extractMapping(Node mainNode) {
 
-			if (!node.getNodeName().equals("#text")
-					&& !node.getNodeName().equals("#comment")) {
-				String propName = node.getNodeName().trim();
-				settings.put(propName, node.getTextContent());
-			}
-		}
+        Properties settings = new Properties();
 
-		return settings;
-	}
+        NodeList firstElements = mainNode.getChildNodes();
+        for (int j = 0; j < firstElements.getLength(); j++) {
 
-	/**
-	 * Validates a XML document containing a specification of a dialogue domain.
-	 * Returns true if the XML document is valid, false otherwise.
-	 * 
-	 * @param dialSpecs the domain file
-	 * @param schemaFile the schema file
-	 * @return true if document is validated, false otherwise when parsing XML
-	 */
-	public static boolean validateXML(String dialSpecs, String schemaFile) {
+            Node node = firstElements.item(j);
 
-		log.fine("Checking the validation of file " + dialSpecs
-				+ " against XML schema " + schemaFile + "...");
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            if (!node.getNodeName().equals("#text")
+                    && !node.getNodeName().equals("#comment")) {
+                String propName = node.getNodeName().trim();
+                settings.put(propName, node.getTextContent());
+            }
+        }
 
-		try {
-			SchemaFactory schema =
-					SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
-			factory.setSchema(
-					schema.newSchema(new Source[] { new StreamSource(schemaFile) }));
-			DocumentBuilder builder = factory.newDocumentBuilder();
+        return settings;
+    }
 
-			try {
-				builder.setErrorHandler(new XMLErrorHandler());
-				Document doc = builder.parse(new InputSource(dialSpecs));
-				log.fine("XML parsing of file: " + dialSpecs + " successful!");
+    /**
+     * Validates a XML document containing a specification of a dialogue domain.
+     * Returns true if the XML document is valid, false otherwise.
+     *
+     * @param dialSpecs  the domain file
+     * @param schemaFile the schema file
+     * @return true if document is validated, false otherwise when parsing XML
+     */
+    public static boolean validateXML(String dialSpecs, String schemaFile) {
 
-				// extracting included files, and validating them as well
-				String rootpath =
-						dialSpecs.substring(0, dialSpecs.lastIndexOf("//") + 1);
-				Vector<String> includedFiles = extractIncludedFiles(doc);
-				for (String file : includedFiles) {
-					boolean validation = validateXML(rootpath + file, schemaFile);
-					if (!validation) {
-						return false;
-					}
-				}
-			}
-			catch (Exception e) {
-				throw new RuntimeException(e.getMessage());
-			}
-			return true;
-		}
-		catch (SAXException e) {
-			log.warning("Validation aborted: \n" + e.getMessage());
-			return false;
-		}
-		catch (ParserConfigurationException e) {
-			log.warning(e.getMessage());
-			return false;
-		}
-	}
+        log.fine("Checking the validation of file " + dialSpecs
+                + " against XML schema " + schemaFile + "...");
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
-	/**
-	 * Extract included filenames in the XML document, assuming that filenames are
-	 * provided with the attribute "href".
-	 * 
-	 * @param xmlDocument the XML document
-	 * @return the filenames to include
-	 */
-	private static Vector<String> extractIncludedFiles(Document xmlDocument) {
+        try {
+            SchemaFactory schema =
+                    SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+            factory.setSchema(
+                    schema.newSchema(new Source[]{new StreamSource(schemaFile)}));
+            DocumentBuilder builder = factory.newDocumentBuilder();
 
-		Vector<String> includedFiles = new Vector<String>();
+            try {
+                builder.setErrorHandler(new XMLErrorHandler());
+                Document doc = builder.parse(new InputSource(dialSpecs));
+                log.fine("XML parsing of file: " + dialSpecs + " successful!");
 
-		NodeList top = xmlDocument.getChildNodes();
-		for (int i = 0; i < top.getLength(); i++) {
-			Node topNode = top.item(i);
-			NodeList firstElements = topNode.getChildNodes();
-			for (int j = 0; j < firstElements.getLength(); j++) {
-				Node midNode = firstElements.item(j);
-				for (int k = 0; k < midNode.getChildNodes().getLength(); k++) {
-					Node node = midNode.getChildNodes().item(k);
-					if (node.hasAttributes()
-							&& node.getAttributes().getNamedItem("href") != null) {
-						String fileName = node.getAttributes().getNamedItem("href")
-								.getNodeValue();
-						includedFiles.add(fileName);
-					}
-				}
+                // extracting included files, and validating them as well
+                String rootpath =
+                        dialSpecs.substring(0, dialSpecs.lastIndexOf("//") + 1);
+                Vector<String> includedFiles = extractIncludedFiles(doc);
+                for (String file : includedFiles) {
+                    boolean validation = validateXML(rootpath + file, schemaFile);
+                    if (!validation) {
+                        return false;
+                    }
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage());
+            }
+            return true;
+        } catch (SAXException e) {
+            log.warning("Validation aborted: \n" + e.getMessage());
+            return false;
+        } catch (ParserConfigurationException e) {
+            log.warning(e.getMessage());
+            return false;
+        }
+    }
 
-			}
-		}
-		return includedFiles;
-	}
+    /**
+     * Extract included filenames in the XML document, assuming that filenames are
+     * provided with the attribute "href".
+     *
+     * @param xmlDocument the XML document
+     * @return the filenames to include
+     */
+    private static Vector<String> extractIncludedFiles(Document xmlDocument) {
 
-	/**
-	 * Imports a dialogue state or prior parameter distributions.
-	 * 
-	 * @param system the dialogue system
-	 * @param file the file that contains the state or parameter content
-	 * @param tag the expected top XML tag. into the system
-	 */
-	public static void importContent(DialogueSystem system, String file,
-			String tag) {
-		if (tag.equals("parameters")) {
-			BNetwork parameters = XMLStateReader.extractBayesianNetwork(file, tag);
-			for (String oldParam : system.getState().getParameterIds()) {
-				if (!parameters.hasChanceNode(oldParam)) {
-					parameters.addNode(system.getState().getChanceNode(oldParam));
-				}
-			}
-			system.getState().setParameters(parameters);
-		}
-		else {
-			BNetwork state = XMLStateReader.extractBayesianNetwork(file, tag);
-			system.addContent(new DialogueState(state));
-		}
-	}
+        Vector<String> includedFiles = new Vector<String>();
 
-	/**
-	 * Exports a dialogue state or prior parameter distributions.
-	 * 
-	 * @param system the dialogue system
-	 * @param file the file in which to write the state or parameter content
-	 * @param tag the expected top XML tag. from the system
-	 */
-	public static void exportContent(DialogueSystem system, String file,
-			String tag) {
-		Document doc = XMLUtils.newXMLDocument();
+        NodeList top = xmlDocument.getChildNodes();
+        for (int i = 0; i < top.getLength(); i++) {
+            Node topNode = top.item(i);
+            NodeList firstElements = topNode.getChildNodes();
+            for (int j = 0; j < firstElements.getLength(); j++) {
+                Node midNode = firstElements.item(j);
+                for (int k = 0; k < midNode.getChildNodes().getLength(); k++) {
+                    Node node = midNode.getChildNodes().item(k);
+                    if (node.hasAttributes()
+                            && node.getAttributes().getNamedItem("href") != null) {
+                        String fileName = node.getAttributes().getNamedItem("href")
+                                .getNodeValue();
+                        includedFiles.add(fileName);
+                    }
+                }
 
-		Set<String> parameterIds =
-				new HashSet<String>(system.getState().getParameterIds());
-		Set<String> otherVarsIds =
-				new HashSet<String>(system.getState().getChanceNodeIds());
-		otherVarsIds.removeAll(parameterIds);
-		Set<String> variables =
-				(tag.equals("parameters")) ? parameterIds : otherVarsIds;
-		Node paramXML = system.getState().generateXML(doc, variables);
-		doc.renameNode(paramXML, null, tag);
-		doc.appendChild(paramXML);
-		XMLUtils.writeXMLDocument(doc, file);
-	}
+            }
+        }
+        return includedFiles;
+    }
 
-	/**
-	 * Returns true if the node has some actual content (other than a comment or an
-	 * empty text).
-	 * 
-	 * @param node the XML node
-	 * @return true if the node contains information, false otherwise
-	 */
-	public static boolean hasContent(Node node) {
-		if (node.getNodeName().equals("#comment")) {
-			return false;
-		}
-		else if (node.getNodeName().equals("#text")) {
-			return !node.getNodeValue().trim().isEmpty();
-		}
-		return true;
-	}
+    /**
+     * Imports a dialogue state or prior parameter distributions.
+     *
+     * @param system the dialogue system
+     * @param file   the file that contains the state or parameter content
+     * @param tag    the expected top XML tag. into the system
+     */
+    public static void importContent(DialogueSystem system, String file,
+                                     String tag) {
+        if (tag.equals("parameters")) {
+            BNetwork parameters = XMLStateReader.extractBayesianNetwork(file, tag);
+            for (String oldParam : system.getState().getParameterIds()) {
+                if (!parameters.hasChanceNode(oldParam)) {
+                    parameters.addNode(system.getState().getChanceNode(oldParam));
+                }
+            }
+            system.getState().setParameters(parameters);
+        } else {
+            BNetwork state = XMLStateReader.extractBayesianNetwork(file, tag);
+            system.addContent(new DialogueState(state));
+        }
+    }
+
+    /**
+     * Exports a dialogue state or prior parameter distributions.
+     *
+     * @param system the dialogue system
+     * @param file   the file in which to write the state or parameter content
+     * @param tag    the expected top XML tag. from the system
+     */
+    public static void exportContent(DialogueSystem system, String file,
+                                     String tag) {
+        Document doc = XMLUtils.newXMLDocument();
+
+        Set<String> parameterIds =
+                new HashSet<String>(system.getState().getParameterIds());
+        Set<String> otherVarsIds =
+                new HashSet<String>(system.getState().getChanceNodeIds());
+        otherVarsIds.removeAll(parameterIds);
+        Set<String> variables =
+                (tag.equals("parameters")) ? parameterIds : otherVarsIds;
+        Node paramXML = system.getState().generateXML(doc, variables);
+        doc.renameNode(paramXML, null, tag);
+        doc.appendChild(paramXML);
+        XMLUtils.writeXMLDocument(doc, file);
+    }
+
+    /**
+     * Returns true if the node has some actual content (other than a comment or an
+     * empty text).
+     *
+     * @param node the XML node
+     * @return true if the node contains information, false otherwise
+     */
+    public static boolean hasContent(Node node) {
+        if (node.getNodeName().equals("#comment")) {
+            return false;
+        } else if (node.getNodeName().equals("#text")) {
+            return !node.getNodeValue().trim().isEmpty();
+        }
+        return true;
+    }
 }
 
 /**
  * Small error handler for XML syntax errors.
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 final class XMLErrorHandler extends DefaultHandler {
 
-	final static Logger log = Logger.getLogger("OpenDial");
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	@Override
-	public void error(SAXParseException e) throws SAXParseException {
-		log.warning("Parsing error: " + e.getMessage());
-		throw e;
-	}
+    @Override
+    public void error(SAXParseException e) throws SAXParseException {
+        log.warning("Parsing error: " + e.getMessage());
+        throw e;
+    }
 
-	@Override
-	public void warning(SAXParseException e) {
-		log.warning("Parsing problem: " + e.getMessage());
-	}
+    @Override
+    public void warning(SAXParseException e) {
+        log.warning("Parsing problem: " + e.getMessage());
+    }
 
-	@Override
-	public void fatalError(SAXParseException e) {
-		log.severe("Fatal error: " + e.getMessage());
-	}
+    @Override
+    public void fatalError(SAXParseException e) {
+        log.severe("Fatal error: " + e.getMessage());
+    }
 
 }

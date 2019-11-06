@@ -34,77 +34,76 @@ import java.util.Collection;
  * <li>concatenated with another value.
  * </ol>
  * .
- * 
+ *
  * <p>
  * <b>IMPORTANT</b>: all implementations of Value <i>must</i> implement the three
  * core methods equals(Object o), toString() and hashCode().
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public interface Value extends Comparable<Value> {
 
-	/**
-	 * Copies the value
-	 * 
-	 * @return the value
-	 */
-	public Value copy();
+    /**
+     * Copies the value
+     *
+     * @return the value
+     */
+    public Value copy();
 
-	/**
-	 * Return true if the value contains the value given as argument
-	 * 
-	 * @param subvalue the value to check for inclusion
-	 * @return true if the value is contained, false otherwise
-	 */
-	public boolean contains(Value subvalue);
+    /**
+     * Return true if the value contains the value given as argument
+     *
+     * @param subvalue the value to check for inclusion
+     * @return true if the value is contained, false otherwise
+     */
+    public boolean contains(Value subvalue);
 
-	/**
-	 * If the value is a container for other values, returns the collection of
-	 * contained values. Else, returns an empty set.
-	 * 
-	 * @return the collection of values inside the present value
-	 */
-	public Collection<Value> getSubValues();
+    /**
+     * If the value is a container for other values, returns the collection of
+     * contained values. Else, returns an empty set.
+     *
+     * @return the collection of values inside the present value
+     */
+    public Collection<Value> getSubValues();
 
-	/**
-	 * Returns a value that is the concatenation of the two values
-	 * 
-	 * @param value the value to concatenate with the current one
-	 * @return the concatenated result
-	 */
-	public Value concatenate(Value value);
+    /**
+     * Returns a value that is the concatenation of the two values
+     *
+     * @param value the value to concatenate with the current one
+     * @return the concatenated result
+     */
+    public Value concatenate(Value value);
 
-	/**
-	 * Returns the length of the value
-	 * 
-	 * @return the value length
-	 */
-	public int length();
+    /**
+     * Returns the length of the value
+     *
+     * @return the value length
+     */
+    public int length();
 
-	/**
-	 * Returns the hash code for the value
-	 * 
-	 * @return the hash code
-	 */
-	@Override
-	public int hashCode();
+    /**
+     * Returns the hash code for the value
+     *
+     * @return the hash code
+     */
+    @Override
+    public int hashCode();
 
-	/**
-	 * Returns the string representation of the value
-	 * 
-	 * @return the string representation
-	 */
-	@Override
-	public String toString();
+    /**
+     * Returns the string representation of the value
+     *
+     * @return the string representation
+     */
+    @Override
+    public String toString();
 
-	/**
-	 * Returns true if o and the current object are equal, and false otherwise
-	 * 
-	 * @param o the other to compare
-	 * @return true if this==o, false otherwise
-	 */
-	@Override
-	public boolean equals(Object o);
+    /**
+     * Returns true if o and the current object are equal, and false otherwise
+     *
+     * @param o the other to compare
+     * @return true if this==o, false otherwise
+     */
+    @Override
+    public boolean equals(Object o);
 
 }

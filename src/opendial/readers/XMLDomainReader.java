@@ -48,222 +48,215 @@ import org.w3c.dom.NodeList;
  * XML reader for dialogue domains.
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public class XMLDomainReader {
 
-	final static Logger log = Logger.getLogger("OpenDial");
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	// ===================================
-	// TOP DOMAIN
-	// ===================================
+    // ===================================
+    // TOP DOMAIN
+    // ===================================
 
-	/**
-	 * Extract a dialogue domain from the XML specification
-	 * 
-	 * @param topDomainFile the filename of the top XML file
-	 * @return the extracted dialogue domain
-	 */
+    /**
+     * Extract a dialogue domain from the XML specification
+     *
+     * @param topDomainFile the filename of the top XML file
+     * @return the extracted dialogue domain
+     */
 
-	public static Domain extractDomain(String topDomainFile) {
-		return extractDomain(topDomainFile, true);
+    public static Domain extractDomain(String topDomainFile) {
+        return extractDomain(topDomainFile, true);
 
-	}
+    }
 
-	/**
-	 * Extract a empty domain from the XML domain specification, only setting the
-	 * source file and its possible imports. This method is used to be able to
-	 * extract the source and import files in case the domain is ill-formed. You can
-	 * usually safely ignore this method.
-	 * 
-	 * @param topDomainFile the filename of the top XML file
-	 * @return the extracted dialogue domain
-	 */
-	public static Domain extractEmptyDomain(String topDomainFile) {
-		return extractDomain(topDomainFile, false);
-	}
+    /**
+     * Extract a empty domain from the XML domain specification, only setting the
+     * source file and its possible imports. This method is used to be able to
+     * extract the source and import files in case the domain is ill-formed. You can
+     * usually safely ignore this method.
+     *
+     * @param topDomainFile the filename of the top XML file
+     * @return the extracted dialogue domain
+     */
+    public static Domain extractEmptyDomain(String topDomainFile) {
+        return extractDomain(topDomainFile, false);
+    }
 
-	/**
-	 * Extract a dialogue domain from the XML specification
-	 * 
-	 * @param topDomainFile the filename of the top XML file
-	 * @param fullExtract whether to extract the full domain or only the files
-	 * @return the extracted dialogue domain
-	 */
-	private static Domain extractDomain(String topDomainFile, boolean fullExtract) {
+    /**
+     * Extract a dialogue domain from the XML specification
+     *
+     * @param topDomainFile the filename of the top XML file
+     * @param fullExtract   whether to extract the full domain or only the files
+     * @return the extracted dialogue domain
+     */
+    private static Domain extractDomain(String topDomainFile, boolean fullExtract) {
 
-		// create a new, empty domain
-		Domain domain = new Domain();
+        // create a new, empty domain
+        Domain domain = new Domain();
 
-		// determine the root path and filename
-		File f = new File(topDomainFile);
-		domain.setSourceFile(f);
+        // determine the root path and filename
+        File f = new File(topDomainFile);
+        domain.setSourceFile(f);
 
-		// extract the XML document
-		try {
-			Document doc = XMLUtils.getXMLDocument(topDomainFile);
+        // extract the XML document
+        try {
+            Document doc = XMLUtils.getXMLDocument(topDomainFile);
 
-			Node mainNode = XMLUtils.getMainNode(doc);
+            Node mainNode = XMLUtils.getMainNode(doc);
 
-			String rootpath = f.getParent();
+            String rootpath = f.getParent();
 
-			NodeList firstElements = mainNode.getChildNodes();
-			for (int j = 0; j < firstElements.getLength(); j++) {
+            NodeList firstElements = mainNode.getChildNodes();
+            for (int j = 0; j < firstElements.getLength(); j++) {
 
-				Node node = firstElements.item(j);
-				domain = extractPartialDomain(node, domain, rootpath, fullExtract);
-			}
-		}
-		catch (RuntimeException e) {
-			if (fullExtract) {
-				throw e;
-			}
-		}
-		return domain;
-	}
+                Node node = firstElements.item(j);
+                domain = extractPartialDomain(node, domain, rootpath, fullExtract);
+            }
+        } catch (RuntimeException e) {
+            if (fullExtract) {
+                throw e;
+            }
+        }
+        return domain;
+    }
 
-	/**
-	 * Extracts a partially specified domain from the XML node and add its content to
-	 * the dialogue domain.
-	 * 
-	 * @param mainNode main XML node
-	 * @param domain dialogue domain
-	 * @param rootpath rooth path (necessary to handle references)
-	 * @param fullExtract whether to extract the full domain or only the files
-	 * 
-	 * @return the augmented dialogue domain
-	 */
-	private static Domain extractPartialDomain(Node mainNode, Domain domain,
-			String rootpath, boolean fullExtract) {
+    /**
+     * Extracts a partially specified domain from the XML node and add its content to
+     * the dialogue domain.
+     *
+     * @param mainNode    main XML node
+     * @param domain      dialogue domain
+     * @param rootpath    rooth path (necessary to handle references)
+     * @param fullExtract whether to extract the full domain or only the files
+     * @return the augmented dialogue domain
+     */
+    private static Domain extractPartialDomain(Node mainNode, Domain domain,
+                                               String rootpath, boolean fullExtract) {
 
-		// extracting rule-based probabilistic model
-		if (mainNode.getNodeName().equals("domain")) {
+        // extracting rule-based probabilistic model
+        if (mainNode.getNodeName().equals("domain")) {
 
-			NodeList firstElements = mainNode.getChildNodes();
-			for (int j = 0; j < firstElements.getLength(); j++) {
-				Node node = firstElements.item(j);
-				domain = extractPartialDomain(node, domain, rootpath, fullExtract);
-			}
-		}
+            NodeList firstElements = mainNode.getChildNodes();
+            for (int j = 0; j < firstElements.getLength(); j++) {
+                Node node = firstElements.item(j);
+                domain = extractPartialDomain(node, domain, rootpath, fullExtract);
+            }
+        }
 
-		// extracting settings
-		else if (fullExtract && mainNode.getNodeName().equals("settings")) {
-			Properties settings = XMLUtils.extractMapping(mainNode);
-			domain.getSettings().fillSettings(settings);
-		}
-		// extracting custom functions
-		else if (fullExtract && mainNode.getNodeName().equals("function")
-				&& mainNode.getAttributes().getNamedItem("name") != null) {
-			String name =
-					mainNode.getAttributes().getNamedItem("name").getNodeValue();
-			String functionStr = mainNode.getTextContent().trim();
-			try {
-				Class<?> clazz = Class.forName(functionStr);
-				@SuppressWarnings("unchecked")
-				Function<List<String>, Value> f =
-						(Function<List<String>, Value>) clazz.newInstance();
-				domain.getSettings();
-				Settings.addFunction(name, f);
-			}
-			catch (Exception e) {
-				log.warning("cannot load function : " + e);
-			}
-		}
+        // extracting settings
+        else if (fullExtract && mainNode.getNodeName().equals("settings")) {
+            Properties settings = XMLUtils.extractMapping(mainNode);
+            domain.getSettings().fillSettings(settings);
+        }
+        // extracting custom functions
+        else if (fullExtract && mainNode.getNodeName().equals("function")
+                && mainNode.getAttributes().getNamedItem("name") != null) {
+            String name =
+                    mainNode.getAttributes().getNamedItem("name").getNodeValue();
+            String functionStr = mainNode.getTextContent().trim();
+            try {
+                Class<?> clazz = Class.forName(functionStr);
+                @SuppressWarnings("unchecked")
+                Function<List<String>, Value> f =
+                        (Function<List<String>, Value>) clazz.newInstance();
+                domain.getSettings();
+                Settings.addFunction(name, f);
+            } catch (Exception e) {
+                log.warning("cannot load function : " + e);
+            }
+        }
 
-		// extracting initial state
-		else if (fullExtract && mainNode.getNodeName().equals("initialstate")) {
-			BNetwork state = XMLStateReader.getBayesianNetwork(mainNode);
-			domain.setInitialState(new DialogueState(state));
-			// log.fine(state);
-		}
+        // extracting initial state
+        else if (fullExtract && mainNode.getNodeName().equals("initialstate")) {
+            BNetwork state = XMLStateReader.getBayesianNetwork(mainNode);
+            domain.setInitialState(new DialogueState(state));
+            // log.fine(state);
+        }
 
-		// extracting rule-based probabilistic model
-		else if (fullExtract && mainNode.getNodeName().equals("model")) {
-			Model model = createModel(mainNode);
-			// log.fine(model);
-			domain.addModel(model);
-		}
+        // extracting rule-based probabilistic model
+        else if (fullExtract && mainNode.getNodeName().equals("model")) {
+            Model model = createModel(mainNode);
+            // log.fine(model);
+            domain.addModel(model);
+        }
 
-		// extracting parameters
-		else if (fullExtract && mainNode.getNodeName().equals("parameters")) {
-			BNetwork parameters = XMLStateReader.getBayesianNetwork(mainNode);
-			domain.setParameters(parameters);
-		}
+        // extracting parameters
+        else if (fullExtract && mainNode.getNodeName().equals("parameters")) {
+            BNetwork parameters = XMLStateReader.getBayesianNetwork(mainNode);
+            domain.setParameters(parameters);
+        }
 
-		// extracting imported references
-		else if (mainNode.getNodeName().equals("import") && mainNode.hasAttributes()
-				&& mainNode.getAttributes().getNamedItem("href") != null) {
+        // extracting imported references
+        else if (mainNode.getNodeName().equals("import") && mainNode.hasAttributes()
+                && mainNode.getAttributes().getNamedItem("href") != null) {
 
-			String fileName =
-					mainNode.getAttributes().getNamedItem("href").getNodeValue();
-			String filepath = rootpath==null? fileName : rootpath + File.separator + fileName;
-			domain.addImportedFiles(new File(filepath));
-			Document subdoc = XMLUtils.getXMLDocument(filepath);
-			domain = extractPartialDomain(XMLUtils.getMainNode(subdoc), domain,
-					rootpath, fullExtract);
-		}
-		else if (fullExtract && XMLUtils.hasContent(mainNode)) {
-			if (mainNode.getNodeName().equals("#text")) {
-				throw new RuntimeException("cannot insert free text in <domain>");
-			}
-			throw new RuntimeException(
-					"Invalid tag in <domain>: " + mainNode.getNodeName());
-		}
+            String fileName =
+                    mainNode.getAttributes().getNamedItem("href").getNodeValue();
+            String filepath = rootpath == null ? fileName : rootpath + File.separator + fileName;
+            domain.addImportedFiles(new File(filepath));
+            Document subdoc = XMLUtils.getXMLDocument(filepath);
+            domain = extractPartialDomain(XMLUtils.getMainNode(subdoc), domain,
+                    rootpath, fullExtract);
+        } else if (fullExtract && XMLUtils.hasContent(mainNode)) {
+            if (mainNode.getNodeName().equals("#text")) {
+                throw new RuntimeException("cannot insert free text in <domain>");
+            }
+            throw new RuntimeException(
+                    "Invalid tag in <domain>: " + mainNode.getNodeName());
+        }
 
-		return domain;
-	}
+        return domain;
+    }
 
-	/**
-	 * Given an XML node, extracts the rule-based model that corresponds to it.
-	 * 
-	 * @param topNode the XML node
-	 * @return the corresponding model
-	 */
-	private static Model createModel(Node topNode) {
-		Model model = new Model();
-		for (int i = 0; i < topNode.getChildNodes().getLength(); i++) {
-			Node node = topNode.getChildNodes().item(i);
-			if (node.getNodeName().equals("rule")) {
-				Rule rule = XMLRuleReader.getRule(node);
-				model.addRule(rule);
-			}
-			else if (XMLUtils.hasContent(node)) {
-				if (node.getNodeName().equals("#text")) {
-					throw new RuntimeException("cannot insert free text in <model>");
-				}
-				throw new RuntimeException(
-						"Invalid tag in <model>: " + node.getNodeName());
-			}
-		}
+    /**
+     * Given an XML node, extracts the rule-based model that corresponds to it.
+     *
+     * @param topNode the XML node
+     * @return the corresponding model
+     */
+    private static Model createModel(Node topNode) {
+        Model model = new Model();
+        for (int i = 0; i < topNode.getChildNodes().getLength(); i++) {
+            Node node = topNode.getChildNodes().item(i);
+            if (node.getNodeName().equals("rule")) {
+                Rule rule = XMLRuleReader.getRule(node);
+                model.addRule(rule);
+            } else if (XMLUtils.hasContent(node)) {
+                if (node.getNodeName().equals("#text")) {
+                    throw new RuntimeException("cannot insert free text in <model>");
+                }
+                throw new RuntimeException(
+                        "Invalid tag in <model>: " + node.getNodeName());
+            }
+        }
 
-		if (topNode.hasAttributes()
-				&& topNode.getAttributes().getNamedItem("trigger") != null) {
-			Pattern p = Pattern.compile("([\\w\\*\\^_\\-\\[\\]\\{\\}]+"
-					+ "(?:\\([\\w\\*,\\s\\^_\\-\\[\\]\\{\\}]+\\))?)"
-					+ "[\\w\\*\\^_\\-\\[\\]\\{\\}]*");
-			Matcher m = p.matcher(
-					topNode.getAttributes().getNamedItem("trigger").getNodeValue());
-			while (m.find()) {
-				model.addTrigger(m.group());
-			}
-		}
-		else {
-			throw new RuntimeException("<model> must have a 'trigger' attribute:"
-					+ XMLUtils.serialise(topNode));
-		}
+        if (topNode.hasAttributes()
+                && topNode.getAttributes().getNamedItem("trigger") != null) {
+            Pattern p = Pattern.compile("([\\w\\*\\^_\\-\\[\\]\\{\\}]+"
+                    + "(?:\\([\\w\\*,\\s\\^_\\-\\[\\]\\{\\}]+\\))?)"
+                    + "[\\w\\*\\^_\\-\\[\\]\\{\\}]*");
+            Matcher m = p.matcher(
+                    topNode.getAttributes().getNamedItem("trigger").getNodeValue());
+            while (m.find()) {
+                model.addTrigger(m.group());
+            }
+        } else {
+            throw new RuntimeException("<model> must have a 'trigger' attribute:"
+                    + XMLUtils.serialise(topNode));
+        }
 
-		if (topNode.getAttributes().getNamedItem("blocking") != null) {
-			boolean blocking = Boolean.parseBoolean(
-					topNode.getAttributes().getNamedItem("blocking").getNodeValue());
-			model.setBlocking(blocking);
-		}
+        if (topNode.getAttributes().getNamedItem("blocking") != null) {
+            boolean blocking = Boolean.parseBoolean(
+                    topNode.getAttributes().getNamedItem("blocking").getNodeValue());
+            model.setBlocking(blocking);
+        }
 
-		if (topNode.getAttributes().getNamedItem("id") != null) {
-			String id = topNode.getAttributes().getNamedItem("id").getNodeValue();
-			model.setId(id);
-		}
+        if (topNode.getAttributes().getNamedItem("id") != null) {
+            String id = topNode.getAttributes().getNamedItem("id").getNodeValue();
+            model.setId(id);
+        }
 
-		return model;
-	}
+        return model;
+    }
 
 }

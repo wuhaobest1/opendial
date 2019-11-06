@@ -36,116 +36,115 @@ import opendial.templates.Template;
  * Negated condition, which is satisfied when the included condition is not.
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public final class NegatedCondition implements Condition {
 
-	// logger
-	final static Logger log = Logger.getLogger("OpenDial");
+    // logger
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	// condition to negate
-	final Condition initCondition;
+    // condition to negate
+    final Condition initCondition;
 
-	// ===================================
-	// CONDITION CONSTRUCTIOn
-	// ===================================
+    // ===================================
+    // CONDITION CONSTRUCTIOn
+    // ===================================
 
-	/**
-	 * Creates a new negated condition with the condition provided as argument
-	 * 
-	 * @param initCondition the condition to negate
-	 */
-	public NegatedCondition(Condition initCondition) {
-		this.initCondition = initCondition;
-	}
+    /**
+     * Creates a new negated condition with the condition provided as argument
+     *
+     * @param initCondition the condition to negate
+     */
+    public NegatedCondition(Condition initCondition) {
+        this.initCondition = initCondition;
+    }
 
-	// ===================================
-	// GETTERS
-	// ===================================
+    // ===================================
+    // GETTERS
+    // ===================================
 
-	/**
-	 * Returns the input variables for the condition (which are the same as the ones
-	 * for the condition to negate)
-	 * 
-	 * @return the input variables
-	 */
-	@Override
-	public Collection<Template> getInputVariables() {
-		return initCondition.getInputVariables();
-	}
+    /**
+     * Returns the input variables for the condition (which are the same as the ones
+     * for the condition to negate)
+     *
+     * @return the input variables
+     */
+    @Override
+    public Collection<Template> getInputVariables() {
+        return initCondition.getInputVariables();
+    }
 
-	@Override
-	public RuleGrounding getGroundings(Assignment input) {
-		RuleGrounding g = initCondition.getGroundings(input);
-		g = (g.isFailed()) ? new RuleGrounding() : g;
-		return g;
-	}
+    @Override
+    public RuleGrounding getGroundings(Assignment input) {
+        RuleGrounding g = initCondition.getGroundings(input);
+        g = (g.isFailed()) ? new RuleGrounding() : g;
+        return g;
+    }
 
-	/**
-	 * Returns true if the condition to negate is *not* satisfied, and false if it is
-	 * satisfied
-	 * 
-	 * @param input the input assignment to verify
-	 * @return true if the included condition is false, and vice versa
-	 */
-	@Override
-	public boolean isSatisfiedBy(Assignment input) {
-		return !initCondition.isSatisfiedBy(input);
-	}
+    /**
+     * Returns true if the condition to negate is *not* satisfied, and false if it is
+     * satisfied
+     *
+     * @param input the input assignment to verify
+     * @return true if the included condition is false, and vice versa
+     */
+    @Override
+    public boolean isSatisfiedBy(Assignment input) {
+        return !initCondition.isSatisfiedBy(input);
+    }
 
-	/**
-	 * Returns the condition to negate
-	 * 
-	 * @return the condition to negate
-	 */
-	public Condition getInitCondition() {
-		return initCondition;
-	}
+    /**
+     * Returns the condition to negate
+     *
+     * @return the condition to negate
+     */
+    public Condition getInitCondition() {
+        return initCondition;
+    }
 
-	/**
-	 * Returns the list of slots in the condition
-	 * 
-	 * @return the list of slots
-	 */
-	@Override
-	public Set<String> getSlots() {
-		return initCondition.getSlots();
-	}
+    /**
+     * Returns the list of slots in the condition
+     *
+     * @return the list of slots
+     */
+    @Override
+    public Set<String> getSlots() {
+        return initCondition.getSlots();
+    }
 
-	// ===================================
-	// UTILITY FUNCTIONS
-	// ===================================
+    // ===================================
+    // UTILITY FUNCTIONS
+    // ===================================
 
-	/**
-	 * Returns the hashcode for the condition
-	 * 
-	 * @return the hashcode
-	 */
-	@Override
-	public int hashCode() {
-		return -initCondition.hashCode();
-	}
+    /**
+     * Returns the hashcode for the condition
+     *
+     * @return the hashcode
+     */
+    @Override
+    public int hashCode() {
+        return -initCondition.hashCode();
+    }
 
-	/**
-	 * Returns the string representation of the condition
-	 */
-	@Override
-	public String toString() {
-		return "!" + initCondition.toString();
-	}
+    /**
+     * Returns the string representation of the condition
+     */
+    @Override
+    public String toString() {
+        return "!" + initCondition.toString();
+    }
 
-	/**
-	 * Returns true if the current instance and the object are identical, and false
-	 * otherwise
-	 *
-	 * @param o the object to compare
-	 * @return true if equal, false otherwise
-	 */
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof NegatedCondition) {
-			return ((NegatedCondition) o).getInitCondition().equals(initCondition);
-		}
-		return false;
-	}
+    /**
+     * Returns true if the current instance and the object are identical, and false
+     * otherwise
+     *
+     * @param o the object to compare
+     * @return true if equal, false otherwise
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof NegatedCondition) {
+            return ((NegatedCondition) o).getInitCondition().equals(initCondition);
+        }
+        return false;
+    }
 }

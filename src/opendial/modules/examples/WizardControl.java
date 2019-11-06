@@ -60,162 +60,160 @@ import opendial.modules.WizardLearner;
  * possible actions available for the current dialogue state and displays this list
  * of actions on the right side of the GUI. The Wizard must then select the action to
  * perform.
- * 
+ *
  * <p>
  * The module only works if the GUI is activated.
- * 
+ *
  * @author Pierre Lison (plison@ifi.uio.no)
  */
 public class WizardControl implements Module {
 
-	// logger
-	final static Logger log = Logger.getLogger("OpenDial");
+    // logger
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	DialogueSystem system;
-	GUIFrame gui;
+    DialogueSystem system;
+    GUIFrame gui;
 
-	/**
-	 * Creates a new wizard control for the dialogue system.
-	 * 
-	 * @param system the dialogue system
-	 */
-	public WizardControl(DialogueSystem system) {
-		this.system = system;
+    /**
+     * Creates a new wizard control for the dialogue system.
+     *
+     * @param system the dialogue system
+     */
+    public WizardControl(DialogueSystem system) {
+        this.system = system;
 
-		if (system.getModule(GUIFrame.class) == null) {
-			throw new RuntimeException("could not create wizard control: no GUI");
-		}
-		else {
-			gui = system.getModule(GUIFrame.class);
-		}
-	}
+        if (system.getModule(GUIFrame.class) == null) {
+            throw new RuntimeException("could not create wizard control: no GUI");
+        } else {
+            gui = system.getModule(GUIFrame.class);
+        }
+    }
 
-	/**
-	 * Does nothing
-	 */
-	@Override
-	public void start() {
-	}
+    /**
+     * Does nothing
+     */
+    @Override
+    public void start() {
+    }
 
-	/**
-	 * Does nothing
-	 */
-	@Override
-	public void pause(boolean shouldBePaused) {
-	}
+    /**
+     * Does nothing
+     */
+    @Override
+    public void pause(boolean shouldBePaused) {
+    }
 
-	/**
-	 * Returns true.
-	 */
-	@Override
-	public boolean isRunning() {
-		return true;
-	}
+    /**
+     * Returns true.
+     */
+    @Override
+    public boolean isRunning() {
+        return true;
+    }
 
-	/**
-	 * Triggers the wizard control. The wizard control window is displayed whenever
-	 * the dialogue state contains at least one action node.
-	 * 
-	 * <p>
-	 * There is an exception: if the action selection is straightforward and does not
-	 * contain any parameters (i.e. there is only one possible action and its utility
-	 * is well-defined), the wizard control directly selects this action. This
-	 * exception is there to allow for the NLG module to directly realise the
-	 * system's communicative intention without the wizard intervention, if there is
-	 * no doubt about how to realise the utterance.
-	 */
-	@Override
-	public void trigger(DialogueState state, Collection<String> updatedVars) {
+    /**
+     * Triggers the wizard control. The wizard control window is displayed whenever
+     * the dialogue state contains at least one action node.
+     *
+     * <p>
+     * There is an exception: if the action selection is straightforward and does not
+     * contain any parameters (i.e. there is only one possible action and its utility
+     * is well-defined), the wizard control directly selects this action. This
+     * exception is there to allow for the NLG module to directly realise the
+     * system's communicative intention without the wizard intervention, if there is
+     * no doubt about how to realise the utterance.
+     */
+    @Override
+    public void trigger(DialogueState state, Collection<String> updatedVars) {
 
-		// if the action selection is straightforward and parameter-less,
-		// directly select the action
-		if (state.getUtilityNodes().size() == 1) {
-			UtilityNode urnode = state.getUtilityNodes().stream().findFirst().get();
-			if (urnode.getFunction() instanceof AnchoredRule) {
-				AnchoredRule arule = (AnchoredRule) urnode.getFunction();
-				if (arule.getInputRange().linearise().size() == 1
-						&& arule.getParameters().isEmpty()) {
-					system.getModule(ForwardPlanner.class).trigger(state,
-							updatedVars);
-					return;
-				}
-			}
+        // if the action selection is straightforward and parameter-less,
+        // directly select the action
+        if (state.getUtilityNodes().size() == 1) {
+            UtilityNode urnode = state.getUtilityNodes().stream().findFirst().get();
+            if (urnode.getFunction() instanceof AnchoredRule) {
+                AnchoredRule arule = (AnchoredRule) urnode.getFunction();
+                if (arule.getInputRange().linearise().size() == 1
+                        && arule.getParameters().isEmpty()) {
+                    system.getModule(ForwardPlanner.class).trigger(state,
+                            updatedVars);
+                    return;
+                }
+            }
 
-		}
-		try {
-			for (ActionNode action : state.getActionNodes()) {
-				displayWizardBox(action);
-			}
-			state.addToState(Assignment.createDefault(state.getActionNodeIds())
-					.removePrimes());
-			state.removeNodes(state.getActionNodeIds());
-			state.removeNodes(state.getUtilityNodeIds());
-		}
-		catch (RuntimeException e) {
-			log.warning("could not apply wizard control: " + e);
-		}
-	}
+        }
+        try {
+            for (ActionNode action : state.getActionNodes()) {
+                displayWizardBox(action);
+            }
+            state.addToState(Assignment.createDefault(state.getActionNodeIds())
+                    .removePrimes());
+            state.removeNodes(state.getActionNodeIds());
+            state.removeNodes(state.getUtilityNodeIds());
+        } catch (RuntimeException e) {
+            log.warning("could not apply wizard control: " + e);
+        }
+    }
 
-	/**
-	 * Displays the Wizard-of-Oz window with the possible action values specified in
-	 * the action node.
-	 * 
-	 * @param actionNode the action node extracted
-	 */
-	@SuppressWarnings("serial")
-	private void displayWizardBox(ActionNode actionNode) {
+    /**
+     * Displays the Wizard-of-Oz window with the possible action values specified in
+     * the action node.
+     *
+     * @param actionNode the action node extracted
+     */
+    @SuppressWarnings("serial")
+    private void displayWizardBox(ActionNode actionNode) {
 
-		DefaultListModel<String> model = new DefaultListModel<String>();
-		for (Value v : actionNode.getValues()) {
-			model.addElement(v.toString());
-		}
-		JList<String> listBox = new JList<String>(model);
-		listBox.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		JScrollPane scrollPane = new JScrollPane(listBox);
-		scrollPane.setBorder(BorderFactory.createEmptyBorder());
-		scrollPane.setPreferredSize(new Dimension(200, 600));
-		scrollPane.setBorder(BorderFactory.createTitledBorder("Actions to select:"));
+        DefaultListModel<String> model = new DefaultListModel<String>();
+        for (Value v : actionNode.getValues()) {
+            model.addElement(v.toString());
+        }
+        JList<String> listBox = new JList<String>(model);
+        listBox.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane scrollPane = new JScrollPane(listBox);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setPreferredSize(new Dimension(200, 600));
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Actions to select:"));
 
-		Container container = new Container();
-		container.setLayout(new BorderLayout());
-		container.add(scrollPane);
-		final JButton button = new JButton("Select");
-		DialogueState copy = system.getState().copy();
-		button.addActionListener(e -> recordAction(copy, listBox,
-				actionNode.getId().replace("'", "")));
+        Container container = new Container();
+        container.setLayout(new BorderLayout());
+        container.add(scrollPane);
+        final JButton button = new JButton("Select");
+        DialogueState copy = system.getState().copy();
+        button.addActionListener(e -> recordAction(copy, listBox,
+                actionNode.getId().replace("'", "")));
 
-		InputMap inputMap = button.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-		KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
-		inputMap.put(enter, "ENTER");
-		button.getActionMap().put("ENTER", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				button.doClick();
-			}
-		});
+        InputMap inputMap = button.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+        inputMap.put(enter, "ENTER");
+        button.getActionMap().put("ENTER", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                button.doClick();
+            }
+        });
 
-		container.add(button, BorderLayout.SOUTH);
-		if (gui.getChatTab().getComponentCount() > 2) {
-			gui.getChatTab().remove(gui.getChatTab().getComponent(2));
-		}
-		gui.getChatTab().add(container, BorderLayout.EAST);
-		gui.getChatTab().repaint();
-	}
+        container.add(button, BorderLayout.SOUTH);
+        if (gui.getChatTab().getComponentCount() > 2) {
+            gui.getChatTab().remove(gui.getChatTab().getComponent(2));
+        }
+        gui.getChatTab().add(container, BorderLayout.EAST);
+        gui.getChatTab().repaint();
+    }
 
-	public void recordAction(DialogueState previousState, JList<String> listBox,
-			String actionVar) {
-		String actionValue = listBox.getModel()
-				.getElementAt(listBox.getMinSelectionIndex()).toString();
-		Assignment action = new Assignment(actionVar, actionValue);
+    public void recordAction(DialogueState previousState, JList<String> listBox,
+                             String actionVar) {
+        String actionValue = listBox.getModel()
+                .getElementAt(listBox.getMinSelectionIndex()).toString();
+        Assignment action = new Assignment(actionVar, actionValue);
 
-		if (system.getModule(WizardLearner.class) != null) {
-			system.getState().reset(previousState);
-			system.getState().addEvidence(action.addPrimes());
-			system.getModule(WizardLearner.class).trigger(system.getState(),
-					Arrays.asList());
-		}
-		system.addContent(action);
-		gui.getChatTab().remove(gui.getChatTab().getComponent(2));
-	}
+        if (system.getModule(WizardLearner.class) != null) {
+            system.getState().reset(previousState);
+            system.getState().addEvidence(action.addPrimes());
+            system.getModule(WizardLearner.class).trigger(system.getState(),
+                    Arrays.asList());
+        }
+        system.addContent(action);
+        gui.getChatTab().remove(gui.getChatTab().getComponent(2));
+    }
 
 }

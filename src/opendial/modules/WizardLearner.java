@@ -44,130 +44,129 @@ import opendial.inference.approximate.SamplingAlgorithm;
 /**
  * Module employed to update parameters when provided with gold-standard actions from
  * Wizard-of-Oz data.
- * 
+ *
  * @author Pierre Lison (plison@ifi.uio.no)
  */
 public class WizardLearner implements Module {
 
-	// logger
-	final static Logger log = Logger.getLogger("OpenDial");
+    // logger
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	DialogueSystem system;
+    DialogueSystem system;
 
-	SamplingAlgorithm sampler;
+    SamplingAlgorithm sampler;
 
-	/** geometric factor used in supervised learning from Wizard-of-Oz data */
-	public static final double GEOMETRIC_FACTOR = 0.5;
+    /**
+     * geometric factor used in supervised learning from Wizard-of-Oz data
+     */
+    public static final double GEOMETRIC_FACTOR = 0.5;
 
-	public WizardLearner(DialogueSystem system) {
-		this.system = system;
-		sampler = new SamplingAlgorithm();
-	}
+    public WizardLearner(DialogueSystem system) {
+        this.system = system;
+        sampler = new SamplingAlgorithm();
+    }
 
-	@Override
-	public void start() {
-	}
+    @Override
+    public void start() {
+    }
 
-	@Override
-	public void pause(boolean shouldBePaused) {
-	}
+    @Override
+    public void pause(boolean shouldBePaused) {
+    }
 
-	@Override
-	public boolean isRunning() {
-		return true;
-	}
+    @Override
+    public boolean isRunning() {
+        return true;
+    }
 
-	@Override
-	public void trigger(DialogueState state, Collection<String> updatedVars) {
-		if (!state.getActionNodeIds().isEmpty()) {
-			if (state.getEvidence().containsVars(state.getActionNodeIds())) {
-				try {
-					Assignment wizardAction =
-							state.getEvidence().getTrimmed(state.getActionNodeIds());
-					state.clearEvidence(wizardAction.getVariables());
-					learnFromWizardAction(wizardAction);
-					state.addToState(wizardAction.removePrimes());
-				}
-				catch (RuntimeException e) {
-					log.warning("could not learn from wizard actions: " + e);
-				}
-			}
-			else {
-				state.removeNodes(state.getActionNodeIds());
-				state.removeNodes(state.getUtilityNodeIds());
-			}
+    @Override
+    public void trigger(DialogueState state, Collection<String> updatedVars) {
+        if (!state.getActionNodeIds().isEmpty()) {
+            if (state.getEvidence().containsVars(state.getActionNodeIds())) {
+                try {
+                    Assignment wizardAction =
+                            state.getEvidence().getTrimmed(state.getActionNodeIds());
+                    state.clearEvidence(wizardAction.getVariables());
+                    learnFromWizardAction(wizardAction);
+                    state.addToState(wizardAction.removePrimes());
+                } catch (RuntimeException e) {
+                    log.warning("could not learn from wizard actions: " + e);
+                }
+            } else {
+                state.removeNodes(state.getActionNodeIds());
+                state.removeNodes(state.getUtilityNodeIds());
+            }
 
-		}
-	}
+        }
+    }
 
-	/**
-	 * Updates the domain parameters given the wizard action selected at the provided
-	 * dialogue state, and returns the list of updated parameters.
-	 * 
-	 * @param wizardAction the wizard action
-	 * @return the list of updated parameters
-	 */
-	protected Set<String> learnFromWizardAction(Assignment wizardAction) {
+    /**
+     * Updates the domain parameters given the wizard action selected at the provided
+     * dialogue state, and returns the list of updated parameters.
+     *
+     * @param wizardAction the wizard action
+     * @return the list of updated parameters
+     */
+    protected Set<String> learnFromWizardAction(Assignment wizardAction) {
 
-		DialogueState state = system.getState();
-		// determine the relevant parameters (discard the isolated ones)
-		Set<String> relevantParams =
-				state.getParameterIds()
-						.stream().filter(p -> !state.getChanceNode(p)
-								.getOutputNodes().isEmpty())
-				.collect(Collectors.toSet());
+        DialogueState state = system.getState();
+        // determine the relevant parameters (discard the isolated ones)
+        Set<String> relevantParams =
+                state.getParameterIds()
+                        .stream().filter(p -> !state.getChanceNode(p)
+                        .getOutputNodes().isEmpty())
+                        .collect(Collectors.toSet());
 
-		if (!relevantParams.isEmpty()) {
-			try {
-				List<String> queryVars = new ArrayList<String>(relevantParams);
-				queryVars.addAll(wizardAction.getVariables());
+        if (!relevantParams.isEmpty()) {
+            try {
+                List<String> queryVars = new ArrayList<String>(relevantParams);
+                queryVars.addAll(wizardAction.getVariables());
 
-				Query query =
-						new Query.UtilQuery(state, queryVars, new Assignment());
-				EmpiricalDistribution empiricalDistrib = sampler.getWeightedSamples(
-						query, cs -> reweightSamples(cs, wizardAction));
+                Query query =
+                        new Query.UtilQuery(state, queryVars, new Assignment());
+                EmpiricalDistribution empiricalDistrib = sampler.getWeightedSamples(
+                        query, cs -> reweightSamples(cs, wizardAction));
 
-				for (String param : relevantParams) {
-					ChanceNode paramNode = state.getChanceNode(param);
+                for (String param : relevantParams) {
+                    ChanceNode paramNode = state.getChanceNode(param);
 
-					ProbDistribution newDistrib = empiricalDistrib.getMarginal(param,
-							paramNode.getInputNodeIds());
-					paramNode.setDistrib(newDistrib);
-				}
-			}
-			catch (RuntimeException e) {
-				log.warning("cannot update parameters based on wizard action: " + e);
-			}
-		}
+                    ProbDistribution newDistrib = empiricalDistrib.getMarginal(param,
+                            paramNode.getInputNodeIds());
+                    paramNode.setDistrib(newDistrib);
+                }
+            } catch (RuntimeException e) {
+                log.warning("cannot update parameters based on wizard action: " + e);
+            }
+        }
 
-		return relevantParams;
-	}
+        return relevantParams;
+    }
 
-	private static void reweightSamples(Collection<Sample> samples,
-			Assignment wizardAction) {
-		Set<String> actionVars = wizardAction.getVariables();
+    private static void reweightSamples(Collection<Sample> samples,
+                                        Assignment wizardAction) {
+        Set<String> actionVars = wizardAction.getVariables();
 
-		UtilityTable averages = new UtilityTable();
-		for (Sample sample : samples) {
-			Assignment action = sample.getTrimmed(actionVars);
-			averages.incrementUtil(action, sample.getUtility());
-		}
-		if (averages.getTable().size() == 1) {
-			return;
-		}
-		for (Sample sample : samples) {
+        UtilityTable averages = new UtilityTable();
+        for (Sample sample : samples) {
+            Assignment action = sample.getTrimmed(actionVars);
+            averages.incrementUtil(action, sample.getUtility());
+        }
+        if (averages.getTable().size() == 1) {
+            return;
+        }
+        for (Sample sample : samples) {
 
-			UtilityTable copy = averages.copy();
-			Assignment sampleAssign = sample.getTrimmed(actionVars);
-			copy.setUtil(sampleAssign, sample.getUtility());
-			int ranking = copy.getRanking(wizardAction, 0.1);
-			if (ranking != -1) {
-				double logweight = Math.log(
-						(GEOMETRIC_FACTOR * Math.pow(1 - GEOMETRIC_FACTOR, ranking))
-								+ 0.00001);
-				sample.addLogWeight(logweight);
-			}
-		}
-	}
+            UtilityTable copy = averages.copy();
+            Assignment sampleAssign = sample.getTrimmed(actionVars);
+            copy.setUtil(sampleAssign, sample.getUtility());
+            int ranking = copy.getRanking(wizardAction, 0.1);
+            if (ranking != -1) {
+                double logweight = Math.log(
+                        (GEOMETRIC_FACTOR * Math.pow(1 - GEOMETRIC_FACTOR, ranking))
+                                + 0.00001);
+                sample.addLogWeight(logweight);
+            }
+        }
+    }
 
 }

@@ -33,115 +33,114 @@ import opendial.datastructs.Graph;
  * Representation of a relational value. Its extends a graph where the nodes contains
  * Value objects, and the relation are plain strings. See the Graph class for more
  * information about the syntax for the graph.
- * 
- * @author Pierre Lison
  *
+ * @author Pierre Lison
  */
 public class RelationalVal extends Graph<Value, String> implements Value {
 
-	final static Logger log = Logger.getLogger("OpenDial");
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	/**
-	 * Creates an empty relational structure.
-	 */
-	public RelationalVal() {
-		super();
-	}
+    /**
+     * Creates an empty relational structure.
+     */
+    public RelationalVal() {
+        super();
+    }
 
-	/**
-	 * Creates a relational structure from a string representation.
-	 * 
-	 * @param string
-	 */
-	public RelationalVal(String string) {
-		super(string);
-	}
+    /**
+     * Creates a relational structure from a string representation.
+     *
+     * @param string
+     */
+    public RelationalVal(String string) {
+        super(string);
+    }
 
-	/**
-	 * Compares the value with another one (based on their string).
-	 */
-	@Override
-	public int compareTo(Value o) {
-		return toString().compareTo(o.toString());
-	}
+    /**
+     * Compares the value with another one (based on their string).
+     */
+    @Override
+    public int compareTo(Value o) {
+        return toString().compareTo(o.toString());
+    }
 
-	/**
-	 * Returns true if the value is contained in the relation structure. (this is
-	 * done
-	 */
-	@Override
-	public boolean contains(Value subvalue) {
-		return toString().contains(subvalue.toString());
-	}
+    /**
+     * Returns true if the value is contained in the relation structure. (this is
+     * done
+     */
+    @Override
+    public boolean contains(Value subvalue) {
+        return toString().contains(subvalue.toString());
+    }
 
-	/**
-	 * Returns the collection of values in the relational structure
-	 */
-	@Override
-	public Collection<Value> getSubValues() {
-		return getNodes().stream().map(n -> n.getContent())
-				.collect(Collectors.toList());
-	}
+    /**
+     * Returns the collection of values in the relational structure
+     */
+    @Override
+    public Collection<Value> getSubValues() {
+        return getNodes().stream().map(n -> n.getContent())
+                .collect(Collectors.toList());
+    }
 
-	/**
-	 * Concatenates two relational structures (by juxtaposing their roots).
-	 */
-	@Override
-	public Value concatenate(Value value) {
-		if (!(value instanceof RelationalVal)) {
-			throw new RuntimeException(
-					"Cannot concatenate " + this + " with " + value);
-		}
-		return new RelationalVal(toString() + value.toString());
-	}
+    /**
+     * Concatenates two relational structures (by juxtaposing their roots).
+     */
+    @Override
+    public Value concatenate(Value value) {
+        if (!(value instanceof RelationalVal)) {
+            throw new RuntimeException(
+                    "Cannot concatenate " + this + " with " + value);
+        }
+        return new RelationalVal(toString() + value.toString());
+    }
 
-	/**
-	 * Returns the number of nodes in the graph.
-	 */
-	@Override
-	public int length() {
-		return getNodes().size();
-	}
+    /**
+     * Returns the number of nodes in the graph.
+     */
+    @Override
+    public int length() {
+        return getNodes().size();
+    }
 
-	/**
-	 * Copies the relational structure
-	 */
-	@Override
-	public RelationalVal copy() {
-		return new RelationalVal(toString());
-	}
+    /**
+     * Copies the relational structure
+     */
+    @Override
+    public RelationalVal copy() {
+        return new RelationalVal(toString());
+    }
 
-	/**
-	 * Returns true if the structure does not contain any nodes, else false.
-	 * 
-	 * @return
-	 */
-	public boolean isEmpty() {
-		return getNodes().isEmpty();
-	}
+    /**
+     * Returns true if the structure does not contain any nodes, else false.
+     *
+     * @return
+     */
+    public boolean isEmpty() {
+        return getNodes().isEmpty();
+    }
 
-	/**
-	 * Creates a value from a string representation within the graph.
-	 */
-	@Override
-	protected Value createValue(String valueStr) {
-		return ValueFactory.create(valueStr);
-	}
+    /**
+     * Creates a value from a string representation within the graph.
+     */
+    @Override
+    protected Value createValue(String valueStr) {
+        return ValueFactory.create(valueStr);
+    }
 
-	/**
-	 * Creates a relation from a string representation within the graph.
-	 */
-	@Override
-	protected String createRelation(String relStr) {
-		return relStr;
-	}
+    /**
+     * Creates a relation from a string representation within the graph.
+     */
+    @Override
+    protected String createRelation(String relStr) {
+        return relStr;
+    }
 
-	/**
-	 * Copies a value
-	 */
-	@Override
-	protected Value copyValue(Value v) {
-		return v.copy();
-	}
+    /**
+     * Copies a value
+     */
+    @Override
+    protected Value copyValue(Value v) {
+        return v.copy();
+    }
 
 }

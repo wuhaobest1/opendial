@@ -42,63 +42,63 @@ import opendial.templates.RelationalTemplate;
 
 public class RelationalTest {
 
-	final static Logger log = Logger.getLogger("OpenDial");
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	@Test
-	public void relationalTest() {
-		RelationalVal rel = (RelationalVal) ValueFactory.create(
-				"[sees|tag:VB subject>John object>Anne instrument>[telescope|tag:NN colour>red|tag:ADJ]]");
-		assertEquals(5, rel.length());
-		assertTrue(rel.getSubValues().contains(ValueFactory.create("telescope")));
-		assertEquals("sees", rel.getNodes().get(0).getContent().toString());
-		RelationalTemplate t = new RelationalTemplate("[sees subject>John]");
-		assertEquals(1, t.getMatches(rel).size());
-		t = new RelationalTemplate("[sees {S}>John]");
-		assertEquals(1, t.getMatches(rel).size());
-		assertEquals("subject", t.getMatches(rel).get(0).getValue("S").toString());
-		t = new RelationalTemplate("[sees {S}>{O}]");
-		assertEquals(3, t.getMatches(rel).size());
-		assertEquals("instrument",
-				t.getMatches(rel).get(0).getValue("S").toString());
-		assertEquals("telescope", t.getMatches(rel).get(0).getValue("O").toString());
-		t = new RelationalTemplate("[{V}|tag:{T} subject>{X} object>{Y}]");
-		assertEquals("sees", t.getMatches(rel).get(0).getValue("V").toString());
-		assertEquals("VB", t.getMatches(rel).get(0).getValue("T").toString());
-		assertEquals("John", t.getMatches(rel).get(0).getValue("X").toString());
-		assertEquals("Anne", t.getMatches(rel).get(0).getValue("Y").toString());
-		t = new RelationalTemplate("[sees +>red|tag:{X}]");
-		assertEquals(1, t.getMatches(rel).size());
-		assertEquals("ADJ", t.getMatches(rel).get(0).getValue("X").toString());
-		RelationalVal rel2 = (RelationalVal) ValueFactory.create(
-				"[sees|tag:VB object>Anne instrument>[telescope|tag:NN colour>red|tag:ADJ] subject>John]");
-		assertEquals(rel, rel2);
-		assertEquals(rel.hashCode(), rel2.hashCode());
-		assertTrue(rel2.contains(ValueFactory.create("Anne")));
-		t = new RelationalTemplate("[sees {S}>John]");
-		assertEquals(1, t.getSlots().size());
-		assertEquals("[sees subject>John]",
-				t.fillSlots(new Assignment("S", "subject")));
+    @Test
+    public void relationalTest() {
+        RelationalVal rel = (RelationalVal) ValueFactory.create(
+                "[sees|tag:VB subject>John object>Anne instrument>[telescope|tag:NN colour>red|tag:ADJ]]");
+        assertEquals(5, rel.length());
+        assertTrue(rel.getSubValues().contains(ValueFactory.create("telescope")));
+        assertEquals("sees", rel.getNodes().get(0).getContent().toString());
+        RelationalTemplate t = new RelationalTemplate("[sees subject>John]");
+        assertEquals(1, t.getMatches(rel).size());
+        t = new RelationalTemplate("[sees {S}>John]");
+        assertEquals(1, t.getMatches(rel).size());
+        assertEquals("subject", t.getMatches(rel).get(0).getValue("S").toString());
+        t = new RelationalTemplate("[sees {S}>{O}]");
+        assertEquals(3, t.getMatches(rel).size());
+        assertEquals("instrument",
+                t.getMatches(rel).get(0).getValue("S").toString());
+        assertEquals("telescope", t.getMatches(rel).get(0).getValue("O").toString());
+        t = new RelationalTemplate("[{V}|tag:{T} subject>{X} object>{Y}]");
+        assertEquals("sees", t.getMatches(rel).get(0).getValue("V").toString());
+        assertEquals("VB", t.getMatches(rel).get(0).getValue("T").toString());
+        assertEquals("John", t.getMatches(rel).get(0).getValue("X").toString());
+        assertEquals("Anne", t.getMatches(rel).get(0).getValue("Y").toString());
+        t = new RelationalTemplate("[sees +>red|tag:{X}]");
+        assertEquals(1, t.getMatches(rel).size());
+        assertEquals("ADJ", t.getMatches(rel).get(0).getValue("X").toString());
+        RelationalVal rel2 = (RelationalVal) ValueFactory.create(
+                "[sees|tag:VB object>Anne instrument>[telescope|tag:NN colour>red|tag:ADJ] subject>John]");
+        assertEquals(rel, rel2);
+        assertEquals(rel.hashCode(), rel2.hashCode());
+        assertTrue(rel2.contains(ValueFactory.create("Anne")));
+        t = new RelationalTemplate("[sees {S}>John]");
+        assertEquals(1, t.getSlots().size());
+        assertEquals("[sees subject>John]",
+                t.fillSlots(new Assignment("S", "subject")));
 
-	}
+    }
 
-	@Test
-	public void functionTest() throws InterruptedException {
-		Domain d = XMLDomainReader.extractDomain("test/domains/relationaltest.xml");
-		DialogueSystem system = new DialogueSystem(d);
-		system.getSettings().showGUI = false;
-		system.startSystem();
-		// assertEquals(0.5, system.getContent("second").getProb("bla"), 0.05);
-	}
+    @Test
+    public void functionTest() throws InterruptedException {
+        Domain d = XMLDomainReader.extractDomain("test/domains/relationaltest.xml");
+        DialogueSystem system = new DialogueSystem(d);
+        system.getSettings().showGUI = false;
+        system.startSystem();
+        // assertEquals(0.5, system.getContent("second").getProb("bla"), 0.05);
+    }
 
-	public static final class TestFunction implements Function<List<String>, Value> {
+    public static final class TestFunction implements Function<List<String>, Value> {
 
-		@Override
-		public Value apply(List<String> t) {
-			String arg = t.get(0);
-			int length = arg.length();
-			int nbWords = arg.split(" ").length;
-			return ValueFactory.create(new double[] { length, nbWords });
-		}
-	}
+        @Override
+        public Value apply(List<String> t) {
+            String arg = t.get(0);
+            int length = arg.length();
+            int nbWords = arg.split(" ").length;
+            return ValueFactory.create(new double[]{length, nbWords});
+        }
+    }
 
 }

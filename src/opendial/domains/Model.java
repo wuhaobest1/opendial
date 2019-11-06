@@ -39,230 +39,228 @@ import opendial.templates.Template;
  * variables.
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public class Model {
 
-	final static Logger log = Logger.getLogger("OpenDial");
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	// identifier for the model
-	String id;
+    // identifier for the model
+    String id;
 
-	// whether triggering the model should block other models
-	boolean blocking = false;
+    // whether triggering the model should block other models
+    boolean blocking = false;
 
-	// counter for the model identifier, if not explicitly given
-	public static int idCounter = 0;
+    // counter for the model identifier, if not explicitly given
+    public static int idCounter = 0;
 
-	// triggers associated with the model
-	List<Template> triggers;
+    // triggers associated with the model
+    List<Template> triggers;
 
-	// collection of rules for the model
-	Collection<Rule> rules;
+    // collection of rules for the model
+    Collection<Rule> rules;
 
-	// ===================================
-	// MODEL CONSTRUCTION
-	// ===================================
+    // ===================================
+    // MODEL CONSTRUCTION
+    // ===================================
 
-	/**
-	 * Creates a new model, with initially no trigger and an empty list of rules
-	 */
-	public Model() {
-		triggers = new LinkedList<Template>();
-		rules = new LinkedList<Rule>();
-		id = "model" + idCounter;
-		idCounter++;
-	}
+    /**
+     * Creates a new model, with initially no trigger and an empty list of rules
+     */
+    public Model() {
+        triggers = new LinkedList<Template>();
+        rules = new LinkedList<Rule>();
+        id = "model" + idCounter;
+        idCounter++;
+    }
 
-	public void start() {
-	}
+    public void start() {
+    }
 
-	public void pause(boolean shouldBePaused) {
-	}
+    public void pause(boolean shouldBePaused) {
+    }
 
-	/**
-	 * Changes the identifier for the model
-	 * 
-	 * @param id the model identifier
-	 */
-	public void setId(String id) {
-		this.id = id;
-	}
+    /**
+     * Changes the identifier for the model
+     *
+     * @param id the model identifier
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	/**
-	 * Adds a new trigger to the model, defined by the variable label
-	 * 
-	 * @param trigger the variable
-	 */
-	public void addTrigger(String trigger) {
-		triggers.add(Template.create(trigger));
-	}
+    /**
+     * Adds a new trigger to the model, defined by the variable label
+     *
+     * @param trigger the variable
+     */
+    public void addTrigger(String trigger) {
+        triggers.add(Template.create(trigger));
+    }
 
-	/**
-	 * Adds a list of triggers to the model, defined by the variable label
-	 * 
-	 * @param triggers the list of triggers
-	 */
-	public void addTriggers(List<String> triggers) {
-		for (String s : triggers) {
-			addTrigger(s);
-		}
-	}
+    /**
+     * Adds a list of triggers to the model, defined by the variable label
+     *
+     * @param triggers the list of triggers
+     */
+    public void addTriggers(List<String> triggers) {
+        for (String s : triggers) {
+            addTrigger(s);
+        }
+    }
 
-	/**
-	 * Adds a new rule to the model
-	 * 
-	 * @param rule the rule to add
-	 */
-	public void addRule(Rule rule) {
-		rules.add(rule);
-	}
+    /**
+     * Adds a new rule to the model
+     *
+     * @param rule the rule to add
+     */
+    public void addRule(Rule rule) {
+        rules.add(rule);
+    }
 
-	/**
-	 * Sets the model as "blocking" (forbids other models to be triggered in parallel
-	 * when this model is triggered). Default is false.
-	 * 
-	 * @param blocking whether to set the model in blocking mode or not
-	 */
-	public void setBlocking(boolean blocking) {
-		this.blocking = blocking;
-	}
+    /**
+     * Sets the model as "blocking" (forbids other models to be triggered in parallel
+     * when this model is triggered). Default is false.
+     *
+     * @param blocking whether to set the model in blocking mode or not
+     */
+    public void setBlocking(boolean blocking) {
+        this.blocking = blocking;
+    }
 
-	// ===================================
-	// GETTERS
-	// ===================================
+    // ===================================
+    // GETTERS
+    // ===================================
 
-	/**
-	 * Returns the model identifier
-	 * 
-	 * @return the model identifier
-	 */
-	public String getId() {
-		return id;
-	}
+    /**
+     * Returns the model identifier
+     *
+     * @return the model identifier
+     */
+    public String getId() {
+        return id;
+    }
 
-	/**
-	 * Returns the list of rules contained in the model
-	 * 
-	 * @return the list of rules
-	 */
-	public List<Rule> getRules() {
-		return new ArrayList<Rule>(rules);
-	}
+    /**
+     * Returns the list of rules contained in the model
+     *
+     * @return the list of rules
+     */
+    public List<Rule> getRules() {
+        return new ArrayList<Rule>(rules);
+    }
 
-	/**
-	 * Triggers the model with the given state and list of recently updated
-	 * variables.
-	 * 
-	 * @param state the current dialogue state
-	 * @return true if the state has been changed, false otherwise
-	 */
-	public boolean trigger(DialogueState state) {
-		for (Rule r : rules) {
-			try {
-				state.applyRule(r);
-			}
-			catch (RuntimeException e) {
-				log.warning("rule " + r.getRuleId() + " could not be applied: "
-						+ e.toString());
-				e.printStackTrace();
-			}
-		}
-		return !state.getNewVariables().isEmpty() || !state.getNewActionVariables().isEmpty();
-	}
+    /**
+     * Triggers the model with the given state and list of recently updated
+     * variables.
+     *
+     * @param state the current dialogue state
+     * @return true if the state has been changed, false otherwise
+     */
+    public boolean trigger(DialogueState state) {
+        for (Rule r : rules) {
+            try {
+                state.applyRule(r);
+            } catch (RuntimeException e) {
+                log.warning("rule " + r.getRuleId() + " could not be applied: "
+                        + e.toString());
+                e.printStackTrace();
+            }
+        }
+        return !state.getNewVariables().isEmpty() || !state.getNewActionVariables().isEmpty();
+    }
 
-	/**
-	 * Returns true if the model is triggered by the updated variables.
-	 * 
-	 * @param state the dialogue state
-	 * @param updatedVars the updated variables
-	 * @return true if triggered, false otherwise
-	 */
-	public boolean isTriggered(DialogueState state, Collection<String> updatedVars) {
+    /**
+     * Returns true if the model is triggered by the updated variables.
+     *
+     * @param state       the dialogue state
+     * @param updatedVars the updated variables
+     * @return true if triggered, false otherwise
+     */
+    public boolean isTriggered(DialogueState state, Collection<String> updatedVars) {
 
-		if (rules.isEmpty()) {
-			return false;
-		}
-		for (Template trigger : triggers) {
-			for (String updatedVar : updatedVars) {
-				if (trigger.match(updatedVar).isMatching()) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+        if (rules.isEmpty()) {
+            return false;
+        }
+        for (Template trigger : triggers) {
+            for (String updatedVar : updatedVars) {
+                if (trigger.match(updatedVar).isMatching()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
-	/**
-	 * Returns true if the model is triggered by the updated variables.
-	 * 
-	 * @param updatedVars the updated variables
-	 * @return true if triggered, false otherwise
-	 */
-	public boolean isTriggered(Collection<String> updatedVars) {
+    /**
+     * Returns true if the model is triggered by the updated variables.
+     *
+     * @param updatedVars the updated variables
+     * @return true if triggered, false otherwise
+     */
+    public boolean isTriggered(Collection<String> updatedVars) {
 
-		if (rules.isEmpty()) {
-			return false;
-		}
-		for (Template trigger : triggers) {
-			for (String updatedVar : updatedVars) {
-				if (trigger.match(updatedVar).isMatching()) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+        if (rules.isEmpty()) {
+            return false;
+        }
+        for (Template trigger : triggers) {
+            for (String updatedVar : updatedVars) {
+                if (trigger.match(updatedVar).isMatching()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
-	/**
-	 * Returns the model triggers
-	 * 
-	 * @return the model triggers
-	 */
-	public Collection<Template> getTriggers() {
-		return triggers;
-	}
+    /**
+     * Returns the model triggers
+     *
+     * @return the model triggers
+     */
+    public Collection<Template> getTriggers() {
+        return triggers;
+    }
 
-	/**
-	 * Returns true if the model is set in "blocking" mode and false otherwise.
-	 * 
-	 * @return whether blocking mode is activated or not (default is false).
-	 */
-	public boolean isBlocking() {
-		return blocking;
-	}
+    /**
+     * Returns true if the model is set in "blocking" mode and false otherwise.
+     *
+     * @return whether blocking mode is activated or not (default is false).
+     */
+    public boolean isBlocking() {
+        return blocking;
+    }
 
-	// ===================================
-	// UTILITY METHODS
-	// ===================================
+    // ===================================
+    // UTILITY METHODS
+    // ===================================
 
-	/**
-	 * Returns the string representation of the model
-	 */
-	@Override
-	public String toString() {
-		String str = id;
-		str += " [triggers=";
-		for (Template trigger : triggers) {
-			str += "(" + trigger + ")" + " v ";
-		}
-		str = str.substring(0, str.length() - 3) + "] with " + rules.size()
-				+ " rules: ";
+    /**
+     * Returns the string representation of the model
+     */
+    @Override
+    public String toString() {
+        String str = id;
+        str += " [triggers=";
+        for (Template trigger : triggers) {
+            str += "(" + trigger + ")" + " v ";
+        }
+        str = str.substring(0, str.length() - 3) + "] with " + rules.size()
+                + " rules: ";
 
-		for (Rule rule : rules) {
-			str += rule.getRuleId() + ",";
-		}
-		return str.substring(0, str.length() - 1);
-	}
+        for (Rule rule : rules) {
+            str += rule.getRuleId() + ",";
+        }
+        return str.substring(0, str.length() - 1);
+    }
 
-	/**
-	 * Returns the hashcode for the model
-	 *
-	 * @return the hashcode
-	 */
-	@Override
-	public int hashCode() {
-		return id.hashCode() + triggers.hashCode() - rules.hashCode();
-	}
+    /**
+     * Returns the hashcode for the model
+     *
+     * @return the hashcode
+     */
+    @Override
+    public int hashCode() {
+        return id.hashCode() + triggers.hashCode() - rules.hashCode();
+    }
 
 }

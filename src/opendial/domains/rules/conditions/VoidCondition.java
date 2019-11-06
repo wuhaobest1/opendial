@@ -38,83 +38,82 @@ import opendial.templates.Template;
  * Representation of a void condition, which is always true.
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public final class VoidCondition implements Condition {
 
-	// logger
-	final static Logger log = Logger.getLogger("OpenDial");
+    // logger
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	static VoidCondition instance;
+    static VoidCondition instance;
 
-	/**
-	 * Return an empty set
-	 * 
-	 * @return an empty set
-	 */
-	@Override
-	public Collection<Template> getInputVariables() {
-		return Arrays.asList();
-	}
+    /**
+     * Return an empty set
+     *
+     * @return an empty set
+     */
+    @Override
+    public Collection<Template> getInputVariables() {
+        return Arrays.asList();
+    }
 
-	/**
-	 * Returns true (condition is always trivially satisfied)
-	 *
-	 * @param input the input assignment (ignored)
-	 * @return true
-	 */
-	@Override
-	public boolean isSatisfiedBy(Assignment input) {
-		return true;
-	}
+    /**
+     * Returns true (condition is always trivially satisfied)
+     *
+     * @param input the input assignment (ignored)
+     * @return true
+     */
+    @Override
+    public boolean isSatisfiedBy(Assignment input) {
+        return true;
+    }
 
-	/**
-	 * Returns an empty set of groundings
-	 */
-	@Override
-	public RuleGrounding getGroundings(Assignment input) {
-		return new RuleGrounding();
-	}
+    /**
+     * Returns an empty set of groundings
+     */
+    @Override
+    public RuleGrounding getGroundings(Assignment input) {
+        return new RuleGrounding();
+    }
 
-	/**
-	 * Returns an empty list
-	 * 
-	 * @return an empty list
-	 */
-	@Override
-	public Set<String> getSlots() {
-		return Collections.emptySet();
-	}
+    /**
+     * Returns an empty list
+     *
+     * @return an empty list
+     */
+    @Override
+    public Set<String> getSlots() {
+        return Collections.emptySet();
+    }
 
-	/**
-	 * Returns the string "true" indicating that the condition is always trivially
-	 * true
-	 *
-	 * @return true
-	 */
-	@Override
-	public String toString() {
-		return "true";
-	}
+    /**
+     * Returns the string "true" indicating that the condition is always trivially
+     * true
+     *
+     * @return true
+     */
+    @Override
+    public String toString() {
+        return "true";
+    }
 
-	/**
-	 * Returns a constant representing the hashcode for the void condition
-	 *
-	 * @return 36
-	 */
-	@Override
-	public int hashCode() {
-		return 36;
-	}
+    /**
+     * Returns a constant representing the hashcode for the void condition
+     *
+     * @return 36
+     */
+    @Override
+    public int hashCode() {
+        return 36;
+    }
 
-	/**
-	 * Returns true if o is also a void condition
-	 *
-	 * @param o the object to compare
-	 * @return true if o is also a void condition
-	 */
-	@Override
-	public boolean equals(Object o) {
-		return (o instanceof VoidCondition);
-	}
+    /**
+     * Returns true if o is also a void condition
+     *
+     * @param o the object to compare
+     * @return true if o is also a void condition
+     */
+    @Override
+    public boolean equals(Object o) {
+        return (o instanceof VoidCondition);
+    }
 }

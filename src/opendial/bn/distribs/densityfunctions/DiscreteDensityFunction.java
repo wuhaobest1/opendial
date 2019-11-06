@@ -45,217 +45,213 @@ import org.w3c.dom.Element;
  * distribution, divided by a constant volume (used for normalisation).
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public class DiscreteDensityFunction implements DensityFunction {
 
-	// logger
-	public final static Logger log = Logger.getLogger("OpenDial");
+    // logger
+    public final static Logger log = Logger.getLogger("OpenDial");
 
-	// the set of points for the density function
-	Map<double[], Double> points;
+    // the set of points for the density function
+    Map<double[], Double> points;
 
-	// the sampler
-	Random sampler;
+    // the sampler
+    Random sampler;
 
-	// minimum distance between points
-	double minDistance;
+    // minimum distance between points
+    double minDistance;
 
-	// the volume employed for the normalisation
-	double volume;
+    // the volume employed for the normalisation
+    double volume;
 
-	/**
-	 * Creates a new discrete density function, given the set of points
-	 * 
-	 * @param points a set of (value,prob) pairs
-	 */
-	public DiscreteDensityFunction(Map<double[], Double> points) {
-		this.points = new HashMap<double[], Double>();
-		this.points.putAll(points);
-		sampler = new Random();
+    /**
+     * Creates a new discrete density function, given the set of points
+     *
+     * @param points a set of (value,prob) pairs
+     */
+    public DiscreteDensityFunction(Map<double[], Double> points) {
+        this.points = new HashMap<double[], Double>();
+        this.points.putAll(points);
+        sampler = new Random();
 
-		// calculate the minimum distance between points
-		this.minDistance = MathUtils.getMinEuclidianDistance(points.keySet());
+        // calculate the minimum distance between points
+        this.minDistance = MathUtils.getMinEuclidianDistance(points.keySet());
 
-		// and define the volume with a radius that is half this distance
-		this.volume = MathUtils.getVolume(minDistance / 2, getDimensions());
-	}
+        // and define the volume with a radius that is half this distance
+        this.volume = MathUtils.getVolume(minDistance / 2, getDimensions());
+    }
 
-	/**
-	 * Returns the density for a given point. The density is derived in two steps:
-	 * <br>
-	 * <ol>
-	 * 
-	 * <li>locating the point in the distribution that is closest to x (according to
-	 * Euclidian distance)
-	 * 
-	 * <li>dividing the probability mass for the point by the n-dimensional volume
-	 * around this point. The radius of the ball is the half of the minimum distance
-	 * between the points of the distribution.
-	 * </ol>
-	 *
-	 * @param x the point
-	 * @return the density at the point
-	 */
-	@Override
-	public double getDensity(double... x) {
-		double[] closest = null;
-		double closestDist = -Double.MAX_VALUE;
-		for (double[] point : points.keySet()) {
-			double curDist = MathUtils.getDistance(point, x);
-			if (closest == null || curDist < closestDist) {
-				closest = point;
-				closestDist = curDist;
-			}
-		}
-		if (closestDist < minDistance / 2) {
-			return points.get(closest)
-					/ MathUtils.getVolume(minDistance / 2, getDimensions());
-		}
-		else {
-			return 0;
-		}
-	}
+    /**
+     * Returns the density for a given point. The density is derived in two steps:
+     * <br>
+     * <ol>
+     *
+     * <li>locating the point in the distribution that is closest to x (according to
+     * Euclidian distance)
+     *
+     * <li>dividing the probability mass for the point by the n-dimensional volume
+     * around this point. The radius of the ball is the half of the minimum distance
+     * between the points of the distribution.
+     * </ol>
+     *
+     * @param x the point
+     * @return the density at the point
+     */
+    @Override
+    public double getDensity(double... x) {
+        double[] closest = null;
+        double closestDist = -Double.MAX_VALUE;
+        for (double[] point : points.keySet()) {
+            double curDist = MathUtils.getDistance(point, x);
+            if (closest == null || curDist < closestDist) {
+                closest = point;
+                closestDist = curDist;
+            }
+        }
+        if (closestDist < minDistance / 2) {
+            return points.get(closest)
+                    / MathUtils.getVolume(minDistance / 2, getDimensions());
+        } else {
+            return 0;
+        }
+    }
 
-	/**
-	 * Samples according to the density function
-	 *
-	 * @return the resulting sample
-	 */
-	@Override
-	public double[] sample() {
-		double sampled = sampler.nextFloat();
-		double sum = 0.0;
-		for (double[] point : points.keySet()) {
-			sum += points.get(point);
-			if (sampled < sum) {
-				return point;
-			}
-		}
-		log.warning("discrete density function could not be sampled");
-		return new double[0];
-	}
+    /**
+     * Samples according to the density function
+     *
+     * @return the resulting sample
+     */
+    @Override
+    public double[] sample() {
+        double sampled = sampler.nextFloat();
+        double sum = 0.0;
+        for (double[] point : points.keySet()) {
+            sum += points.get(point);
+            if (sampled < sum) {
+                return point;
+            }
+        }
+        log.warning("discrete density function could not be sampled");
+        return new double[0];
+    }
 
-	/**
-	 * Returns the points for this distribution.
-	 * 
-	 */
-	@Override
-	public Map<double[], Double> discretise(int nbBuckets) {
-		return points;
-	}
+    /**
+     * Returns the points for this distribution.
+     */
+    @Override
+    public Map<double[], Double> discretise(int nbBuckets) {
+        return points;
+    }
 
-	/**
-	 * Returns a copy of the density function
-	 * 
-	 * @return the copy
-	 */
-	@Override
-	public DiscreteDensityFunction copy() {
-		return new DiscreteDensityFunction(points);
-	}
+    /**
+     * Returns a copy of the density function
+     *
+     * @return the copy
+     */
+    @Override
+    public DiscreteDensityFunction copy() {
+        return new DiscreteDensityFunction(points);
+    }
 
-	/**
-	 * Returns a pretty print representation of the function
-	 * 
-	 * @return the pretty print
-	 */
-	@Override
-	public String toString() {
-		String s = "Discrete(";
-		for (double[] point : points.keySet()) {
-			s += "(";
-			for (int i = 0; i < point.length; i++) {
-				s += StringUtils.getShortForm(point[i]) + ",";
-			}
-			s = s.substring(0, s.length() - 1) + "):="
-					+ StringUtils.getShortForm(points.get(point));
-		}
-		return s + ")";
-	}
+    /**
+     * Returns a pretty print representation of the function
+     *
+     * @return the pretty print
+     */
+    @Override
+    public String toString() {
+        String s = "Discrete(";
+        for (double[] point : points.keySet()) {
+            s += "(";
+            for (int i = 0; i < point.length; i++) {
+                s += StringUtils.getShortForm(point[i]) + ",";
+            }
+            s = s.substring(0, s.length() - 1) + "):="
+                    + StringUtils.getShortForm(points.get(point));
+        }
+        return s + ")";
+    }
 
-	/**
-	 * Returns the hashcode for the function
-	 *
-	 * @return the hashcode
-	 */
-	@Override
-	public int hashCode() {
-		return points.hashCode();
-	}
+    /**
+     * Returns the hashcode for the function
+     *
+     * @return the hashcode
+     */
+    @Override
+    public int hashCode() {
+        return points.hashCode();
+    }
 
-	/**
-	 * Returns the dimensionality of the distribution.
-	 */
-	@Override
-	public int getDimensions() {
-		return points.keySet().iterator().next().length;
-	}
+    /**
+     * Returns the dimensionality of the distribution.
+     */
+    @Override
+    public int getDimensions() {
+        return points.keySet().iterator().next().length;
+    }
 
-	/**
-	 * Returns the means of the distribution (calculated like for a categorical
-	 * distribution).
-	 */
-	@Override
-	public double[] getMean() {
-		double[] mean = new double[getDimensions()];
-		for (int i = 0; i < getDimensions(); i++) {
-			mean[i] = 0.0;
-			for (double[] point : points.keySet()) {
-				mean[i] += (point[i] * points.get(point));
-			}
-		}
-		return mean;
-	}
+    /**
+     * Returns the means of the distribution (calculated like for a categorical
+     * distribution).
+     */
+    @Override
+    public double[] getMean() {
+        double[] mean = new double[getDimensions()];
+        for (int i = 0; i < getDimensions(); i++) {
+            mean[i] = 0.0;
+            for (double[] point : points.keySet()) {
+                mean[i] += (point[i] * points.get(point));
+            }
+        }
+        return mean;
+    }
 
-	/**
-	 * Returns the variance of the distribution (calculated like for a categorical
-	 * distribution)
-	 * 
-	 */
-	@Override
-	public double[] getVariance() {
-		double[] variance = new double[getDimensions()];
-		double[] mean = getMean();
-		for (int i = 0; i < getDimensions(); i++) {
-			variance[i] = 0.0;
-			for (double[] point : points.keySet()) {
-				variance[i] += Math.pow(point[i] - mean[i], 2) * points.get(point);
-			}
-		}
-		return variance;
-	}
+    /**
+     * Returns the variance of the distribution (calculated like for a categorical
+     * distribution)
+     */
+    @Override
+    public double[] getVariance() {
+        double[] variance = new double[getDimensions()];
+        double[] mean = getMean();
+        for (int i = 0; i < getDimensions(); i++) {
+            variance[i] = 0.0;
+            for (double[] point : points.keySet()) {
+                variance[i] += Math.pow(point[i] - mean[i], 2) * points.get(point);
+            }
+        }
+        return variance;
+    }
 
-	/**
-	 * Returns the cumulative distribution for the distribution (by counting all the
-	 * points with a value that is lower than x).
-	 */
-	@Override
-	public double getCDF(double... x) {
-		if (x.length != getDimensions()) {
-			throw new RuntimeException(
-					"Illegal dimensionality: " + x.length + "!=" + getDimensions());
-		}
+    /**
+     * Returns the cumulative distribution for the distribution (by counting all the
+     * points with a value that is lower than x).
+     */
+    @Override
+    public double getCDF(double... x) {
+        if (x.length != getDimensions()) {
+            throw new RuntimeException(
+                    "Illegal dimensionality: " + x.length + "!=" + getDimensions());
+        }
 
-		double cdf = points.keySet().stream().filter(v -> MathUtils.isLower(v, x))
-				.mapToDouble(v -> points.get(v)).sum();
+        double cdf = points.keySet().stream().filter(v -> MathUtils.isLower(v, x))
+                .mapToDouble(v -> points.get(v)).sum();
 
-		return cdf;
-	}
+        return cdf;
+    }
 
-	@Override
-	public List<Element> generateXML(Document doc) {
-		List<Element> elList = new ArrayList<Element>();
+    @Override
+    public List<Element> generateXML(Document doc) {
+        List<Element> elList = new ArrayList<Element>();
 
-		for (double[] a : points.keySet()) {
-			Element valueNode = doc.createElement("value");
-			Attr prob = doc.createAttribute("prob");
-			prob.setValue("" + StringUtils.getShortForm(points.get(a)));
-			valueNode.setAttributeNode(prob);
-			valueNode.setTextContent("" + ValueFactory.create(a));
-			elList.add(valueNode);
-		}
-		return elList;
-	}
+        for (double[] a : points.keySet()) {
+            Element valueNode = doc.createElement("value");
+            Attr prob = doc.createAttribute("prob");
+            prob.setValue("" + StringUtils.getShortForm(points.get(a)));
+            valueNode.setAttributeNode(prob);
+            valueNode.setTextContent("" + ValueFactory.create(a));
+            elList.add(valueNode);
+        }
+        return elList;
+    }
 
 }

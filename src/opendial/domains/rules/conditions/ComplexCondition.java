@@ -40,200 +40,197 @@ import opendial.templates.Template;
  * logical operator (AND, OR).
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public final class ComplexCondition implements Condition {
 
-	// logger
-	final static Logger log = Logger.getLogger("OpenDial");
+    // logger
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	// the collection of subconditions
-	final Collection<Condition> subconditions;
+    // the collection of subconditions
+    final Collection<Condition> subconditions;
 
-	// the enumeration of possible binary operators
-	public static enum BinaryOperator {
-		AND, OR
-	}
+    // the enumeration of possible binary operators
+    public static enum BinaryOperator {
+        AND, OR
+    }
 
-	// the binary operator for the complex condition (default is AND)
-	final BinaryOperator operator;
+    // the binary operator for the complex condition (default is AND)
+    final BinaryOperator operator;
 
-	// ===================================
-	// CONDITION CONSTRUCTION
-	// ===================================
+    // ===================================
+    // CONDITION CONSTRUCTION
+    // ===================================
 
-	/**
-	 * Creates a new complex condition with a list of subconditions
-	 * 
-	 * @param subconditions the subconditions
-	 * @param operator the binary operator to employ between the conditions
-	 */
-	public ComplexCondition(List<Condition> subconditions, BinaryOperator operator) {
-		this.subconditions = subconditions;
-		this.operator = operator;
-	}
+    /**
+     * Creates a new complex condition with a list of subconditions
+     *
+     * @param subconditions the subconditions
+     * @param operator      the binary operator to employ between the conditions
+     */
+    public ComplexCondition(List<Condition> subconditions, BinaryOperator operator) {
+        this.subconditions = subconditions;
+        this.operator = operator;
+    }
 
-	// ===================================
-	// GETTERS
-	// ===================================
+    // ===================================
+    // GETTERS
+    // ===================================
 
-	/**
-	 * Returns the logical operator for the complex condition
-	 * 
-	 * @return the operator
-	 */
-	public BinaryOperator getOperator() {
-		return operator;
-	}
+    /**
+     * Returns the logical operator for the complex condition
+     *
+     * @return the operator
+     */
+    public BinaryOperator getOperator() {
+        return operator;
+    }
 
-	/**
-	 * Returns the set of input variables for the complex condition
-	 * 
-	 * @return the set of input variables
-	 */
-	@Override
-	public Collection<Template> getInputVariables() {
-		List<Template> variables = new ArrayList<Template>();
-		for (Condition cond : subconditions) {
-			variables.addAll(cond.getInputVariables());
-		}
-		return variables;
-	}
+    /**
+     * Returns the set of input variables for the complex condition
+     *
+     * @return the set of input variables
+     */
+    @Override
+    public Collection<Template> getInputVariables() {
+        List<Template> variables = new ArrayList<Template>();
+        for (Condition cond : subconditions) {
+            variables.addAll(cond.getInputVariables());
+        }
+        return variables;
+    }
 
-	/**
-	 * Returns the subconditions in the complex condition.
-	 * 
-	 * @return the subconditions.
-	 */
-	public Collection<Condition> getConditions() {
-		return subconditions;
-	}
+    /**
+     * Returns the subconditions in the complex condition.
+     *
+     * @return the subconditions.
+     */
+    public Collection<Condition> getConditions() {
+        return subconditions;
+    }
 
-	/**
-	 * Returns the list of all slots used in the conditions
-	 * 
-	 * @return the list of all slots
-	 */
-	@Override
-	public Set<String> getSlots() {
-		Set<String> slots = new HashSet<String>();
-		for (Condition cond : subconditions) {
-			slots.addAll(cond.getSlots());
-		}
-		return slots;
-	}
+    /**
+     * Returns the list of all slots used in the conditions
+     *
+     * @return the list of all slots
+     */
+    @Override
+    public Set<String> getSlots() {
+        Set<String> slots = new HashSet<String>();
+        for (Condition cond : subconditions) {
+            slots.addAll(cond.getSlots());
+        }
+        return slots;
+    }
 
-	/**
-	 * Returns true if the complex condition is satisfied by the input assignment,
-	 * and false otherwise.
-	 * 
-	 * <p>
-	 * If the logical operator is AND, all the subconditions must be satisfied. If
-	 * the operator is OR, at least one must be satisfied.
-	 * 
-	 * @param input the input assignment
-	 * @return true if the conditions are satisfied, false otherwise
-	 */
-	@Override
-	public boolean isSatisfiedBy(Assignment input) {
-		for (Condition cond : subconditions) {
-			if (operator == BinaryOperator.AND && !cond.isSatisfiedBy(input)) {
-				return false;
-			}
-			else if (operator == BinaryOperator.OR && cond.isSatisfiedBy(input)) {
-				return true;
-			}
-		}
-		return (operator == BinaryOperator.AND);
-	}
+    /**
+     * Returns true if the complex condition is satisfied by the input assignment,
+     * and false otherwise.
+     *
+     * <p>
+     * If the logical operator is AND, all the subconditions must be satisfied. If
+     * the operator is OR, at least one must be satisfied.
+     *
+     * @param input the input assignment
+     * @return true if the conditions are satisfied, false otherwise
+     */
+    @Override
+    public boolean isSatisfiedBy(Assignment input) {
+        for (Condition cond : subconditions) {
+            if (operator == BinaryOperator.AND && !cond.isSatisfiedBy(input)) {
+                return false;
+            } else if (operator == BinaryOperator.OR && cond.isSatisfiedBy(input)) {
+                return true;
+            }
+        }
+        return (operator == BinaryOperator.AND);
+    }
 
-	/**
-	 * Returns the groundings for the complex condition (which is the union of the
-	 * groundings for all basic conditions).
-	 * 
-	 * @return the full set of groundings
-	 */
-	@Override
-	public RuleGrounding getGroundings(Assignment input) {
+    /**
+     * Returns the groundings for the complex condition (which is the union of the
+     * groundings for all basic conditions).
+     *
+     * @return the full set of groundings
+     */
+    @Override
+    public RuleGrounding getGroundings(Assignment input) {
 
-		RuleGrounding groundings = new RuleGrounding();
+        RuleGrounding groundings = new RuleGrounding();
 
-		if (operator == BinaryOperator.AND) {
-			for (Condition cond : subconditions) {
+        if (operator == BinaryOperator.AND) {
+            for (Condition cond : subconditions) {
 
-				RuleGrounding newGrounding = new RuleGrounding();
-				boolean foundGrounding = false;
-				for (Assignment g : groundings.getAlternatives()) {
-					Assignment g2 = (g.isEmpty()) ? input : new Assignment(input, g);
-					RuleGrounding ground = cond.getGroundings(g2);
-					foundGrounding = foundGrounding || !ground.isFailed();
-					ground.extend(g);
-					newGrounding.add(ground);
-				}
-				if (!foundGrounding) {
-					newGrounding.setAsFailed();
-					return newGrounding;
-				}
-				groundings = newGrounding;
-			}
-		}
-		else if (operator == BinaryOperator.OR) {
+                RuleGrounding newGrounding = new RuleGrounding();
+                boolean foundGrounding = false;
+                for (Assignment g : groundings.getAlternatives()) {
+                    Assignment g2 = (g.isEmpty()) ? input : new Assignment(input, g);
+                    RuleGrounding ground = cond.getGroundings(g2);
+                    foundGrounding = foundGrounding || !ground.isFailed();
+                    ground.extend(g);
+                    newGrounding.add(ground);
+                }
+                if (!foundGrounding) {
+                    newGrounding.setAsFailed();
+                    return newGrounding;
+                }
+                groundings = newGrounding;
+            }
+        } else if (operator == BinaryOperator.OR) {
 
-			List<RuleGrounding> alternatives = new ArrayList<RuleGrounding>();
-			for (Condition cond : subconditions) {
-				RuleGrounding newGround = cond.getGroundings(input);
-				alternatives.add(newGround);
-			}
-			groundings.add(alternatives);
+            List<RuleGrounding> alternatives = new ArrayList<RuleGrounding>();
+            for (Condition cond : subconditions) {
+                RuleGrounding newGround = cond.getGroundings(input);
+                alternatives.add(newGround);
+            }
+            groundings.add(alternatives);
 
-		}
+        }
 
-		return groundings;
-	}
+        return groundings;
+    }
 
-	// ===================================
-	// UTILITY FUNCTIONS
-	// ===================================
+    // ===================================
+    // UTILITY FUNCTIONS
+    // ===================================
 
-	/**
-	 * Returns a string representation of the complex condition
-	 */
-	@Override
-	public String toString() {
-		String str = "";
-		for (Condition cond : subconditions) {
-			str += cond.toString();
-			switch (operator) {
-			case AND:
-				str += " ^ ";
-				break;
-			case OR:
-				str += " v ";
-				break;
-			}
-		}
-		return str.substring(0, str.length() - 3);
-	}
+    /**
+     * Returns a string representation of the complex condition
+     */
+    @Override
+    public String toString() {
+        String str = "";
+        for (Condition cond : subconditions) {
+            str += cond.toString();
+            switch (operator) {
+                case AND:
+                    str += " ^ ";
+                    break;
+                case OR:
+                    str += " v ";
+                    break;
+            }
+        }
+        return str.substring(0, str.length() - 3);
+    }
 
-	/**
-	 * Returns the hashcode for the condition
-	 *
-	 * @return the hashcode
-	 */
-	@Override
-	public int hashCode() {
-		return subconditions.hashCode() - operator.hashCode();
-	}
+    /**
+     * Returns the hashcode for the condition
+     *
+     * @return the hashcode
+     */
+    @Override
+    public int hashCode() {
+        return subconditions.hashCode() - operator.hashCode();
+    }
 
-	/**
-	 * Returns true if the complex conditions are equal, false otherwise
-	 *
-	 * @param o the object to compare with current instance
-	 * @return true if the conditions are equal, false otherwise
-	 */
-	@Override
-	public boolean equals(Object o) {
-		return this.hashCode() == o.hashCode();
-	}
+    /**
+     * Returns true if the complex conditions are equal, false otherwise
+     *
+     * @param o the object to compare with current instance
+     * @return true if the conditions are equal, false otherwise
+     */
+    @Override
+    public boolean equals(Object o) {
+        return this.hashCode() == o.hashCode();
+    }
 
 }

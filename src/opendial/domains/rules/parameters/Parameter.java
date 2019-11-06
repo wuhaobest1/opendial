@@ -32,33 +32,32 @@ import opendial.datastructs.MathExpression;
  * Interface for a parameter associated with an effect
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public interface Parameter {
 
-	/**
-	 * Returns the actual parameter value given the inputs provided as arguments. If
-	 * the actual value cannot be retrieved (missing information), throws an
-	 * exception.
-	 * 
-	 * @param input the input assignment
-	 * @return the actual parameter value
-	 */
-	public double getValue(Assignment input);
+    /**
+     * Returns the actual parameter value given the inputs provided as arguments. If
+     * the actual value cannot be retrieved (missing information), throws an
+     * exception.
+     *
+     * @param input the input assignment
+     * @return the actual parameter value
+     */
+    public double getValue(Assignment input);
 
-	/**
-	 * Returns the (possibly empty) set of parameter identifiers used in the
-	 * parameter object.
-	 * 
-	 * @return the collection of parameter labels
-	 */
-	public Collection<String> getVariables();
+    /**
+     * Returns the (possibly empty) set of parameter identifiers used in the
+     * parameter object.
+     *
+     * @return the collection of parameter labels
+     */
+    public Collection<String> getVariables();
 
-	/**
-	 * Returns the mathematical expression representing the parameter
-	 * 
-	 * @return the expression
-	 */
-	public MathExpression getExpression();
+    /**
+     * Returns the mathematical expression representing the parameter
+     *
+     * @return the expression
+     */
+    public MathExpression getExpression();
 
 }

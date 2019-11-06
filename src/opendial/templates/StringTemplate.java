@@ -35,131 +35,128 @@ import opendial.utils.StringUtils;
  * Template for a string without any underspecified or optional elements. In other
  * words, the match, find can be simplified to the usual string matching methods. The
  * fillSlots method returns the string.
- * 
- *
  */
 public class StringTemplate implements Template {
 
-	// the string corresponding to the template
-	final String string;
+    // the string corresponding to the template
+    final String string;
 
-	// whether the string represents a whole word or phrase (and not a
-	// punctuation)
-	final boolean whole;
+    // whether the string represents a whole word or phrase (and not a
+    // punctuation)
+    final boolean whole;
 
-	// empty set of slots
-	final Set<String> slots = Collections.emptySet();
+    // empty set of slots
+    final Set<String> slots = Collections.emptySet();
 
-	/**
-	 * Creates a new string template.
-	 * 
-	 * @param string the string object
-	 */
-	protected StringTemplate(String str) {
-		this.string = str;
-		whole = (str.length() != 1 || !StringUtils.isDelimiter(str.charAt(0)));
-	}
+    /**
+     * Creates a new string template.
+     *
+     * @param string the string object
+     */
+    protected StringTemplate(String str) {
+        this.string = str;
+        whole = (str.length() != 1 || !StringUtils.isDelimiter(str.charAt(0)));
+    }
 
-	/**
-	 * Returns an empty set.
-	 */
-	@Override
-	public Set<String> getSlots() {
-		return slots;
-	}
+    /**
+     * Returns an empty set.
+     */
+    @Override
+    public Set<String> getSlots() {
+        return slots;
+    }
 
-	/**
-	 * Returns false.
-	 */
-	@Override
-	public boolean isUnderspecified() {
-		return false;
-	}
+    /**
+     * Returns false.
+     */
+    @Override
+    public boolean isUnderspecified() {
+        return false;
+    }
 
-	/**
-	 * Returns a match result if the provided value is identical to the string
-	 * template. Else, returns an unmatched result.
-	 */
-	@Override
-	public MatchResult match(String str) {
+    /**
+     * Returns a match result if the provided value is identical to the string
+     * template. Else, returns an unmatched result.
+     */
+    @Override
+    public MatchResult match(String str) {
 
-		String input = str.trim();
+        String input = str.trim();
 
-		if (input.equalsIgnoreCase(string)) {
-			return new MatchResult(0, string.length());
-		}
-		else {
-			return new MatchResult(false);
-		}
-	}
+        if (input.equalsIgnoreCase(string)) {
+            return new MatchResult(0, string.length());
+        } else {
+            return new MatchResult(false);
+        }
+    }
 
-	/**
-	 * Searches for all possible occurrences of the template in the provided string.
-	 * Stops if the maximum number of results is reached.
-	 */
-	@Override
-	public List<MatchResult> find(String str, int maxResults) {
+    /**
+     * Searches for all possible occurrences of the template in the provided string.
+     * Stops if the maximum number of results is reached.
+     */
+    @Override
+    public List<MatchResult> find(String str, int maxResults) {
 
-		str = str.trim();
-		List<MatchResult> results = new ArrayList<MatchResult>();
-		int start = 0;
-		while (start != -1) {
-			start = str.indexOf(string, start);
-			if (start != -1) {
-				int end = start + string.length();
-				if (!whole || StringUtils.isDelimited(str, start, end)) {
-					results.add(new MatchResult(start, end));
-				}
-				if (results.size() >= maxResults) {
-					return results;
-				}
-				start = end;
-			}
-		}
-		return results;
-	}
+        str = str.trim();
+        List<MatchResult> results = new ArrayList<MatchResult>();
+        int start = 0;
+        while (start != -1) {
+            start = str.indexOf(string, start);
+            if (start != -1) {
+                int end = start + string.length();
+                if (!whole || StringUtils.isDelimited(str, start, end)) {
+                    results.add(new MatchResult(start, end));
+                }
+                if (results.size() >= maxResults) {
+                    return results;
+                }
+                start = end;
+            }
+        }
+        return results;
+    }
 
-	/**
-	 * Returns true.
-	 */
-	@Override
-	public boolean isFilledBy(Assignment input) {
-		return true;
-	}
+    /**
+     * Returns true.
+     */
+    @Override
+    public boolean isFilledBy(Assignment input) {
+        return true;
+    }
 
-	/**
-	 * Returns the string itself.
-	 */
-	@Override
-	public String fillSlots(Assignment fillers) {
-		return string;
-	}
+    /**
+     * Returns the string itself.
+     */
+    @Override
+    public String fillSlots(Assignment fillers) {
+        return string;
+    }
 
-	/**
-	 * Returns the hashcode for the string.
-	 */
-	@Override
-	public int hashCode() {
-		return string.hashCode();
-	}
+    /**
+     * Returns the hashcode for the string.
+     */
+    @Override
+    public int hashCode() {
+        return string.hashCode();
+    }
 
-	/**
-	 * Returns the string itself.
-	 */
-	@Override
-	public String toString() {
-		return string;
-	}
+    /**
+     * Returns the string itself.
+     */
+    @Override
+    public String toString() {
+        return string;
+    }
 
-	/**
-	 * Returns true if the object is an identical string template.
-	 */
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof StringTemplate) {
-			return ((StringTemplate) o).string.equals(string);
-		}
-		return false;
-	}
+    /**
+     * Returns true if the object is an identical string template.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof StringTemplate) {
+            return ((StringTemplate) o).string.equals(string);
+        }
+        return false;
+    }
 
 }

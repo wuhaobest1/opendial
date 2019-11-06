@@ -34,82 +34,81 @@ import opendial.datastructs.MathExpression;
  * Representation of a parameter fixed to one single specific value.
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public class FixedParameter implements Parameter {
 
-	// logger
-	final static Logger log = Logger.getLogger("OpenDial");
+    // logger
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	// the parameter value
-	final double param;
+    // the parameter value
+    final double param;
 
-	/**
-	 * Constructs a fixed parameter with the given value.
-	 * 
-	 * @param param the parameter value
-	 */
-	public FixedParameter(double param) {
-		this.param = param;
-	}
+    /**
+     * Constructs a fixed parameter with the given value.
+     *
+     * @param param the parameter value
+     */
+    public FixedParameter(double param) {
+        this.param = param;
+    }
 
-	/**
-	 * Returns the parameter value
-	 * 
-	 * @return the value for the parameter
-	 */
-	public double getValue() {
-		return param;
-	}
+    /**
+     * Returns the parameter value
+     *
+     * @return the value for the parameter
+     */
+    public double getValue() {
+        return param;
+    }
 
-	/**
-	 * Returns the parameter value, ignoring the input
-	 * 
-	 * @return the value for the parameter
-	 */
-	@Override
-	public double getValue(Assignment input) {
-		return param;
-	}
+    /**
+     * Returns the parameter value, ignoring the input
+     *
+     * @return the value for the parameter
+     */
+    @Override
+    public double getValue(Assignment input) {
+        return param;
+    }
 
-	/**
-	 * Returns an empty set
-	 *
-	 * @return an empty set of distributions
-	 */
-	@Override
-	public Collection<String> getVariables() {
-		return Collections.emptySet();
-	}
+    /**
+     * Returns an empty set
+     *
+     * @return an empty set of distributions
+     */
+    @Override
+    public Collection<String> getVariables() {
+        return Collections.emptySet();
+    }
 
-	/**
-	 * Returns the parameter value as a string
-	 *
-	 * @return the string
-	 */
-	@Override
-	public String toString() {
-		return "" + param;
-	}
+    /**
+     * Returns the parameter value as a string
+     *
+     * @return the string
+     */
+    @Override
+    public String toString() {
+        return "" + param;
+    }
 
-	/**
-	 * Returns the hashcode for the fixed parameter
-	 *
-	 * @return the hashcode
-	 */
-	@Override
-	public int hashCode() {
-		return 2 * new Double(param).hashCode();
-	}
+    /**
+     * Returns the hashcode for the fixed parameter
+     *
+     * @return the hashcode
+     */
+    @Override
+    public int hashCode() {
+        return 2 * new Double(param).hashCode();
+    }
 
-	/**
-	 * Returns the mathematical expression representing the parameter
-	 * 
-	 * @return the expression
-	 */
-	@Override
-	public MathExpression getExpression() {
-		return new MathExpression("" + param);
-	}
+    /**
+     * Returns the mathematical expression representing the parameter
+     *
+     * @return the expression
+     */
+    @Override
+    public MathExpression getExpression() {
+        return new MathExpression("" + param);
+    }
 
 }

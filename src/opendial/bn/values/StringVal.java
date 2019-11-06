@@ -34,157 +34,152 @@ import opendial.templates.Template;
  * String value.
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 
 public final class StringVal implements Value {
 
-	final static Logger log = Logger.getLogger("OpenDial");
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	// the string
-	final String str;
-	final int hashcode;
-	Template template;
+    // the string
+    final String str;
+    final int hashcode;
+    Template template;
 
-	/**
-	 * Creates a new string value (protected, use the ValueFactory instead)
-	 * 
-	 * @param str the string
-	 */
-	public StringVal(String str) {
-		this.str = str;
-		hashcode = str.toLowerCase().hashCode();
-	};
+    /**
+     * Creates a new string value (protected, use the ValueFactory instead)
+     *
+     * @param str the string
+     */
+    public StringVal(String str) {
+        this.str = str;
+        hashcode = str.toLowerCase().hashCode();
+    }
 
-	/**
-	 * Returns the hashcode for the string
-	 *
-	 * @return the hashcode
-	 */
-	@Override
-	public int hashCode() {
-		return hashcode;
-	}
+    ;
 
-	/**
-	 * Returns true if the strings are equals, false otherwise
-	 *
-	 * @param o the object to compare
-	 * @return true if equals, false otherwise
-	 */
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof StringVal) {
-			StringVal stringval = (StringVal) o;
-			if (stringval.str.equalsIgnoreCase(str)) {
-				return true;
-			}
-		}
-		return false;
-	}
+    /**
+     * Returns the hashcode for the string
+     *
+     * @return the hashcode
+     */
+    @Override
+    public int hashCode() {
+        return hashcode;
+    }
 
-	/**
-	 * Returns the string itself
-	 * 
-	 * @return the string
-	 */
-	public String getString() {
-		return str;
-	}
+    /**
+     * Returns true if the strings are equals, false otherwise
+     *
+     * @param o the object to compare
+     * @return true if equals, false otherwise
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof StringVal) {
+            StringVal stringval = (StringVal) o;
+            if (stringval.str.equalsIgnoreCase(str)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	/**
-	 * Returns a copy of the string value
-	 *
-	 * @return the copy
-	 */
-	@Override
-	public StringVal copy() {
-		return new StringVal(str);
-	}
+    /**
+     * Returns the string itself
+     *
+     * @return the string
+     */
+    public String getString() {
+        return str;
+    }
 
-	/**
-	 * Returns the string itself
-	 *
-	 * @return the string
-	 */
-	@Override
-	public String toString() {
-		return str;
-	}
+    /**
+     * Returns a copy of the string value
+     *
+     * @return the copy
+     */
+    @Override
+    public StringVal copy() {
+        return new StringVal(str);
+    }
 
-	/**
-	 * Returns the string length
-	 * 
-	 * @return the length
-	 */
-	@Override
-	public int length() {
-		return str.length();
-	}
+    /**
+     * Returns the string itself
+     *
+     * @return the string
+     */
+    @Override
+    public String toString() {
+        return str;
+    }
 
-	/**
-	 * Compares the string value to another value
-	 * 
-	 * @return usual ordering, or hashcode if the value is not a string
-	 */
-	@Override
-	public int compareTo(Value o) {
-		if (o instanceof StringVal) {
-			return str.compareTo(((StringVal) o).str);
-		}
-		else {
-			return 0;
-		}
-	}
+    /**
+     * Returns the string length
+     *
+     * @return the length
+     */
+    @Override
+    public int length() {
+        return str.length();
+    }
 
-	/**
-	 * Returns a list of words
-	 * 
-	 */
-	@Override
-	public Collection<Value> getSubValues() {
-		return Arrays.stream(str.split(" ")).map(w -> ValueFactory.create(w))
-				.collect(Collectors.toList());
-	}
+    /**
+     * Compares the string value to another value
+     *
+     * @return usual ordering, or hashcode if the value is not a string
+     */
+    @Override
+    public int compareTo(Value o) {
+        if (o instanceof StringVal) {
+            return str.compareTo(((StringVal) o).str);
+        } else {
+            return 0;
+        }
+    }
 
-	/**
-	 * Returns the concatenation of the two values.
-	 */
-	@Override
-	public Value concatenate(Value v) {
-		if (v instanceof StringVal) {
-			return ValueFactory.create(str + " " + v.toString());
-		}
-		else if (v instanceof DoubleVal) {
-			return ValueFactory.create(str + " " + v.toString());
-		}
-		else if (v instanceof NoneVal) {
-			return this;
-		}
-		else {
-			log.warning("cannot concatenate " + this + " and " + v);
-			return ValueFactory.noneValue;
-		}
-	}
+    /**
+     * Returns a list of words
+     */
+    @Override
+    public Collection<Value> getSubValues() {
+        return Arrays.stream(str.split(" ")).map(w -> ValueFactory.create(w))
+                .collect(Collectors.toList());
+    }
 
-	/**
-	 * Returns true if subvalue is a substring of the current StringVal, and false
-	 * otherwise
-	 * 
-	 * @return true is subvalue is a substring of the object, false otherwise
-	 */
-	@Override
-	public boolean contains(Value subvalue) {
-		if (subvalue instanceof StringVal) {
-			StringVal stringval = (StringVal) subvalue;
-			if (stringval.template == null) {
-				stringval.template = Template.create(stringval.str);
-			}
-			return stringval.template.partialmatch(str).isMatching();
-		}
-		else {
-			return subvalue.toString().contains(str);
-		}
-	}
+    /**
+     * Returns the concatenation of the two values.
+     */
+    @Override
+    public Value concatenate(Value v) {
+        if (v instanceof StringVal) {
+            return ValueFactory.create(str + " " + v.toString());
+        } else if (v instanceof DoubleVal) {
+            return ValueFactory.create(str + " " + v.toString());
+        } else if (v instanceof NoneVal) {
+            return this;
+        } else {
+            log.warning("cannot concatenate " + this + " and " + v);
+            return ValueFactory.noneValue;
+        }
+    }
+
+    /**
+     * Returns true if subvalue is a substring of the current StringVal, and false
+     * otherwise
+     *
+     * @return true is subvalue is a substring of the object, false otherwise
+     */
+    @Override
+    public boolean contains(Value subvalue) {
+        if (subvalue instanceof StringVal) {
+            StringVal stringval = (StringVal) subvalue;
+            if (stringval.template == null) {
+                stringval.template = Template.create(stringval.str);
+            }
+            return stringval.template.partialmatch(str).isMatching();
+        } else {
+            return subvalue.toString().contains(str);
+        }
+    }
 
 }

@@ -37,70 +37,69 @@ import org.junit.Test;
 
 public class DialogueStateTest {
 
-	// logger
-	final static Logger log = Logger.getLogger("OpenDial");
+    // logger
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	public static final String domainFile = "test//domains//domain1.xml";
+    public static final String domainFile = "test//domains//domain1.xml";
 
-	static Domain domain;
-	static InferenceChecks inference;
+    static Domain domain;
+    static InferenceChecks inference;
 
-	static {
-		try {
-			domain = XMLDomainReader.extractDomain(domainFile);
-			inference = new InferenceChecks();
-		}
-		catch (RuntimeException e) {
-			e.printStackTrace();
-		}
-	}
+    static {
+        try {
+            domain = XMLDomainReader.extractDomain(domainFile);
+            inference = new InferenceChecks();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
+    }
 
-	@Test
-	public void testStateCopy() throws InterruptedException {
+    @Test
+    public void testStateCopy() throws InterruptedException {
 
-		DialogueSystem system = new DialogueSystem(domain);
-		system.detachModule(ForwardPlanner.class);
-		StatePruner.ENABLE_REDUCTION = false;
+        DialogueSystem system = new DialogueSystem(domain);
+        system.detachModule(ForwardPlanner.class);
+        StatePruner.ENABLE_REDUCTION = false;
 
-		system.getSettings().showGUI = false;
-		system.startSystem();
+        system.getSettings().showGUI = false;
+        system.startSystem();
 
-		DialogueState initialState = system.getState().copy();
+        DialogueState initialState = system.getState().copy();
 
-		String ruleId = "";
-		for (String id : system.getState().getNode("u_u2").getOutputNodesIds()) {
-			if (system.getContent(id).toString().contains("+=HowAreYou")) {
-				ruleId = id;
-			}
-		}
+        String ruleId = "";
+        for (String id : system.getState().getNode("u_u2").getOutputNodesIds()) {
+            if (system.getContent(id).toString().contains("+=HowAreYou")) {
+                ruleId = id;
+            }
+        }
 
-		inference.checkProb(initialState, ruleId,
-				Effect.parseEffect("a_u2+=HowAreYou"), 0.9);
-		inference.checkProb(initialState, ruleId, Effect.parseEffect("Void"), 0.1);
+        inference.checkProb(initialState, ruleId,
+                Effect.parseEffect("a_u2+=HowAreYou"), 0.9);
+        inference.checkProb(initialState, ruleId, Effect.parseEffect("Void"), 0.1);
 
-		inference.checkProb(initialState, "a_u2", "[HowAreYou]", 0.2);
-		inference.checkProb(initialState, "a_u2", "[Greet, HowAreYou]", 0.7);
-		inference.checkProb(initialState, "a_u2", "[]", 0.1);
+        inference.checkProb(initialState, "a_u2", "[HowAreYou]", 0.2);
+        inference.checkProb(initialState, "a_u2", "[Greet, HowAreYou]", 0.7);
+        inference.checkProb(initialState, "a_u2", "[]", 0.1);
 
-		StatePruner.ENABLE_REDUCTION = true;
-	}
+        StatePruner.ENABLE_REDUCTION = true;
+    }
 
-	@Test
-	public void testStateCopy2() throws InterruptedException {
+    @Test
+    public void testStateCopy2() throws InterruptedException {
 
-		inference.EXACT_THRESHOLD = 0.08;
+        inference.EXACT_THRESHOLD = 0.08;
 
-		DialogueSystem system = new DialogueSystem(domain);
-		system.getSettings().showGUI = false;
-		system.detachModule(ForwardPlanner.class);
-		system.startSystem();
+        DialogueSystem system = new DialogueSystem(domain);
+        system.getSettings().showGUI = false;
+        system.detachModule(ForwardPlanner.class);
+        system.startSystem();
 
-		DialogueState initialState = system.getState().copy();
+        DialogueState initialState = system.getState().copy();
 
-		inference.checkProb(initialState, "a_u2", "[HowAreYou]", 0.2);
-		inference.checkProb(initialState, "a_u2", "[Greet, HowAreYou]", 0.7);
-		inference.checkProb(initialState, "a_u2", "[]", 0.1);
+        inference.checkProb(initialState, "a_u2", "[HowAreYou]", 0.2);
+        inference.checkProb(initialState, "a_u2", "[Greet, HowAreYou]", 0.7);
+        inference.checkProb(initialState, "a_u2", "[]", 0.1);
 
-	}
+    }
 
 }

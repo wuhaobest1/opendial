@@ -41,197 +41,196 @@ import opendial.datastructs.Assignment;
  * <li>reduction queries where a Bayesian network is reduced to a subset of variables
  * X1,...,Xn
  * </ul>
- * 
+ * <p>
  * The interface contains 3 abstract methods (queryProb, queryUtil and reduce) that
  * must be specified by all implementing classes. In addition, a set of default
  * methods provide alternative ways to call the inference process (e.g. with one or
  * several query variables, with or without evidence, etc.).
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public interface InferenceAlgorithm {
 
-	// ===================================
-	// PROBABILITY QUERIES
-	// ===================================
+    // ===================================
+    // PROBABILITY QUERIES
+    // ===================================
 
-	/**
-	 * Computes the probability distribution for the query variables given the
-	 * provided evidence, all specified in the query
-	 * 
-	 * @param query the full query
-	 * @return the resulting probability distribution failed to deliver a result
-	 */
-	public MultivariateDistribution queryProb(Query.ProbQuery query);
+    /**
+     * Computes the probability distribution for the query variables given the
+     * provided evidence, all specified in the query
+     *
+     * @param query the full query
+     * @return the resulting probability distribution failed to deliver a result
+     */
+    public MultivariateDistribution queryProb(Query.ProbQuery query);
 
-	/**
-	 * Computes the probability distribution for the query variables given the
-	 * provided evidence.
-	 * 
-	 * @param network the Bayesian network on which to perform the inference
-	 * @param queryVars the collection of query variables
-	 * @param evidence the evidence
-	 * @return the resulting probability distribution failed to deliver a result
-	 */
-	public default MultivariateDistribution queryProb(BNetwork network,
-			Collection<String> queryVars, Assignment evidence) {
-		return queryProb(new Query.ProbQuery(network, queryVars, evidence));
-	}
+    /**
+     * Computes the probability distribution for the query variables given the
+     * provided evidence.
+     *
+     * @param network   the Bayesian network on which to perform the inference
+     * @param queryVars the collection of query variables
+     * @param evidence  the evidence
+     * @return the resulting probability distribution failed to deliver a result
+     */
+    public default MultivariateDistribution queryProb(BNetwork network,
+                                                      Collection<String> queryVars, Assignment evidence) {
+        return queryProb(new Query.ProbQuery(network, queryVars, evidence));
+    }
 
-	/**
-	 * Computes the probability distribution for the query variables, assuming no
-	 * additional evidence.
-	 * 
-	 * @param network the Bayesian network on which to perform the inference
-	 * @param queryVars the collection of query variables
-	 * @return the resulting probability distribution failed to deliver a result
-	 */
-	public default MultivariateDistribution queryProb(BNetwork network,
-			Collection<String> queryVars) {
-		return queryProb(new Query.ProbQuery(network, queryVars, new Assignment()));
-	}
+    /**
+     * Computes the probability distribution for the query variables, assuming no
+     * additional evidence.
+     *
+     * @param network   the Bayesian network on which to perform the inference
+     * @param queryVars the collection of query variables
+     * @return the resulting probability distribution failed to deliver a result
+     */
+    public default MultivariateDistribution queryProb(BNetwork network,
+                                                      Collection<String> queryVars) {
+        return queryProb(new Query.ProbQuery(network, queryVars, new Assignment()));
+    }
 
-	/**
-	 * Computes the probability distribution for the query variable given the
-	 * provided evidence.
-	 * 
-	 * @param network the Bayesian network on which to perform the inference
-	 * @param queryVar the (unique) query variable
-	 * @param evidence the evidence
-	 * @return the resulting probability distribution for the variable inference
-	 *         process failed to deliver a result
-	 */
-	public default IndependentDistribution queryProb(BNetwork network,
-			String queryVar, Assignment evidence) {
-		return queryProb(
-				new Query.ProbQuery(network, Arrays.asList(queryVar), evidence))
-						.getMarginal(queryVar);
-	}
+    /**
+     * Computes the probability distribution for the query variable given the
+     * provided evidence.
+     *
+     * @param network  the Bayesian network on which to perform the inference
+     * @param queryVar the (unique) query variable
+     * @param evidence the evidence
+     * @return the resulting probability distribution for the variable inference
+     * process failed to deliver a result
+     */
+    public default IndependentDistribution queryProb(BNetwork network,
+                                                     String queryVar, Assignment evidence) {
+        return queryProb(
+                new Query.ProbQuery(network, Arrays.asList(queryVar), evidence))
+                .getMarginal(queryVar);
+    }
 
-	/**
-	 * Computes the probability distribution for the query variable, assuming no
-	 * additional evidence.
-	 * 
-	 * @param network the Bayesian network on which to perform the inference
-	 * @param queryVar the (unique) query variable
-	 * @return the resulting probability distribution for the variable inference
-	 *         process failed to deliver a result
-	 */
-	public default IndependentDistribution queryProb(BNetwork network,
-			String queryVar) {
-		return queryProb(network, queryVar, new Assignment());
-	}
+    /**
+     * Computes the probability distribution for the query variable, assuming no
+     * additional evidence.
+     *
+     * @param network  the Bayesian network on which to perform the inference
+     * @param queryVar the (unique) query variable
+     * @return the resulting probability distribution for the variable inference
+     * process failed to deliver a result
+     */
+    public default IndependentDistribution queryProb(BNetwork network,
+                                                     String queryVar) {
+        return queryProb(network, queryVar, new Assignment());
+    }
 
-	// ===================================
-	// UTILITY QUERIES
-	// ===================================
+    // ===================================
+    // UTILITY QUERIES
+    // ===================================
 
-	/**
-	 * Computes the utility table for the query variables (typically action
-	 * variables), given the provided evidence.
-	 * 
-	 * @param query the full query
-	 * @return the resulting utility table deliver a result
-	 */
-	public UtilityTable queryUtil(Query.UtilQuery query);
+    /**
+     * Computes the utility table for the query variables (typically action
+     * variables), given the provided evidence.
+     *
+     * @param query the full query
+     * @return the resulting utility table deliver a result
+     */
+    public UtilityTable queryUtil(Query.UtilQuery query);
 
-	/**
-	 * Computes the utility table for the query variables (typically action
-	 * variables), given the provided evidence.
-	 * 
-	 * @param network the Bayesian network on which to perform the inference
-	 * @param queryVars the query variables (usually action variables)
-	 * @param evidence the additional evidence
-	 * @return the resulting utility table for the query variables process failed to
-	 *         deliver a result
-	 */
-	public default UtilityTable queryUtil(BNetwork network,
-			Collection<String> queryVars, Assignment evidence) {
-		return queryUtil(new Query.UtilQuery(network, queryVars, evidence));
-	}
+    /**
+     * Computes the utility table for the query variables (typically action
+     * variables), given the provided evidence.
+     *
+     * @param network   the Bayesian network on which to perform the inference
+     * @param queryVars the query variables (usually action variables)
+     * @param evidence  the additional evidence
+     * @return the resulting utility table for the query variables process failed to
+     * deliver a result
+     */
+    public default UtilityTable queryUtil(BNetwork network,
+                                          Collection<String> queryVars, Assignment evidence) {
+        return queryUtil(new Query.UtilQuery(network, queryVars, evidence));
+    }
 
-	/**
-	 * Computes the utility table for the query variables (typically action
-	 * variables), assuming no additional evidence.
-	 * 
-	 * @param network the Bayesian network on which to perform the inference
-	 * @param queryVars the query variables (usually action variables)
-	 * @return the resulting utility table for the query variables process failed to
-	 *         deliver a result
-	 */
-	public default UtilityTable queryUtil(BNetwork network,
-			Collection<String> queryVars) {
-		return queryUtil(new Query.UtilQuery(network, queryVars, new Assignment()));
-	}
+    /**
+     * Computes the utility table for the query variables (typically action
+     * variables), assuming no additional evidence.
+     *
+     * @param network   the Bayesian network on which to perform the inference
+     * @param queryVars the query variables (usually action variables)
+     * @return the resulting utility table for the query variables process failed to
+     * deliver a result
+     */
+    public default UtilityTable queryUtil(BNetwork network,
+                                          Collection<String> queryVars) {
+        return queryUtil(new Query.UtilQuery(network, queryVars, new Assignment()));
+    }
 
-	/**
-	 * Computes the utility table for the query variable (typically an action
-	 * variable), assuming no additional evidence.
-	 * 
-	 * @param network the Bayesian network on which to perform the inference
-	 * @param queryVar the query variable
-	 * @return the resulting utility table for the query variable process failed to
-	 *         deliver a result
-	 */
-	public default UtilityTable queryUtil(BNetwork network, String queryVar) {
-		return queryUtil(new Query.UtilQuery(network, Arrays.asList(queryVar),
-				new Assignment()));
-	}
+    /**
+     * Computes the utility table for the query variable (typically an action
+     * variable), assuming no additional evidence.
+     *
+     * @param network  the Bayesian network on which to perform the inference
+     * @param queryVar the query variable
+     * @return the resulting utility table for the query variable process failed to
+     * deliver a result
+     */
+    public default UtilityTable queryUtil(BNetwork network, String queryVar) {
+        return queryUtil(new Query.UtilQuery(network, Arrays.asList(queryVar),
+                new Assignment()));
+    }
 
-	/**
-	 * Computes the utility table for the query variable (typically an action
-	 * variable), given the provided evidence
-	 * 
-	 * @param network the Bayesian network on which to perform the inference
-	 * @param queryVar the query variable
-	 * @param evidence the additional evidence
-	 * @return the resulting utility table for the query variable process failed to
-	 *         deliver a result
-	 */
-	public default UtilityTable queryUtil(BNetwork network, String queryVar,
-			Assignment evidence) {
-		return queryUtil(
-				new Query.UtilQuery(network, Arrays.asList(queryVar), evidence));
-	}
+    /**
+     * Computes the utility table for the query variable (typically an action
+     * variable), given the provided evidence
+     *
+     * @param network  the Bayesian network on which to perform the inference
+     * @param queryVar the query variable
+     * @param evidence the additional evidence
+     * @return the resulting utility table for the query variable process failed to
+     * deliver a result
+     */
+    public default UtilityTable queryUtil(BNetwork network, String queryVar,
+                                          Assignment evidence) {
+        return queryUtil(
+                new Query.UtilQuery(network, Arrays.asList(queryVar), evidence));
+    }
 
-	// ===================================
-	// REDUCTION QUERIES
-	// ===================================
+    // ===================================
+    // REDUCTION QUERIES
+    // ===================================
 
-	/**
-	 * Generates a new Bayesian network that only contains a subset of variables in
-	 * the original network and integrates the provided evidence.
-	 * 
-	 * @param query the full reduction query
-	 * @return the reduced Bayesian network deliver a result
-	 */
-	public BNetwork reduce(Query.ReduceQuery query);
+    /**
+     * Generates a new Bayesian network that only contains a subset of variables in
+     * the original network and integrates the provided evidence.
+     *
+     * @param query the full reduction query
+     * @return the reduced Bayesian network deliver a result
+     */
+    public BNetwork reduce(Query.ReduceQuery query);
 
-	/**
-	 * Generates a new Bayesian network that only contains a subset of variables in
-	 * the original network and integrates the provided evidence.
-	 * 
-	 * @param network the original Bayesian network
-	 * @param queryVars the variables to retain
-	 * @param evidence the additional evidence
-	 * @return the new, reduced Bayesian network deliver a result
-	 */
-	public default BNetwork reduce(BNetwork network, Collection<String> queryVars,
-			Assignment evidence) {
-		return reduce(new Query.ReduceQuery(network, queryVars, evidence));
-	}
+    /**
+     * Generates a new Bayesian network that only contains a subset of variables in
+     * the original network and integrates the provided evidence.
+     *
+     * @param network   the original Bayesian network
+     * @param queryVars the variables to retain
+     * @param evidence  the additional evidence
+     * @return the new, reduced Bayesian network deliver a result
+     */
+    public default BNetwork reduce(BNetwork network, Collection<String> queryVars,
+                                   Assignment evidence) {
+        return reduce(new Query.ReduceQuery(network, queryVars, evidence));
+    }
 
-	/**
-	 * Generates a new Bayesian network that only contains a subset of variables in
-	 * the original network, assuming no additional evidence.
-	 * 
-	 * @param network the original Bayesian network
-	 * @param queryVars the variables to retain
-	 * @return the new, reduced Bayesian network deliver a result
-	 */
-	public default BNetwork reduce(BNetwork network, Collection<String> queryVars) {
-		return reduce(new Query.ReduceQuery(network, queryVars, new Assignment()));
-	}
+    /**
+     * Generates a new Bayesian network that only contains a subset of variables in
+     * the original network, assuming no additional evidence.
+     *
+     * @param network   the original Bayesian network
+     * @param queryVars the variables to retain
+     * @return the new, reduced Bayesian network deliver a result
+     */
+    public default BNetwork reduce(BNetwork network, Collection<String> queryVars) {
+        return reduce(new Query.ReduceQuery(network, queryVars, new Assignment()));
+    }
 
 }

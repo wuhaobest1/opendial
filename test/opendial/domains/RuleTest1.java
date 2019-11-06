@@ -35,149 +35,145 @@ import opendial.readers.XMLDomainReader;
 import org.junit.Test;
 
 /**
- * 
- *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public class RuleTest1 {
 
-	// logger
-	final static Logger log = Logger.getLogger("OpenDial");
+    // logger
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	public static final String domainFile = "test//domains//domain1.xml";
+    public static final String domainFile = "test//domains//domain1.xml";
 
-	static InferenceChecks inference;
-	static Domain domain;
+    static InferenceChecks inference;
+    static Domain domain;
 
-	static {
-		try {
-			domain = XMLDomainReader.extractDomain(domainFile);
-			inference = new InferenceChecks();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    static {
+        try {
+            domain = XMLDomainReader.extractDomain(domainFile);
+            inference = new InferenceChecks();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	@Test
-	public void test1() throws InterruptedException {
+    @Test
+    public void test1() throws InterruptedException {
 
-		DialogueSystem system = new DialogueSystem(domain);
-		system.detachModule(ForwardPlanner.class);
-		StatePruner.ENABLE_REDUCTION = false;
-		system.getSettings().showGUI = false;
-		system.startSystem();
+        DialogueSystem system = new DialogueSystem(domain);
+        system.detachModule(ForwardPlanner.class);
+        StatePruner.ENABLE_REDUCTION = false;
+        system.getSettings().showGUI = false;
+        system.startSystem();
 
-		inference.checkProb(system.getState(), "a_u", "Greeting", 0.8);
-		inference.checkProb(system.getState(), "a_u", "None", 0.2);
+        inference.checkProb(system.getState(), "a_u", "Greeting", 0.8);
+        inference.checkProb(system.getState(), "a_u", "None", 0.2);
 
-		StatePruner.ENABLE_REDUCTION = true;
-	}
+        StatePruner.ENABLE_REDUCTION = true;
+    }
 
-	@Test
-	public void test2() {
+    @Test
+    public void test2() {
 
-		DialogueSystem system = new DialogueSystem(domain);
-		system.detachModule(ForwardPlanner.class);
-		StatePruner.ENABLE_REDUCTION = false;
-		system.getSettings().showGUI = false;
-		system.startSystem();
+        DialogueSystem system = new DialogueSystem(domain);
+        system.detachModule(ForwardPlanner.class);
+        StatePruner.ENABLE_REDUCTION = false;
+        system.getSettings().showGUI = false;
+        system.startSystem();
 
-		inference.checkProb(system.getState(), "i_u", "Inform", 0.7 * 0.8);
-		inference.checkProb(system.getState(), "i_u", "None", 1 - 0.7 * 0.8);
+        inference.checkProb(system.getState(), "i_u", "Inform", 0.7 * 0.8);
+        inference.checkProb(system.getState(), "i_u", "None", 1 - 0.7 * 0.8);
 
-		StatePruner.ENABLE_REDUCTION = true;
-	}
+        StatePruner.ENABLE_REDUCTION = true;
+    }
 
-	@Test
-	public void test3() throws InterruptedException {
+    @Test
+    public void test3() throws InterruptedException {
 
-		inference.EXACT_THRESHOLD = 0.06;
+        inference.EXACT_THRESHOLD = 0.06;
 
-		DialogueSystem system = new DialogueSystem(domain);
-		system.detachModule(ForwardPlanner.class);
-		StatePruner.ENABLE_REDUCTION = false;
-		system.getSettings().showGUI = false;
-		system.startSystem();
-		inference.checkProb(system.getState(), "direction", "straight", 0.79);
-		inference.checkProb(system.getState(), "direction", "left", 0.20);
-		inference.checkProb(system.getState(), "direction", "right", 0.01);
+        DialogueSystem system = new DialogueSystem(domain);
+        system.detachModule(ForwardPlanner.class);
+        StatePruner.ENABLE_REDUCTION = false;
+        system.getSettings().showGUI = false;
+        system.startSystem();
+        inference.checkProb(system.getState(), "direction", "straight", 0.79);
+        inference.checkProb(system.getState(), "direction", "left", 0.20);
+        inference.checkProb(system.getState(), "direction", "right", 0.01);
 
-		StatePruner.ENABLE_REDUCTION = true;
-	}
+        StatePruner.ENABLE_REDUCTION = true;
+    }
 
-	@Test
-	public void test4() {
+    @Test
+    public void test4() {
 
-		DialogueSystem system = new DialogueSystem(domain);
-		system.detachModule(ForwardPlanner.class);
-		StatePruner.ENABLE_REDUCTION = false;
-		system.getSettings().showGUI = false;
-		system.startSystem();
+        DialogueSystem system = new DialogueSystem(domain);
+        system.detachModule(ForwardPlanner.class);
+        StatePruner.ENABLE_REDUCTION = false;
+        system.getSettings().showGUI = false;
+        system.startSystem();
 
-		inference.checkProb(system.getState(), "o", "and we have var1=value2", 0.3);
-		inference.checkProb(system.getState(), "o", "and we have localvar=value1",
-				0.2);
-		inference.checkProb(system.getState(), "o", "and we have localvar=value3",
-				0.28);
+        inference.checkProb(system.getState(), "o", "and we have var1=value2", 0.3);
+        inference.checkProb(system.getState(), "o", "and we have localvar=value1",
+                0.2);
+        inference.checkProb(system.getState(), "o", "and we have localvar=value3",
+                0.28);
 
-		StatePruner.ENABLE_REDUCTION = true;
-	}
+        StatePruner.ENABLE_REDUCTION = true;
+    }
 
-	@Test
-	public void test5() {
+    @Test
+    public void test5() {
 
-		DialogueSystem system = new DialogueSystem(domain);
-		system.detachModule(ForwardPlanner.class);
-		StatePruner.ENABLE_REDUCTION = false;
-		system.getSettings().showGUI = false;
-		system.startSystem();
+        DialogueSystem system = new DialogueSystem(domain);
+        system.detachModule(ForwardPlanner.class);
+        StatePruner.ENABLE_REDUCTION = false;
+        system.getSettings().showGUI = false;
+        system.startSystem();
 
-		inference.checkProb(system.getState(), "o2", "here is value1", 0.35);
-		inference.checkProb(system.getState(), "o2", "and value2 is over there",
-				0.07);
-		inference.checkProb(system.getState(), "o2", "value3, finally", 0.28);
+        inference.checkProb(system.getState(), "o2", "here is value1", 0.35);
+        inference.checkProb(system.getState(), "o2", "and value2 is over there",
+                0.07);
+        inference.checkProb(system.getState(), "o2", "value3, finally", 0.28);
 
-		StatePruner.ENABLE_REDUCTION = true;
+        StatePruner.ENABLE_REDUCTION = true;
 
-	}
+    }
 
-	@Test
-	public void test6() throws InterruptedException {
+    @Test
+    public void test6() throws InterruptedException {
 
-		inference.EXACT_THRESHOLD = 0.06;
+        inference.EXACT_THRESHOLD = 0.06;
 
-		DialogueSystem system = new DialogueSystem(domain);
-		system.detachModule(ForwardPlanner.class);
-		system.getSettings().showGUI = false;
-		system.startSystem();
-		CategoricalTable.Builder builder = new CategoricalTable.Builder("var1");
-		builder.addRow("value2", 0.9);
-		system.addContent(builder.build());
+        DialogueSystem system = new DialogueSystem(domain);
+        system.detachModule(ForwardPlanner.class);
+        system.getSettings().showGUI = false;
+        system.startSystem();
+        CategoricalTable.Builder builder = new CategoricalTable.Builder("var1");
+        builder.addRow("value2", 0.9);
+        system.addContent(builder.build());
 
-		inference.checkProb(system.getState(), "o", "and we have var1=value2", 0.9);
-		inference.checkProb(system.getState(), "o", "and we have localvar=value1",
-				0.05);
-		inference.checkProb(system.getState(), "o", "and we have localvar=value3",
-				0.04);
+        inference.checkProb(system.getState(), "o", "and we have var1=value2", 0.9);
+        inference.checkProb(system.getState(), "o", "and we have localvar=value1",
+                0.05);
+        inference.checkProb(system.getState(), "o", "and we have localvar=value3",
+                0.04);
 
-		StatePruner.ENABLE_REDUCTION = true;
-	}
+        StatePruner.ENABLE_REDUCTION = true;
+    }
 
-	@Test
-	public void test7() throws InterruptedException {
+    @Test
+    public void test7() throws InterruptedException {
 
-		DialogueSystem system = new DialogueSystem(domain);
-		system.detachModule(ForwardPlanner.class);
-		StatePruner.ENABLE_REDUCTION = false;
-		system.getSettings().showGUI = false;
-		system.startSystem();
-		inference.checkProb(system.getState(), "a_u2", "[Greet, HowAreYou]", 0.7);
-		inference.checkProb(system.getState(), "a_u2", "[]", 0.1);
-		inference.checkProb(system.getState(), "a_u2", "[HowAreYou]", 0.2);
+        DialogueSystem system = new DialogueSystem(domain);
+        system.detachModule(ForwardPlanner.class);
+        StatePruner.ENABLE_REDUCTION = false;
+        system.getSettings().showGUI = false;
+        system.startSystem();
+        inference.checkProb(system.getState(), "a_u2", "[Greet, HowAreYou]", 0.7);
+        inference.checkProb(system.getState(), "a_u2", "[]", 0.1);
+        inference.checkProb(system.getState(), "a_u2", "[HowAreYou]", 0.2);
 
-		StatePruner.ENABLE_REDUCTION = true;
-	}
+        StatePruner.ENABLE_REDUCTION = true;
+    }
 
 }

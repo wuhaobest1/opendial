@@ -32,152 +32,151 @@ import java.util.Set;
 
 /**
  * Value that is defined as a set of values.
- * 
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public final class SetVal implements Value {
 
-	// logger
-	final static Logger log = Logger.getLogger("OpenDial");
+    // logger
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	// the set of values
-	final Set<Value> set;
-	final int hashcode;
+    // the set of values
+    final Set<Value> set;
+    final int hashcode;
 
-	/**
-	 * Creates the list of values (protected, should be created via ValueFactory)
-	 * 
-	 * @param values the values
-	 */
-	protected SetVal(Collection<Value> values) {
-		this.set = new LinkedHashSet<Value>();
-		for (Value v : values) {
-			if (v instanceof SetVal) {
-				this.set.addAll(((SetVal) v).getSubValues());
-			}
-			else {
-				this.set.add(v);
-			}
-		}
-		hashcode = set.hashCode();
-	};
+    /**
+     * Creates the list of values (protected, should be created via ValueFactory)
+     *
+     * @param values the values
+     */
+    protected SetVal(Collection<Value> values) {
+        this.set = new LinkedHashSet<Value>();
+        for (Value v : values) {
+            if (v instanceof SetVal) {
+                this.set.addAll(((SetVal) v).getSubValues());
+            } else {
+                this.set.add(v);
+            }
+        }
+        hashcode = set.hashCode();
+    }
 
-	/**
-	 * Creates the set of values (protected, should be created via ValueFactory)
-	 * 
-	 * @param values the values
-	 */
-	protected SetVal(Value... values) {
-		this(Arrays.asList(values));
-	};
+    ;
 
-	/**
-	 * Returns the hashcode for the list
-	 *
-	 * @return the hashcode
-	 */
-	@Override
-	public int hashCode() {
-		return hashcode;
-	}
+    /**
+     * Creates the set of values (protected, should be created via ValueFactory)
+     *
+     * @param values the values
+     */
+    protected SetVal(Value... values) {
+        this(Arrays.asList(values));
+    }
 
-	/**
-	 * Returns true if the lists are equals (contain the same elements), false
-	 * otherwise
-	 *
-	 * @param o the object to compare
-	 * @return true if equal, false otherwise
-	 */
-	@Override
-	public boolean equals(Object o) {
-		return ((o instanceof SetVal
-				&& ((SetVal) o).getSubValues().equals(getSubValues())));
-	}
+    ;
 
-	/**
-	 * Returns the set length
-	 * 
-	 * @return the length
-	 */
-	@Override
-	public int length() {
-		return set.size();
-	}
+    /**
+     * Returns the hashcode for the list
+     *
+     * @return the hashcode
+     */
+    @Override
+    public int hashCode() {
+        return hashcode;
+    }
 
-	/**
-	 * Returns the set of values
-	 * 
-	 * @return the set
-	 */
-	@Override
-	public Set<Value> getSubValues() {
-		return set;
-	}
+    /**
+     * Returns true if the lists are equals (contain the same elements), false
+     * otherwise
+     *
+     * @param o the object to compare
+     * @return true if equal, false otherwise
+     */
+    @Override
+    public boolean equals(Object o) {
+        return ((o instanceof SetVal
+                && ((SetVal) o).getSubValues().equals(getSubValues())));
+    }
 
-	/**
-	 * Returns a copy of the list
-	 *
-	 * @return the copy
-	 */
-	@Override
-	public SetVal copy() {
-		return new SetVal(set);
-	}
+    /**
+     * Returns the set length
+     *
+     * @return the length
+     */
+    @Override
+    public int length() {
+        return set.size();
+    }
 
-	/**
-	 * Returns a string representation of the set
-	 *
-	 * @return the string
-	 */
-	@Override
-	public String toString() {
-		return "" + set.toString();
-	}
+    /**
+     * Returns the set of values
+     *
+     * @return the set
+     */
+    @Override
+    public Set<Value> getSubValues() {
+        return set;
+    }
 
-	/**
-	 * Concatenates the two sets.
-	 */
-	@Override
-	public Value concatenate(Value v) {
-		if (v instanceof SetVal) {
-			Set<Value> newSet = new LinkedHashSet<Value>(set);
-			newSet.addAll(((SetVal) v).getSubValues());
-			return new SetVal(newSet);
-		}
-		else if (v instanceof NoneVal) {
-			return this;
-		}
-		else {
-			Set<Value> newSet = new LinkedHashSet<Value>(set);
-			newSet.add(v);
-			return new SetVal(newSet);
-		}
-	}
+    /**
+     * Returns a copy of the list
+     *
+     * @return the copy
+     */
+    @Override
+    public SetVal copy() {
+        return new SetVal(set);
+    }
 
-	/**
-	 * Compares the list value to another value
-	 * 
-	 * @return hashcode difference
-	 */
-	@Override
-	public int compareTo(Value o) {
-		return hashCode() - o.hashCode();
-	}
+    /**
+     * Returns a string representation of the set
+     *
+     * @return the string
+     */
+    @Override
+    public String toString() {
+        return "" + set.toString();
+    }
 
-	/**
-	 * Returns true if subvalue is contained, and false otherwise
-	 * 
-	 * @return true if contained, false otherwise
-	 */
-	@Override
-	public boolean contains(Value subvalue) {
-		return set.contains(subvalue);
-	}
+    /**
+     * Concatenates the two sets.
+     */
+    @Override
+    public Value concatenate(Value v) {
+        if (v instanceof SetVal) {
+            Set<Value> newSet = new LinkedHashSet<Value>(set);
+            newSet.addAll(((SetVal) v).getSubValues());
+            return new SetVal(newSet);
+        } else if (v instanceof NoneVal) {
+            return this;
+        } else {
+            Set<Value> newSet = new LinkedHashSet<Value>(set);
+            newSet.add(v);
+            return new SetVal(newSet);
+        }
+    }
 
-	public boolean isEmpty() {
-		return set.isEmpty();
-	}
+    /**
+     * Compares the list value to another value
+     *
+     * @return hashcode difference
+     */
+    @Override
+    public int compareTo(Value o) {
+        return hashCode() - o.hashCode();
+    }
+
+    /**
+     * Returns true if subvalue is contained, and false otherwise
+     *
+     * @return true if contained, false otherwise
+     */
+    @Override
+    public boolean contains(Value subvalue) {
+        return set.contains(subvalue);
+    }
+
+    public boolean isEmpty() {
+        return set.isEmpty();
+    }
 
 }

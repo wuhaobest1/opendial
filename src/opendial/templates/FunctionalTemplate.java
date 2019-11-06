@@ -39,121 +39,118 @@ import opendial.datastructs.Assignment;
 
 public class FunctionalTemplate implements Template {
 
-	final CustomFunction function;
+    final CustomFunction function;
 
-	final List<Template> parameters = new ArrayList<Template>();
+    final List<Template> parameters = new ArrayList<Template>();
 
-	final Set<String> slots = new HashSet<String>();
+    final Set<String> slots = new HashSet<String>();
 
-	/**
-	 * Creates a new string template.
-	 * 
-	 * @param string the string object
-	 */
-	protected FunctionalTemplate(String string) {
-		string = string.trim();
-		String funcName = string.substring(0, string.indexOf('('));
-		function = Settings.getFunction(funcName);
-		StringBuilder curParam = new StringBuilder();
-		int openParams = 0;
-		for (int i = funcName.length() + 1; i < string.length() - 1; i++) {
-			char c = string.charAt(i);
-			if (c == '(') {
-				openParams++;
-			}
-			else if (c == ')') {
-				openParams--;
-			}
-			else if (openParams == 0 && c == ',') {
-				Template param = Template.create(curParam.toString());
-				parameters.add(param);
-				slots.addAll(param.getSlots());
-				curParam = new StringBuilder();
-				continue;
-			}
-			curParam.append(c);
-		}
-		Template param = Template.create(curParam.toString());
-		parameters.add(param);
-		slots.addAll(param.getSlots());
-	}
+    /**
+     * Creates a new string template.
+     *
+     * @param string the string object
+     */
+    protected FunctionalTemplate(String string) {
+        string = string.trim();
+        String funcName = string.substring(0, string.indexOf('('));
+        function = Settings.getFunction(funcName);
+        StringBuilder curParam = new StringBuilder();
+        int openParams = 0;
+        for (int i = funcName.length() + 1; i < string.length() - 1; i++) {
+            char c = string.charAt(i);
+            if (c == '(') {
+                openParams++;
+            } else if (c == ')') {
+                openParams--;
+            } else if (openParams == 0 && c == ',') {
+                Template param = Template.create(curParam.toString());
+                parameters.add(param);
+                slots.addAll(param.getSlots());
+                curParam = new StringBuilder();
+                continue;
+            }
+            curParam.append(c);
+        }
+        Template param = Template.create(curParam.toString());
+        parameters.add(param);
+        slots.addAll(param.getSlots());
+    }
 
-	@Override
-	public Set<String> getSlots() {
-		return slots;
-	}
+    @Override
+    public Set<String> getSlots() {
+        return slots;
+    }
 
-	@Override
-	public boolean isUnderspecified() {
-		return !slots.isEmpty();
-	}
+    @Override
+    public boolean isUnderspecified() {
+        return !slots.isEmpty();
+    }
 
-	@Override
-	public MatchResult match(String str) {
-		if (isUnderspecified()) {
-			StringTemplate st = new StringTemplate(fillSlots(new Assignment()));
-			return st.match(str);
-		}
-		return new MatchResult(false);
-	}
+    @Override
+    public MatchResult match(String str) {
+        if (isUnderspecified()) {
+            StringTemplate st = new StringTemplate(fillSlots(new Assignment()));
+            return st.match(str);
+        }
+        return new MatchResult(false);
+    }
 
-	@Override
-	public List<MatchResult> find(String str, int maxResults) {
-		if (isUnderspecified()) {
-			StringTemplate st = new StringTemplate(fillSlots(new Assignment()));
-			return st.find(str, maxResults);
-		}
-		return Collections.emptyList();
-	}
+    @Override
+    public List<MatchResult> find(String str, int maxResults) {
+        if (isUnderspecified()) {
+            StringTemplate st = new StringTemplate(fillSlots(new Assignment()));
+            return st.find(str, maxResults);
+        }
+        return Collections.emptyList();
+    }
 
-	@Override
-	public boolean isFilledBy(Assignment input) {
-		return input.containsVars(slots);
-	}
+    @Override
+    public boolean isFilledBy(Assignment input) {
+        return input.containsVars(slots);
+    }
 
-	@Override
-	public String fillSlots(Assignment fillers) {
-		return getValue(fillers).toString();
-	}
+    @Override
+    public String fillSlots(Assignment fillers) {
+        return getValue(fillers).toString();
+    }
 
-	public Value getValue(Assignment fillers) {
-		List<String> filledParams = new LinkedList<String>();
-		for (Template t : parameters) {
-			if (t.isFilledBy(fillers)){
-				filledParams.add(t.fillSlots(fillers));
-			}
-			else {
-				return ValueFactory.none();
-			}
-		}
-		return function.apply(filledParams);
-	}
+    public Value getValue(Assignment fillers) {
+        List<String> filledParams = new LinkedList<String>();
+        for (Template t : parameters) {
+            if (t.isFilledBy(fillers)) {
+                filledParams.add(t.fillSlots(fillers));
+            } else {
+                return ValueFactory.none();
+            }
+        }
+        return function.apply(filledParams);
+    }
 
-	@Override
-	public int hashCode() {
-		return Math.abs(function.hashCode() + parameters.hashCode());
-	}
+    @Override
+    public int hashCode() {
+        return Math.abs(function.hashCode() + parameters.hashCode());
+    }
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append(function.getName() + "(");
-		String paramsStr = parameters.stream().map(p -> p.toString())
-				.collect(Collectors.joining(","));
-		builder.append(paramsStr + ")");
-		return builder.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(function.getName() + "(");
+        String paramsStr = parameters.stream().map(p -> p.toString())
+                .collect(Collectors.joining(","));
+        builder.append(paramsStr + ")");
+        return builder.toString();
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof FunctionalTemplate) {
-			return o.toString().equals(toString());
-		}
-		return false;
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof FunctionalTemplate) {
+            return o.toString().equals(toString());
+        }
+        return false;
+    }
 
-	public CustomFunction getFunction() {
-		return function;
-	}
+    public CustomFunction getFunction() {
+        return function;
+    }
 
 }

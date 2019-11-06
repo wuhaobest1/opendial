@@ -40,190 +40,187 @@ import opendial.utils.XMLUtils;
  * upon relevant changes.
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public class Domain {
 
-	final static Logger log = Logger.getLogger("OpenDial");
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	// path to the source XML file (and its imports)
-	File xmlFile;
-	List<File> importedFiles;
+    // path to the source XML file (and its imports)
+    File xmlFile;
+    List<File> importedFiles;
 
-	// initial dialogue state
-	DialogueState initState;
+    // initial dialogue state
+    DialogueState initState;
 
-	BNetwork parameters;
+    BNetwork parameters;
 
-	// list of models
-	List<Model> models;
+    // list of models
+    List<Model> models;
 
-	// settings
-	Settings settings;
+    // settings
+    Settings settings;
 
-	/**
-	 * Creates a new domain with an empty dialogue state and list of models.
-	 */
-	public Domain() {
-		settings = new Settings();
-		models = new LinkedList<Model>();
-		initState = new DialogueState();
-		parameters = new BNetwork();
-		importedFiles = new ArrayList<File>();
-	}
+    /**
+     * Creates a new domain with an empty dialogue state and list of models.
+     */
+    public Domain() {
+        settings = new Settings();
+        models = new LinkedList<Model>();
+        initState = new DialogueState();
+        parameters = new BNetwork();
+        importedFiles = new ArrayList<File>();
+    }
 
-	/**
-	 * Associate the given source XML files to the domain
-	 * 
-	 * @param xmlFile the file to associate
-	 */
-	public void setSourceFile(File xmlFile) {
-		if ( xmlFile.exists()
-			 || XMLUtils.existResource(xmlFile.getPath()) // file in JAR
-			) {
-			this.xmlFile = xmlFile;
-		}
-		else {
-			this.xmlFile = new File("resources/" + xmlFile);
-		}
-	}
+    /**
+     * Associate the given source XML files to the domain
+     *
+     * @param xmlFile the file to associate
+     */
+    public void setSourceFile(File xmlFile) {
+        if (xmlFile.exists()
+                || XMLUtils.existResource(xmlFile.getPath()) // file in JAR
+        ) {
+            this.xmlFile = xmlFile;
+        } else {
+            this.xmlFile = new File("resources/" + xmlFile);
+        }
+    }
 
-	/**
-	 * Returns true if the domain is empty
-	 * 
-	 * @return true if empty, false otherwise
-	 */
-	public boolean isEmpty() {
-		return this.xmlFile == null;
-	}
+    /**
+     * Returns true if the domain is empty
+     *
+     * @return true if empty, false otherwise
+     */
+    public boolean isEmpty() {
+        return this.xmlFile == null;
+    }
 
-	/**
-	 * Adds the given XML files to the list of imported source files
-	 * 
-	 * @param xmlFile the file to add
-	 */
-	public void addImportedFiles(File xmlFile) {
-		if ( xmlFile.exists()
-			 || XMLUtils.existResource(xmlFile.getPath()) // file in JAR
-			) {
-			importedFiles.add(xmlFile);
-		}
-		else {
-			importedFiles.add(new File("resources/" + xmlFile));
-		}
-	}
+    /**
+     * Adds the given XML files to the list of imported source files
+     *
+     * @param xmlFile the file to add
+     */
+    public void addImportedFiles(File xmlFile) {
+        if (xmlFile.exists()
+                || XMLUtils.existResource(xmlFile.getPath()) // file in JAR
+        ) {
+            importedFiles.add(xmlFile);
+        } else {
+            importedFiles.add(new File("resources/" + xmlFile));
+        }
+    }
 
-	/**
-	 * Returns the source file containing the domain specification
-	 * 
-	 * @return the source file
-	 */
-	public File getSourceFile() {
-		return xmlFile;
-	}
+    /**
+     * Returns the source file containing the domain specification
+     *
+     * @return the source file
+     */
+    public File getSourceFile() {
+        return xmlFile;
+    }
 
-	/**
-	 * Returns the (possibly empty) list of imported files
-	 * 
-	 * @return the imported files
-	 */
-	public List<File> getImportedFiles() {
-		return importedFiles;
-	}
+    /**
+     * Returns the (possibly empty) list of imported files
+     *
+     * @return the imported files
+     */
+    public List<File> getImportedFiles() {
+        return importedFiles;
+    }
 
-	/**
-	 * Sets the initial dialogue state
-	 * 
-	 * @param initState the initial state
-	 */
-	public void setInitialState(DialogueState initState) {
-		this.initState = initState;
-	}
+    /**
+     * Sets the initial dialogue state
+     *
+     * @param initState the initial state
+     */
+    public void setInitialState(DialogueState initState) {
+        this.initState = initState;
+    }
 
-	/**
-	 * Adds a model to the domain
-	 * 
-	 * @param model the model to add
-	 */
-	public void addModel(Model model) {
-		models.add(model);
-	}
+    /**
+     * Adds a model to the domain
+     *
+     * @param model the model to add
+     */
+    public void addModel(Model model) {
+        models.add(model);
+    }
 
-	/**
-	 * Returns the initial dialogue state
-	 * 
-	 * @return the initial state
-	 */
-	public DialogueState getInitialState() {
-		return initState;
-	}
+    /**
+     * Returns the initial dialogue state
+     *
+     * @return the initial state
+     */
+    public DialogueState getInitialState() {
+        return initState;
+    }
 
-	/**
-	 * Returns the models for the domain
-	 * 
-	 * @return the models
-	 */
-	public List<Model> getModels() {
-		return models;
-	}
+    /**
+     * Returns the models for the domain
+     *
+     * @return the models
+     */
+    public List<Model> getModels() {
+        return models;
+    }
 
-	/**
-	 * Replaces the domain-specific settings
-	 * 
-	 * @param settings the settings
-	 */
-	public void setSettings(Settings settings) {
-		this.settings = settings;
-	}
+    /**
+     * Replaces the domain-specific settings
+     *
+     * @param settings the settings
+     */
+    public void setSettings(Settings settings) {
+        this.settings = settings;
+    }
 
-	/**
-	 * Returns the domain-specific settings
-	 * 
-	 * @return the settings for the domain
-	 */
-	public Settings getSettings() {
-		return settings;
-	}
+    /**
+     * Returns the domain-specific settings
+     *
+     * @return the settings for the domain
+     */
+    public Settings getSettings() {
+        return settings;
+    }
 
-	/**
-	 * Returns the domain name.
-	 */
-	@Override
-	public String toString() {
-		return xmlFile.getName();
-	}
+    /**
+     * Returns the domain name.
+     */
+    @Override
+    public String toString() {
+        return xmlFile.getName();
+    }
 
-	/**
-	 * Sets the prior distribution for the domain parameters
-	 * 
-	 * @param parameters the parameters
-	 */
-	public void setParameters(BNetwork parameters) {
-		this.parameters = parameters;
-	}
+    /**
+     * Sets the prior distribution for the domain parameters
+     *
+     * @param parameters the parameters
+     */
+    public void setParameters(BNetwork parameters) {
+        this.parameters = parameters;
+    }
 
-	/**
-	 * Returns the prior distribution for the domain parameters
-	 * 
-	 * @return the prior distribution for the parameters
-	 */
-	public BNetwork getParameters() {
-		return parameters;
-	}
+    /**
+     * Returns the prior distribution for the domain parameters
+     *
+     * @return the prior distribution for the parameters
+     */
+    public BNetwork getParameters() {
+        return parameters;
+    }
 
-	/**
-	 * Returns true if o is a domain with the same source file, and false otherwise.
-	 */
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof Domain) {
-			File src1 = ((Domain) o).getSourceFile();
-			if (src1 == xmlFile) {
-				return true;
-			}
-			return (src1 != null && xmlFile != null && src1.equals(xmlFile));
-		}
-		return false;
-	}
+    /**
+     * Returns true if o is a domain with the same source file, and false otherwise.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Domain) {
+            File src1 = ((Domain) o).getSourceFile();
+            if (src1 == xmlFile) {
+                return true;
+            }
+            return (src1 != null && xmlFile != null && src1.equals(xmlFile));
+        }
+        return false;
+    }
 
 }

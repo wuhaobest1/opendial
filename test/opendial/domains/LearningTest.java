@@ -26,6 +26,7 @@ package opendial.domains;
 import java.util.logging.*;
 
 import static org.junit.Assert.assertTrue;
+
 import opendial.DialogueSystem;
 import opendial.Settings;
 import opendial.bn.BNetwork;
@@ -38,50 +39,50 @@ import org.junit.Test;
 
 public class LearningTest {
 
-	// logger
-	final static Logger log = Logger.getLogger("OpenDial");
+    // logger
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	public static final String domainFile = "test//domains//domain-is.xml";
-	public static final String parametersFile = "test//domains/params-is.xml";
+    public static final String domainFile = "test//domains//domain-is.xml";
+    public static final String parametersFile = "test//domains/params-is.xml";
 
-	@Test
-	public void testIS2013() throws InterruptedException {
-		Domain domain = XMLDomainReader.extractDomain(domainFile);
-		BNetwork params =
-				XMLStateReader.extractBayesianNetwork(parametersFile, "parameters");
-		domain.setParameters(params);
-		// Settings.guiSettings.showGUI = true;
-		DialogueSystem system = new DialogueSystem(domain);
-		system.getSettings().showGUI = false;
-		system.detachModule(ForwardPlanner.class);
-		Settings.nbSamples = Settings.nbSamples * 3;
-		Settings.maxSamplingTime = Settings.maxSamplingTime * 10;
-		system.startSystem();
+    @Test
+    public void testIS2013() throws InterruptedException {
+        Domain domain = XMLDomainReader.extractDomain(domainFile);
+        BNetwork params =
+                XMLStateReader.extractBayesianNetwork(parametersFile, "parameters");
+        domain.setParameters(params);
+        // Settings.guiSettings.showGUI = true;
+        DialogueSystem system = new DialogueSystem(domain);
+        system.getSettings().showGUI = false;
+        system.detachModule(ForwardPlanner.class);
+        Settings.nbSamples = Settings.nbSamples * 3;
+        Settings.maxSamplingTime = Settings.maxSamplingTime * 10;
+        system.startSystem();
 
-		double[] initMean =
-				system.getContent("theta_1").toContinuous().getFunction().getMean();
+        double[] initMean =
+                system.getContent("theta_1").toContinuous().getFunction().getMean();
 
-		CategoricalTable.Builder builder = new CategoricalTable.Builder("a_u");
-		builder.addRow("Move(Left)", 1.0);
-		builder.addRow("Move(Right)", 0.0);
-		builder.addRow("None", 0.0);
-		system.addContent(builder.build());
-		system.getState().removeNodes(system.getState().getUtilityNodeIds());
-		system.getState().removeNodes(system.getState().getActionNodeIds());
+        CategoricalTable.Builder builder = new CategoricalTable.Builder("a_u");
+        builder.addRow("Move(Left)", 1.0);
+        builder.addRow("Move(Right)", 0.0);
+        builder.addRow("None", 0.0);
+        system.addContent(builder.build());
+        system.getState().removeNodes(system.getState().getUtilityNodeIds());
+        system.getState().removeNodes(system.getState().getActionNodeIds());
 
-		double[] afterMean =
-				system.getContent("theta_1").toContinuous().getFunction().getMean();
+        double[] afterMean =
+                system.getContent("theta_1").toContinuous().getFunction().getMean();
 
-		assertTrue(afterMean[0] - initMean[0] > 0.04);
-		assertTrue(afterMean[1] - initMean[1] < 0.04);
-		assertTrue(afterMean[2] - initMean[2] < 0.04);
-		assertTrue(afterMean[3] - initMean[3] < 0.04);
-		assertTrue(afterMean[4] - initMean[4] < 0.04);
-		assertTrue(afterMean[5] - initMean[5] < 0.04);
-		assertTrue(afterMean[6] - initMean[6] < 0.04);
-		assertTrue(afterMean[7] - initMean[7] < 0.04);
+        assertTrue(afterMean[0] - initMean[0] > 0.04);
+        assertTrue(afterMean[1] - initMean[1] < 0.04);
+        assertTrue(afterMean[2] - initMean[2] < 0.04);
+        assertTrue(afterMean[3] - initMean[3] < 0.04);
+        assertTrue(afterMean[4] - initMean[4] < 0.04);
+        assertTrue(afterMean[5] - initMean[5] < 0.04);
+        assertTrue(afterMean[6] - initMean[6] < 0.04);
+        assertTrue(afterMean[7] - initMean[7] < 0.04);
 
-		Settings.nbSamples = Settings.nbSamples / 3;
-		Settings.maxSamplingTime = Settings.maxSamplingTime / 10;
-	}
+        Settings.nbSamples = Settings.nbSamples / 3;
+        Settings.maxSamplingTime = Settings.maxSamplingTime / 10;
+    }
 }

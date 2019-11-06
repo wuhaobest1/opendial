@@ -39,58 +39,55 @@ import org.w3c.dom.Node;
  * XML reader for previously recorded dialogues.
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public class XMLDialogueReader {
 
-	final static Logger log = Logger.getLogger("OpenDial");
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	/**
-	 * Extracts the dialogue specified in the data file. The result is a list of
-	 * dialogue state (one for each turn).
-	 * 
-	 * @param dataFile the XML file containing the turns
-	 * @return the list of dialogue states
-	 */
-	public static List<DialogueState> extractDialogue(String dataFile) {
-		// extract the XML document
-		Document doc = XMLUtils.getXMLDocument(dataFile);
-		Node mainNode = XMLUtils.getMainNode(doc);
+    /**
+     * Extracts the dialogue specified in the data file. The result is a list of
+     * dialogue state (one for each turn).
+     *
+     * @param dataFile the XML file containing the turns
+     * @return the list of dialogue states
+     */
+    public static List<DialogueState> extractDialogue(String dataFile) {
+        // extract the XML document
+        Document doc = XMLUtils.getXMLDocument(dataFile);
+        Node mainNode = XMLUtils.getMainNode(doc);
 
-		File f = new File(dataFile);
-		String rootpath = f.getParent();
+        File f = new File(dataFile);
+        String rootpath = f.getParent();
 
-		List<DialogueState> sample = new LinkedList<DialogueState>();
-		for (int j = 0; j < mainNode.getChildNodes().getLength(); j++) {
+        List<DialogueState> sample = new LinkedList<DialogueState>();
+        for (int j = 0; j < mainNode.getChildNodes().getLength(); j++) {
 
-			Node node = mainNode.getChildNodes().item(j);
-			if (node.getNodeName().contains("Turn")) {
-				DialogueState state =
-						new DialogueState(XMLStateReader.getBayesianNetwork(node));
-				sample.add(state);
-				if (node.getNodeName().equals("systemTurn")
-						&& state.hasChanceNode("a_m")) {
-					Assignment assign =
-							new Assignment("a_m", state.queryProb("a_m").getBest());
-					state.addEvidence(assign);
-				}
-			}
-			else if (node.getNodeName().equals("wizard")) {
-				Assignment assign = Assignment.createFromString(
-						node.getFirstChild().getNodeValue().trim());
-				sample.get(sample.size() - 1).addEvidence(assign);
-			}
-			else if (node.getNodeName().equals("import")) {
-				String fileName =
-						mainNode.getAttributes().getNamedItem("href").getNodeValue();
-				List<DialogueState> points =
-						extractDialogue(rootpath + "/" + fileName);
-				sample.addAll(points);
-			}
+            Node node = mainNode.getChildNodes().item(j);
+            if (node.getNodeName().contains("Turn")) {
+                DialogueState state =
+                        new DialogueState(XMLStateReader.getBayesianNetwork(node));
+                sample.add(state);
+                if (node.getNodeName().equals("systemTurn")
+                        && state.hasChanceNode("a_m")) {
+                    Assignment assign =
+                            new Assignment("a_m", state.queryProb("a_m").getBest());
+                    state.addEvidence(assign);
+                }
+            } else if (node.getNodeName().equals("wizard")) {
+                Assignment assign = Assignment.createFromString(
+                        node.getFirstChild().getNodeValue().trim());
+                sample.get(sample.size() - 1).addEvidence(assign);
+            } else if (node.getNodeName().equals("import")) {
+                String fileName =
+                        mainNode.getAttributes().getNamedItem("href").getNodeValue();
+                List<DialogueState> points =
+                        extractDialogue(rootpath + "/" + fileName);
+                sample.addAll(points);
+            }
 
-		}
+        }
 
-		return sample;
-	}
+        return sample;
+    }
 
 }

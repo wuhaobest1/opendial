@@ -32,95 +32,94 @@ import opendial.datastructs.Assignment;
  * Representation of a conditional probability distribution P(X | Y1,...Ym), where X
  * is the "head" random variable for the distribution, and Y1,...Ym are the
  * conditional variables
- * 
- * @author Pierre Lison (plison@ifi.uio.no)
  *
+ * @author Pierre Lison (plison@ifi.uio.no)
  */
 public interface ProbDistribution {
 
-	/**
-	 * Returns the name of the random variable
-	 * 
-	 * @return the name of the random variable
-	 */
-	public String getVariable();
+    /**
+     * Returns the name of the random variable
+     *
+     * @return the name of the random variable
+     */
+    public String getVariable();
 
-	/**
-	 * Returns the conditional variables Y1,...Ym of the distribution
-	 * 
-	 * @return the set of conditional variables
-	 */
-	public Set<String> getInputVariables();
+    /**
+     * Returns the conditional variables Y1,...Ym of the distribution
+     *
+     * @return the set of conditional variables
+     */
+    public Set<String> getInputVariables();
 
-	/**
-	 * Returns the probability P(head|condition), if any is specified. Else, returns
-	 * 0.0f.
-	 * 
-	 * @param condition the conditional assignment for Y1,..., Ym
-	 * @param head the value for the random variable
-	 * @return the associated probability, if one exists. not be extracted
-	 */
-	public double getProb(Assignment condition, Value head);
+    /**
+     * Returns the probability P(head|condition), if any is specified. Else, returns
+     * 0.0f.
+     *
+     * @param condition the conditional assignment for Y1,..., Ym
+     * @param head      the value for the random variable
+     * @return the associated probability, if one exists. not be extracted
+     */
+    public double getProb(Assignment condition, Value head);
 
-	/**
-	 * Returns the (unconditional) probability distribution associated with the
-	 * conditional assignment provided as argument.
-	 * 
-	 * @param condition the conditional assignment on Y1,...Ym
-	 * @return the independent probability distribution on X. distribution could not
-	 *         be extracted
-	 */
-	public IndependentDistribution getProbDistrib(Assignment condition);
+    /**
+     * Returns the (unconditional) probability distribution associated with the
+     * conditional assignment provided as argument.
+     *
+     * @param condition the conditional assignment on Y1,...Ym
+     * @return the independent probability distribution on X. distribution could not
+     * be extracted
+     */
+    public IndependentDistribution getProbDistrib(Assignment condition);
 
-	/**
-	 * Returns a sample value for the distribution given a particular conditional
-	 * assignment.
-	 * 
-	 * @param condition the conditional assignment for Y1,...,Ym
-	 * @return the sampled values for the random variable sampled
-	 */
-	public Value sample(Assignment condition);
+    /**
+     * Returns a sample value for the distribution given a particular conditional
+     * assignment.
+     *
+     * @param condition the conditional assignment for Y1,...,Ym
+     * @return the sampled values for the random variable sampled
+     */
+    public Value sample(Assignment condition);
 
-	/**
-	 * Returns the set of possible values for the distribution. If the distribution
-	 * is continuous, the method returns a discretised set.
-	 * 
-	 * @return the values in the distribution
-	 */
-	public Set<Value> getValues();
+    /**
+     * Returns the set of possible values for the distribution. If the distribution
+     * is continuous, the method returns a discretised set.
+     *
+     * @return the values in the distribution
+     */
+    public Set<Value> getValues();
 
-	/**
-	 * Returns a new probability distribution that is the posterior of the current
-	 * distribution, given the conditional assignment as argument.
-	 * 
-	 * @param condition an assignment of values to (a subset of) the conditional
-	 *            variables
-	 * @return the posterior distribution
-	 */
-	public abstract ProbDistribution getPosterior(Assignment condition);
+    /**
+     * Returns a new probability distribution that is the posterior of the current
+     * distribution, given the conditional assignment as argument.
+     *
+     * @param condition an assignment of values to (a subset of) the conditional
+     *                  variables
+     * @return the posterior distribution
+     */
+    public abstract ProbDistribution getPosterior(Assignment condition);
 
-	/**
-	 * Prunes values whose frequency in the distribution is lower than the given
-	 * threshold.
-	 * 
-	 * @param threshold the threshold to apply for the pruning
-	 * @return true if at least one value has been removed, false otherwise
-	 */
-	public boolean pruneValues(double threshold);
+    /**
+     * Prunes values whose frequency in the distribution is lower than the given
+     * threshold.
+     *
+     * @param threshold the threshold to apply for the pruning
+     * @return true if at least one value has been removed, false otherwise
+     */
+    public boolean pruneValues(double threshold);
 
-	/**
-	 * Creates a copy of the probability distribution
-	 * 
-	 * @return the copy
-	 */
-	public ProbDistribution copy();
+    /**
+     * Creates a copy of the probability distribution
+     *
+     * @return the copy
+     */
+    public ProbDistribution copy();
 
-	/**
-	 * Changes the variable name in the distribution
-	 * 
-	 * @param oldId the old variable label
-	 * @param newId the new variable label
-	 */
-	public void modifyVariableId(String oldId, String newId);
+    /**
+     * Changes the variable name in the distribution
+     *
+     * @param oldId the old variable label
+     * @param newId the new variable label
+     */
+    public void modifyVariableId(String oldId, String newId);
 
 }

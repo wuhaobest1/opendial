@@ -34,82 +34,77 @@ import opendial.utils.StringUtils;
 /**
  * Template for an arithmetic template, such as "exp(({A}+{B})/{C})". When filling
  * the slots of the template, the function is evaluated.
- *
  */
 class ArithmeticTemplate extends RegexTemplate {
 
-	public ArithmeticTemplate(String rawString) {
-		super(rawString);
-	}
+    public ArithmeticTemplate(String rawString) {
+        super(rawString);
+    }
 
-	/**
-	 * Fills the slots of the template, and returns the result of the function
-	 * evaluation. If the function is not a simple arithmetic expression,
-	 */
-	@Override
-	public String fillSlots(Assignment fillers) {
+    /**
+     * Fills the slots of the template, and returns the result of the function
+     * evaluation. If the function is not a simple arithmetic expression,
+     */
+    @Override
+    public String fillSlots(Assignment fillers) {
 
-		String filled = super.fillSlots(fillers);
-		if (filled.contains("{")) {
-			return filled;
-		}
+        String filled = super.fillSlots(fillers);
+        if (filled.contains("{")) {
+            return filled;
+        }
 
-		if (isArithmeticExpression(filled)) {
-			try {
-				double result = new MathExpression(filled).evaluate();
-				return StringUtils.getShortForm(result);
-			}
-			catch (Exception e) {
-				log.warning("cannot evaluate " + filled);
-				return filled;
-			}
-		}
+        if (isArithmeticExpression(filled)) {
+            try {
+                double result = new MathExpression(filled).evaluate();
+                return StringUtils.getShortForm(result);
+            } catch (Exception e) {
+                log.warning("cannot evaluate " + filled);
+                return filled;
+            }
+        }
 
-		// handling expressions that manipulate sets
-		// (using + and - to respectively add/remove elements)
-		Value merge = ValueFactory.none();
-		for (String split : filled.split("\\+")) {
-			String[] negation = split.split("\\-");
-			merge = merge.concatenate(ValueFactory.create(negation[0]));
-			for (int i = 1; i < negation.length; i++) {
-				Collection<Value> values = merge.getSubValues();
-				values.remove(ValueFactory.create(negation[i]));
-				merge = ValueFactory.create(values);
-			}
-		}
-		return merge.toString();
-	}
+        // handling expressions that manipulate sets
+        // (using + and - to respectively add/remove elements)
+        Value merge = ValueFactory.none();
+        for (String split : filled.split("\\+")) {
+            String[] negation = split.split("\\-");
+            merge = merge.concatenate(ValueFactory.create(negation[0]));
+            for (int i = 1; i < negation.length; i++) {
+                Collection<Value> values = merge.getSubValues();
+                values.remove(ValueFactory.create(negation[i]));
+                merge = ValueFactory.create(values);
+            }
+        }
+        return merge.toString();
+    }
 
-	/**
-	 * Returns true if the string corresponds to an arithmetic expression, and false
-	 * otherwise
-	 * 
-	 * @param exp the string to check
-	 * @return true if the string is an arithmetic expression, false otherwise
-	 */
-	public static boolean isArithmeticExpression(String exp) {
-		boolean mathOperators = false;
-		StringBuilder curString = new StringBuilder();
-		for (int i = 0; i < exp.length(); i++) {
-			char c = exp.charAt(i);
-			if (c == '+' || c == '-' || c == '/' || (c == '*' && exp.length() > 2)) {
-				mathOperators = true;
-			}
-			else if (c == '?' || c == '|' || c == '[' || c == '_' || c == '\'') {
-				return false;
-			}
-			else if (Character.isLetter(c)) {
-				curString.append(c);
-			}
-			else if (StringUtils.isDelimiter(c)) {
-				if (!MathExpression.fixedFunctions.contains(curString.toString())) {
-					return false;
-				}
-				mathOperators = true;
-				curString = new StringBuilder();
-			}
-		}
-		return (mathOperators);
-	}
+    /**
+     * Returns true if the string corresponds to an arithmetic expression, and false
+     * otherwise
+     *
+     * @param exp the string to check
+     * @return true if the string is an arithmetic expression, false otherwise
+     */
+    public static boolean isArithmeticExpression(String exp) {
+        boolean mathOperators = false;
+        StringBuilder curString = new StringBuilder();
+        for (int i = 0; i < exp.length(); i++) {
+            char c = exp.charAt(i);
+            if (c == '+' || c == '-' || c == '/' || (c == '*' && exp.length() > 2)) {
+                mathOperators = true;
+            } else if (c == '?' || c == '|' || c == '[' || c == '_' || c == '\'') {
+                return false;
+            } else if (Character.isLetter(c)) {
+                curString.append(c);
+            } else if (StringUtils.isDelimiter(c)) {
+                if (!MathExpression.fixedFunctions.contains(curString.toString())) {
+                    return false;
+                }
+                mathOperators = true;
+                curString = new StringBuilder();
+            }
+        }
+        return (mathOperators);
+    }
 
 }

@@ -30,7 +30,7 @@ import opendial.DialogueState;
 /**
  * Representation of a system module. A module is connected to the dialogue system
  * and can read and write to its dialogue state. It can also be paused/resumed.
- * 
+ *
  * <p>
  * Two distinct families of modules can be distinguished:
  * <ol>
@@ -39,11 +39,11 @@ import opendial.DialogueState;
  * <li>Synchronous modules are triggered upon an update of the dialogue state via the
  * method trigger(state, updatedVars).
  * </ol>
- * 
+ *
  * <p>
  * Of course, nothing prevents in practice a module to operate both in synchronous
  * and asynchronous mode.
- * 
+ *
  * <p>
  * In order to make the module easy to load into the system (via e.g. the
  * "&lt;modules&gt;" parameters in system settings or the command line), it is a good
@@ -52,37 +52,35 @@ import opendial.DialogueState;
  * arguments can in this case be specified through parameters in the system settings.
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public interface Module {
 
-	/**
-	 * Starts the module.
-	 * 
-	 */
-	public void start();
+    /**
+     * Starts the module.
+     */
+    public void start();
 
-	/**
-	 * Triggers the module after a state update
-	 * 
-	 * @param state the dialogue state
-	 * @param updatedVars the set of updated variables
-	 */
-	public void trigger(DialogueState state, Collection<String> updatedVars);
+    /**
+     * Triggers the module after a state update
+     *
+     * @param state       the dialogue state
+     * @param updatedVars the set of updated variables
+     */
+    public void trigger(DialogueState state, Collection<String> updatedVars);
 
-	/**
-	 * Pauses the current module
-	 * 
-	 * @param toPause whether to pause or resume the module
-	 */
-	public void pause(boolean toPause);
+    /**
+     * Pauses the current module
+     *
+     * @param toPause whether to pause or resume the module
+     */
+    public void pause(boolean toPause);
 
-	/**
-	 * Returns true if the module is running (i.e. started and not paused), and false
-	 * otherwise
-	 * 
-	 * @return whether the module is running or not
-	 */
-	public boolean isRunning();
+    /**
+     * Returns true if the module is running (i.e. started and not paused), and false
+     * otherwise
+     *
+     * @return whether the module is running or not
+     */
+    public boolean isRunning();
 
 }

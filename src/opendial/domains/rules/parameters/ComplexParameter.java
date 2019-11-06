@@ -32,106 +32,103 @@ import opendial.datastructs.MathExpression;
 /**
  * Representation of a complex parameter expression. The class uses the exp4j package
  * to dynamically evaluate the result of the expression.
- * 
- * @author Pierre Lison (plison@ifi.uio.no)
  *
+ * @author Pierre Lison (plison@ifi.uio.no)
  */
 public class ComplexParameter implements Parameter {
 
-	// logger
-	final static Logger log = Logger.getLogger("OpenDial");
+    // logger
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	// mathematical expression
-	final MathExpression expression;
+    // mathematical expression
+    final MathExpression expression;
 
-	/**
-	 * Constructs a new complex parameter with the given expression, assuming the
-	 * list of parameters is provided as labels within the expression.
-	 * 
-	 * @param expression the expression
-	 */
-	public ComplexParameter(MathExpression expression) {
-		this.expression = expression;
-	}
+    /**
+     * Constructs a new complex parameter with the given expression, assuming the
+     * list of parameters is provided as labels within the expression.
+     *
+     * @param expression the expression
+     */
+    public ComplexParameter(MathExpression expression) {
+        this.expression = expression;
+    }
 
-	/**
-	 * Returns the parameter value corresponding to the expression and the assignment
-	 * of values to the unknown parameters.
-	 */
-	@Override
-	public double getValue(Assignment input) {
-		try {
-			return expression.evaluate(input);
-		}
-		catch (IllegalArgumentException e) {
-			log.warning("cannot evaluate " + this + " given " + input + ": "
-					+ e.getMessage());
-			return 0.0;
-		}
-	}
+    /**
+     * Returns the parameter value corresponding to the expression and the assignment
+     * of values to the unknown parameters.
+     */
+    @Override
+    public double getValue(Assignment input) {
+        try {
+            return expression.evaluate(input);
+        } catch (IllegalArgumentException e) {
+            log.warning("cannot evaluate " + this + " given " + input + ": "
+                    + e.getMessage());
+            return 0.0;
+        }
+    }
 
-	/**
-	 * Grounds the parameter by assigning the values in the assignment to the unknown
-	 * variables
-	 * 
-	 * @param input the grounding assignment
-	 * @return the grounded parameter
-	 */
-	public Parameter ground(Assignment input) {
-		if (input.containsVars(expression.getVariables())) {
-			try {
-				double result = expression.evaluate(input);
-				return new FixedParameter(result);
-			}
-			catch (IllegalArgumentException e) {
-				log.warning("cannot ground " + expression + " with " + input);
-			}
-		}
+    /**
+     * Grounds the parameter by assigning the values in the assignment to the unknown
+     * variables
+     *
+     * @param input the grounding assignment
+     * @return the grounded parameter
+     */
+    public Parameter ground(Assignment input) {
+        if (input.containsVars(expression.getVariables())) {
+            try {
+                double result = expression.evaluate(input);
+                return new FixedParameter(result);
+            } catch (IllegalArgumentException e) {
+                log.warning("cannot ground " + expression + " with " + input);
+            }
+        }
 
-		String filled = expression.toString();
-		for (String u : input.getVariables()) {
-			filled.replaceAll(u, input.getValue(u).toString());
-		}
+        String filled = expression.toString();
+        for (String u : input.getVariables()) {
+            filled.replaceAll(u, input.getValue(u).toString());
+        }
 
-		return new ComplexParameter(new MathExpression(filled));
-	}
+        return new ComplexParameter(new MathExpression(filled));
+    }
 
-	/**
-	 * Returns the list of unknown parameter variables
-	 */
-	@Override
-	public Collection<String> getVariables() {
-		return expression.getVariables();
-	}
+    /**
+     * Returns the list of unknown parameter variables
+     */
+    @Override
+    public Collection<String> getVariables() {
+        return expression.getVariables();
+    }
 
-	/**
-	 * Returns the mathematical expression representing the parameter
-	 * 
-	 * @return the expression
-	 */
-	@Override
-	public MathExpression getExpression() {
-		return expression;
-	}
+    /**
+     * Returns the mathematical expression representing the parameter
+     *
+     * @return the expression
+     */
+    @Override
+    public MathExpression getExpression() {
+        return expression;
+    }
 
-	/**
-	 * Returns the parameter template as a string
-	 *
-	 * @return the string
-	 */
-	@Override
-	public String toString() {
-		return expression.toString();
-	}
+    /**
+     * Returns the parameter template as a string
+     *
+     * @return the string
+     */
+    @Override
+    public String toString() {
+        return expression.toString();
+    }
 
-	/**
-	 * Returns the hashcode for the parameter
-	 *
-	 * @return the hashcode
-	 */
-	@Override
-	public int hashCode() {
-		return -3 * expression.hashCode();
-	}
+    /**
+     * Returns the hashcode for the parameter
+     *
+     * @return the hashcode
+     */
+    @Override
+    public int hashCode() {
+        return -3 * expression.hashCode();
+    }
 
 }

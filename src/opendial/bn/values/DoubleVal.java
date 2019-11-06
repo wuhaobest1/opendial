@@ -33,140 +33,137 @@ import opendial.utils.StringUtils;
  * Representation of a double value
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 
 public final class DoubleVal implements Value {
 
-	// logger
-	final static Logger log = Logger.getLogger("OpenDial");
+    // logger
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	// the double
-	final double d;
-	final int hashcode;
+    // the double
+    final double d;
+    final int hashcode;
 
-	/**
-	 * Creates the double value (protected, use the ValueFactory instead)
-	 * 
-	 * @param d the double
-	 */
-	protected DoubleVal(double d) {
-		this.d = d;
-		hashcode = new Double(d).hashCode();
-	};
+    /**
+     * Creates the double value (protected, use the ValueFactory instead)
+     *
+     * @param d the double
+     */
+    protected DoubleVal(double d) {
+        this.d = d;
+        hashcode = new Double(d).hashCode();
+    }
 
-	/**
-	 * Returns the hashcode for the double
-	 *
-	 * @return the hashcode
-	 */
-	@Override
-	public int hashCode() {
-		return hashcode;
-	}
+    ;
 
-	/**
-	 * Returns true if the objects are similar, false otherwise
-	 *
-	 * @param o the object to compare
-	 * @return true if similar, false otherwise
-	 */
-	@Override
-	public boolean equals(Object o) {
-		boolean result = (o instanceof DoubleVal
-				&& Math.abs(((DoubleVal) o).getDouble() - getDouble()) < 0.000001);
-		return result;
-	}
+    /**
+     * Returns the hashcode for the double
+     *
+     * @return the hashcode
+     */
+    @Override
+    public int hashCode() {
+        return hashcode;
+    }
 
-	/**
-	 * Returns the double value
-	 * 
-	 * @return the double value
-	 */
-	public Double getDouble() {
-		return d;
-	}
+    /**
+     * Returns true if the objects are similar, false otherwise
+     *
+     * @param o the object to compare
+     * @return true if similar, false otherwise
+     */
+    @Override
+    public boolean equals(Object o) {
+        boolean result = (o instanceof DoubleVal
+                && Math.abs(((DoubleVal) o).getDouble() - getDouble()) < 0.000001);
+        return result;
+    }
 
-	/**
-	 * Returns a copy of the double value
-	 *
-	 * @return the copy
-	 */
-	@Override
-	public DoubleVal copy() {
-		return new DoubleVal(d);
-	}
+    /**
+     * Returns the double value
+     *
+     * @return the double value
+     */
+    public Double getDouble() {
+        return d;
+    }
 
-	/**
-	 * Returns a string representation of the double
-	 *
-	 * @return the string representation
-	 */
-	@Override
-	public String toString() {
-		return "" + StringUtils.getShortForm(d);
-	}
+    /**
+     * Returns a copy of the double value
+     *
+     * @return the copy
+     */
+    @Override
+    public DoubleVal copy() {
+        return new DoubleVal(d);
+    }
 
-	/**
-	 * Returns 1
-	 * 
-	 * @return 1
-	 */
-	@Override
-	public int length() {
-		return 1;
-	}
+    /**
+     * Returns a string representation of the double
+     *
+     * @return the string representation
+     */
+    @Override
+    public String toString() {
+        return "" + StringUtils.getShortForm(d);
+    }
 
-	/**
-	 * If v is a DoubleVal, returns the addition of the two values. If v is a
-	 * StringVal, returns the string concatenation of the two. Else, returns none.
-	 */
-	@Override
-	public Value concatenate(Value v) {
-		if (v instanceof DoubleVal) {
-			return new DoubleVal(d + ((DoubleVal) v).getDouble());
-		}
-		else if (v instanceof StringVal) {
-			return ValueFactory.create(toString() + " " + v.toString());
-		}
-		else if (v instanceof NoneVal) {
-			return this;
-		}
-		else {
-			log.warning("cannot concatenate " + this + " and " + v);
-			return ValueFactory.noneValue;
-		}
-	}
+    /**
+     * Returns 1
+     *
+     * @return 1
+     */
+    @Override
+    public int length() {
+        return 1;
+    }
 
-	/**
-	 * Compares the double value to another value
-	 * 
-	 * @return usual ordering, or hashcode difference if the value is not a double
-	 */
-	@Override
-	public int compareTo(Value o) {
-		if (o instanceof DoubleVal) {
-			return Double.compare(d, ((DoubleVal) o).getDouble());
-		}
-		else {
-			return 0;
-		}
-	}
+    /**
+     * If v is a DoubleVal, returns the addition of the two values. If v is a
+     * StringVal, returns the string concatenation of the two. Else, returns none.
+     */
+    @Override
+    public Value concatenate(Value v) {
+        if (v instanceof DoubleVal) {
+            return new DoubleVal(d + ((DoubleVal) v).getDouble());
+        } else if (v instanceof StringVal) {
+            return ValueFactory.create(toString() + " " + v.toString());
+        } else if (v instanceof NoneVal) {
+            return this;
+        } else {
+            log.warning("cannot concatenate " + this + " and " + v);
+            return ValueFactory.noneValue;
+        }
+    }
 
-	/**
-	 * Returns false
-	 */
-	@Override
-	public boolean contains(Value subvalue) {
-		return equals(subvalue);
-	}
+    /**
+     * Compares the double value to another value
+     *
+     * @return usual ordering, or hashcode difference if the value is not a double
+     */
+    @Override
+    public int compareTo(Value o) {
+        if (o instanceof DoubleVal) {
+            return Double.compare(d, ((DoubleVal) o).getDouble());
+        } else {
+            return 0;
+        }
+    }
 
-	/**
-	 * Returns an empty list
-	 */
-	@Override
-	public Collection<Value> getSubValues() {
-		return new ArrayList<Value>();
-	}
+    /**
+     * Returns false
+     */
+    @Override
+    public boolean contains(Value subvalue) {
+        return equals(subvalue);
+    }
+
+    /**
+     * Returns an empty list
+     */
+    @Override
+    public Collection<Value> getSubValues() {
+        return new ArrayList<Value>();
+    }
 
 }

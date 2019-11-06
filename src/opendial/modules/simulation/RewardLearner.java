@@ -47,146 +47,143 @@ import opendial.modules.Module;
 /**
  * Module employed during simulated dialogues to automatically estimate a utility
  * model from rewards produced by the simulator.
- * 
+ *
  * @author Pierre Lison (plison@ifi.uio.no)
  */
 public class RewardLearner implements Module {
 
-	// logger
-	final static Logger log = Logger.getLogger("OpenDial");
+    // logger
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	// the dialogue system
-	DialogueSystem system;
+    // the dialogue system
+    DialogueSystem system;
 
-	// previous dialogue states with a decision network. The states are indexed
-	// by the label of their action variables.
-	Map<Set<String>, DialogueState> previousStates;
+    // previous dialogue states with a decision network. The states are indexed
+    // by the label of their action variables.
+    Map<Set<String>, DialogueState> previousStates;
 
-	SamplingAlgorithm sampler;
+    SamplingAlgorithm sampler;
 
-	/**
-	 * Creates the reward learner for the dialogue system.
-	 * 
-	 * @param system the dialogue system.
-	 */
-	public RewardLearner(DialogueSystem system) {
-		this.system = system;
-		previousStates = new HashMap<Set<String>, DialogueState>();
-		sampler = new SamplingAlgorithm();
-	}
+    /**
+     * Creates the reward learner for the dialogue system.
+     *
+     * @param system the dialogue system.
+     */
+    public RewardLearner(DialogueSystem system) {
+        this.system = system;
+        previousStates = new HashMap<Set<String>, DialogueState>();
+        sampler = new SamplingAlgorithm();
+    }
 
-	/**
-	 * Does nothing.
-	 */
-	@Override
-	public void start() {
-	}
+    /**
+     * Does nothing.
+     */
+    @Override
+    public void start() {
+    }
 
-	/**
-	 * Does nothing.
-	 */
-	@Override
-	public void pause(boolean shouldBePaused) {
-	}
+    /**
+     * Does nothing.
+     */
+    @Override
+    public void pause(boolean shouldBePaused) {
+    }
 
-	/**
-	 * Returns true.
-	 */
-	@Override
-	public boolean isRunning() {
-		return true;
-	}
+    /**
+     * Returns true.
+     */
+    @Override
+    public boolean isRunning() {
+        return true;
+    }
 
-	/**
-	 * Triggers the reward learner. The module is only triggered whenever a variable
-	 * of the form R(assignment of action values) is included in the dialogue state
-	 * by the simulator. In such case, the module checks whether a past dialogue
-	 * state contains a decision for these action variables, and if yes, update their
-	 * parameters to reflect the actual received reward.
-	 * 
-	 * @param state the dialogue state
-	 * @param updatedVars the list of recently updated variables.
-	 * 
-	 */
-	@Override
-	public void trigger(DialogueState state, Collection<String> updatedVars) {
+    /**
+     * Triggers the reward learner. The module is only triggered whenever a variable
+     * of the form R(assignment of action values) is included in the dialogue state
+     * by the simulator. In such case, the module checks whether a past dialogue
+     * state contains a decision for these action variables, and if yes, update their
+     * parameters to reflect the actual received reward.
+     *
+     * @param state       the dialogue state
+     * @param updatedVars the list of recently updated variables.
+     */
+    @Override
+    public void trigger(DialogueState state, Collection<String> updatedVars) {
 
-		for (String evidenceVar : state.getEvidence().getVariables()) {
-			if (evidenceVar.startsWith("R(") && evidenceVar.endsWith(")")) {
-				Assignment actualAction = Assignment.createFromString(
-						evidenceVar.substring(2, evidenceVar.length() - 1));
-				double actualUtility =
-						((DoubleVal) state.getEvidence().getValue(evidenceVar))
-								.getDouble();
+        for (String evidenceVar : state.getEvidence().getVariables()) {
+            if (evidenceVar.startsWith("R(") && evidenceVar.endsWith(")")) {
+                Assignment actualAction = Assignment.createFromString(
+                        evidenceVar.substring(2, evidenceVar.length() - 1));
+                double actualUtility =
+                        ((DoubleVal) state.getEvidence().getValue(evidenceVar))
+                                .getDouble();
 
-				if (previousStates.containsKey(actualAction.getVariables())) {
-					DialogueState previousState =
-							previousStates.get(actualAction.getVariables());
-					learnFromFeedback(previousState, actualAction, actualUtility);
-				}
-				state.clearEvidence(Arrays.asList(evidenceVar));
-			}
-		}
+                if (previousStates.containsKey(actualAction.getVariables())) {
+                    DialogueState previousState =
+                            previousStates.get(actualAction.getVariables());
+                    learnFromFeedback(previousState, actualAction, actualUtility);
+                }
+                state.clearEvidence(Arrays.asList(evidenceVar));
+            }
+        }
 
-		if (!state.getActionNodeIds().isEmpty()) {
-			try {
-				previousStates.put(new HashSet<String>(state.getActionNodeIds()),
-						state.copy());
-			}
-			catch (RuntimeException e) {
-				log.warning("cannot copy state: " + e);
-			}
-		}
-	}
+        if (!state.getActionNodeIds().isEmpty()) {
+            try {
+                previousStates.put(new HashSet<String>(state.getActionNodeIds()),
+                        state.copy());
+            } catch (RuntimeException e) {
+                log.warning("cannot copy state: " + e);
+            }
+        }
+    }
 
-	/**
-	 * Re-estimate the posterior distribution for the domain parameters in the
-	 * dialogue state given the actual system decision and its resulting utility
-	 * (provided by the simulator).
-	 * 
-	 * @param state the dialogue state
-	 * @param actualAction the action that was selected
-	 * @param actualUtility the resulting utility for the action.
-	 */
-	private void learnFromFeedback(DialogueState state, Assignment actualAction,
-			double actualUtility) {
+    /**
+     * Re-estimate the posterior distribution for the domain parameters in the
+     * dialogue state given the actual system decision and its resulting utility
+     * (provided by the simulator).
+     *
+     * @param state         the dialogue state
+     * @param actualAction  the action that was selected
+     * @param actualUtility the resulting utility for the action.
+     */
+    private void learnFromFeedback(DialogueState state, Assignment actualAction,
+                                   double actualUtility) {
 
-		try {
+        try {
 
-			// determine the relevant parameters (discard the isolated ones)
-			Set<String> relevantParams =
-					state.getParameterIds()
-							.stream().filter(p -> !state.getChanceNode(p)
-									.getOutputNodes().isEmpty())
-					.collect(Collectors.toSet());
+            // determine the relevant parameters (discard the isolated ones)
+            Set<String> relevantParams =
+                    state.getParameterIds()
+                            .stream().filter(p -> !state.getChanceNode(p)
+                            .getOutputNodes().isEmpty())
+                            .collect(Collectors.toSet());
 
-			if (!relevantParams.isEmpty()) {
+            if (!relevantParams.isEmpty()) {
 
-				Query query =
-						new Query.UtilQuery(state, relevantParams, actualAction);
-				EmpiricalDistribution empiricalDistrib = sampler.getWeightedSamples(
-						query, cs -> reweightSamples(cs, actualUtility));
+                Query query =
+                        new Query.UtilQuery(state, relevantParams, actualAction);
+                EmpiricalDistribution empiricalDistrib = sampler.getWeightedSamples(
+                        query, cs -> reweightSamples(cs, actualUtility));
 
-				for (String param : relevantParams) {
-					ChanceNode paramNode = system.getState().getChanceNode(param);
-					ProbDistribution newDistrib = empiricalDistrib.getMarginal(param,
-							paramNode.getInputNodeIds());
-					paramNode.setDistrib(newDistrib);
-				}
-			}
-		}
-		catch (RuntimeException e) {
-			log.warning("could not learn from action feedback: " + e);
-		}
+                for (String param : relevantParams) {
+                    ChanceNode paramNode = system.getState().getChanceNode(param);
+                    ProbDistribution newDistrib = empiricalDistrib.getMarginal(param,
+                            paramNode.getInputNodeIds());
+                    paramNode.setDistrib(newDistrib);
+                }
+            }
+        } catch (RuntimeException e) {
+            log.warning("could not learn from action feedback: " + e);
+        }
 
-	}
+    }
 
-	private static void reweightSamples(Collection<Sample> samples,
-			double actualUtility) {
-		samples.stream().forEach(s -> {
-			double weight = 1.0 / (Math.abs(s.getUtility() - actualUtility) + 1);
-			s.addLogWeight(Math.log(weight));
-		});
-	}
+    private static void reweightSamples(Collection<Sample> samples,
+                                        double actualUtility) {
+        samples.stream().forEach(s -> {
+            double weight = 1.0 / (Math.abs(s.getUtility() - actualUtility) + 1);
+            s.addLogWeight(Math.log(weight));
+        });
+    }
 
 }

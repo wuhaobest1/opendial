@@ -39,117 +39,113 @@ import opendial.utils.StringUtils;
 
 /**
  * Text-only interface to OpenDial, to use when no X11 display is available.
- * 
- * @author Pierre Lison (plison@ifi.uio.no)
  *
+ * @author Pierre Lison (plison@ifi.uio.no)
  */
 public class TextOnlyInterface implements Module {
 
-	final static Logger log = Logger.getLogger("OpenDial");
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	DialogueSystem system;
-	boolean paused = true;
+    DialogueSystem system;
+    boolean paused = true;
 
-	/**
-	 * Creates a new text-only interface.
-	 * 
-	 * @param system the dialogue system
-	 */
-	public TextOnlyInterface(DialogueSystem system) {
-		this.system = system;
-	}
+    /**
+     * Creates a new text-only interface.
+     *
+     * @param system the dialogue system
+     */
+    public TextOnlyInterface(DialogueSystem system) {
+        this.system = system;
+    }
 
-	/**
-	 * Starts the interface.
-	 */
-	@SuppressWarnings("resource")
-	@Override
-	public void start() {
-		paused = false;
-		log.info("Starting text-only user interface...");
-		log.info("Local address: " + system.getLocalAddress());
-		log.info("Press Ctrl + C to exit");
-		new Thread(() -> {
-			try {
-				Thread.sleep(500);
-			}
-			catch (InterruptedException e) {
-			}
-			while (true) {
-				System.out.println("Type new input: ");
-				String input = new Scanner(System.in).nextLine();
-				Map<String, Double> table = StringUtils.getTableFromInput(input);
-				if (!paused && !table.isEmpty()) {
-					system.addUserInput(table);
-				}
-			}
-		}).start();
-	}
+    /**
+     * Starts the interface.
+     */
+    @SuppressWarnings("resource")
+    @Override
+    public void start() {
+        paused = false;
+        log.info("Starting text-only user interface...");
+        log.info("Local address: " + system.getLocalAddress());
+        log.info("Press Ctrl + C to exit");
+        new Thread(() -> {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+            }
+            while (true) {
+                System.out.println("Type new input: ");
+                String input = new Scanner(System.in).nextLine();
+                Map<String, Double> table = StringUtils.getTableFromInput(input);
+                if (!paused && !table.isEmpty()) {
+                    system.addUserInput(table);
+                }
+            }
+        }).start();
+    }
 
-	/**
-	 * Updates the interface with the new content (if relevant).
-	 */
-	@Override
-	public void trigger(DialogueState state, Collection<String> updatedVars) {
+    /**
+     * Updates the interface with the new content (if relevant).
+     */
+    @Override
+    public void trigger(DialogueState state, Collection<String> updatedVars) {
 
-		for (String var : Arrays.asList(system.getSettings().userInput,
-				system.getSettings().systemOutput)) {
-			if (!paused && updatedVars.contains(var) && state.hasChanceNode(var)) {
-				System.out.println(
-						getTextRendering(system.getContent(var).toDiscrete()));
-			}
-		}
-	}
+        for (String var : Arrays.asList(system.getSettings().userInput,
+                system.getSettings().systemOutput)) {
+            if (!paused && updatedVars.contains(var) && state.hasChanceNode(var)) {
+                System.out.println(
+                        getTextRendering(system.getContent(var).toDiscrete()));
+            }
+        }
+    }
 
-	/**
-	 * Pauses the interface
-	 */
-	@Override
-	public void pause(boolean toPause) {
-		paused = toPause;
-	}
+    /**
+     * Pauses the interface
+     */
+    @Override
+    public void pause(boolean toPause) {
+        paused = toPause;
+    }
 
-	/**
-	 * Returns true if the interface is running, and false otherwise.
-	 */
-	@Override
-	public boolean isRunning() {
-		return !paused;
-	}
+    /**
+     * Returns true if the interface is running, and false otherwise.
+     */
+    @Override
+    public boolean isRunning() {
+        return !paused;
+    }
 
-	/**
-	 * Generates the text representation for the categorical table.
-	 * 
-	 * @param table the table
-	 * @return the text rendering of the table
-	 */
-	private String getTextRendering(CategoricalTable table) {
+    /**
+     * Generates the text representation for the categorical table.
+     *
+     * @param table the table
+     * @return the text rendering of the table
+     */
+    private String getTextRendering(CategoricalTable table) {
 
-		String textTable = "";
-		String baseVar = table.getVariable().replace("'", "");
+        String textTable = "";
+        String baseVar = table.getVariable().replace("'", "");
 
-		if (baseVar.equals(system.getSettings().userInput)) {
-			textTable += "[user]\t";
-		}
-		else if (baseVar.equals(system.getSettings().systemOutput)) {
-			textTable += "[system]\t";
-		}
-		else {
-			textTable += "[" + baseVar + "]\t";
-		}
-		for (Value value : table.getValues()) {
-			if (!(value instanceof NoneVal)) {
-				String content = value.toString();
-				if (table.getProb(value) < 0.98) {
-					content += " (" + StringUtils.getShortForm(table.getProb(value))
-							+ ")";
-				}
-				textTable += content + "\n\t\t";
-			}
-		}
-		textTable = textTable.substring(0, textTable.length() - 3);
+        if (baseVar.equals(system.getSettings().userInput)) {
+            textTable += "[user]\t";
+        } else if (baseVar.equals(system.getSettings().systemOutput)) {
+            textTable += "[system]\t";
+        } else {
+            textTable += "[" + baseVar + "]\t";
+        }
+        for (Value value : table.getValues()) {
+            if (!(value instanceof NoneVal)) {
+                String content = value.toString();
+                if (table.getProb(value) < 0.98) {
+                    content += " (" + StringUtils.getShortForm(table.getProb(value))
+                            + ")";
+                }
+                textTable += content + "\n\t\t";
+            }
+        }
+        textTable = textTable.substring(0, textTable.length() - 3);
 
-		return textTable;
-	}
+        return textTable;
+    }
 
 }

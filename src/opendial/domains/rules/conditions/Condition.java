@@ -32,7 +32,7 @@ import opendial.templates.Template;
 
 /**
  * Generic interface for a condition used in a probability or utility rule.
- * 
+ *
  * <p>
  * A condition operates on a number of (possibly underspecified) input variables, and
  * can be applied to any input assignment to determine if it satisfies the condition
@@ -40,40 +40,39 @@ import opendial.templates.Template;
  * instance based on slots filled via string matching.
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public interface Condition {
 
-	/**
-	 * Returns the input variables of the condition (as templates).
-	 * 
-	 * @return the input variable templates
-	 */
-	public Collection<Template> getInputVariables();
+    /**
+     * Returns the input variables of the condition (as templates).
+     *
+     * @return the input variable templates
+     */
+    public Collection<Template> getInputVariables();
 
-	/**
-	 * Returns true if the condition is satisfied for the given assignment, and false
-	 * otherwise
-	 * 
-	 * @param input the input assignment
-	 * @return true if the condition is satisfied, false otherwise
-	 */
-	public boolean isSatisfiedBy(Assignment input);
+    /**
+     * Returns true if the condition is satisfied for the given assignment, and false
+     * otherwise
+     *
+     * @param input the input assignment
+     * @return true if the condition is satisfied, false otherwise
+     */
+    public boolean isSatisfiedBy(Assignment input);
 
-	/**
-	 * Returns the set of possible groundings derived from the condition, based on
-	 * the given assignment.
-	 * 
-	 * @param input the assignment from which to calculate the groundings
-	 * @return the groundings
-	 */
-	public RuleGrounding getGroundings(Assignment input);
+    /**
+     * Returns the set of possible groundings derived from the condition, based on
+     * the given assignment.
+     *
+     * @param input the assignment from which to calculate the groundings
+     * @return the groundings
+     */
+    public RuleGrounding getGroundings(Assignment input);
 
-	/**
-	 * Returns the labels for the underspecified values in the condition
-	 * 
-	 * @return the list of slots
-	 */
-	public Set<String> getSlots();
+    /**
+     * Returns the labels for the underspecified values in the condition
+     *
+     * @return the list of slots
+     */
+    public Set<String> getSlots();
 
 }

@@ -29,136 +29,133 @@ import java.util.logging.Logger;
 
 /**
  * Representation of a boolean value.
- * 
  *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public final class BooleanVal implements Value {
 
-	// logger
-	final static Logger log = Logger.getLogger("OpenDial");
+    // logger
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	// the boolean
-	final boolean b;
+    // the boolean
+    final boolean b;
 
-	/**
-	 * Creates the boolean value (protected, use the ValueFactory to create it)
-	 * 
-	 * @param b the boolean
-	 */
-	protected BooleanVal(boolean b) {
-		this.b = b;
-	};
+    /**
+     * Creates the boolean value (protected, use the ValueFactory to create it)
+     *
+     * @param b the boolean
+     */
+    protected BooleanVal(boolean b) {
+        this.b = b;
+    }
 
-	/**
-	 * Returns the hashcode of the boolean
-	 *
-	 * @return hashcode
-	 */
-	@Override
-	public int hashCode() {
-		return (b) ? -145 : +78;
-	}
+    ;
 
-	/**
-	 * Returns true if the boolean value is similar, false otherwise
-	 *
-	 * @param o the value to compare
-	 * @return true if similar, false otherwise
-	 */
-	@Override
-	public boolean equals(Object o) {
-		return (o instanceof BooleanVal
-				&& ((BooleanVal) o).getBoolean() == getBoolean());
-	}
+    /**
+     * Returns the hashcode of the boolean
+     *
+     * @return hashcode
+     */
+    @Override
+    public int hashCode() {
+        return (b) ? -145 : +78;
+    }
 
-	/**
-	 * Returns the boolean value
-	 * 
-	 * @return the boolean value
-	 */
-	public boolean getBoolean() {
-		return b;
-	}
+    /**
+     * Returns true if the boolean value is similar, false otherwise
+     *
+     * @param o the value to compare
+     * @return true if similar, false otherwise
+     */
+    @Override
+    public boolean equals(Object o) {
+        return (o instanceof BooleanVal
+                && ((BooleanVal) o).getBoolean() == getBoolean());
+    }
 
-	/**
-	 * Copies the boolean value
-	 *
-	 * @return the copy
-	 */
-	@Override
-	public BooleanVal copy() {
-		return new BooleanVal(b);
-	}
+    /**
+     * Returns the boolean value
+     *
+     * @return the boolean value
+     */
+    public boolean getBoolean() {
+        return b;
+    }
 
-	/**
-	 * Returns a string representation of the boolean value
-	 *
-	 * @return the string representation
-	 */
-	@Override
-	public String toString() {
-		return "" + b;
-	}
+    /**
+     * Copies the boolean value
+     *
+     * @return the copy
+     */
+    @Override
+    public BooleanVal copy() {
+        return new BooleanVal(b);
+    }
 
-	/**
-	 * Returns 1
-	 * 
-	 * @return 1
-	 */
-	@Override
-	public int length() {
-		return 1;
-	}
+    /**
+     * Returns a string representation of the boolean value
+     *
+     * @return the string representation
+     */
+    @Override
+    public String toString() {
+        return "" + b;
+    }
 
-	/**
-	 * If v is a BooleanVal, returns the conjunction of the two values. Else, returns
-	 * none.
-	 */
-	@Override
-	public Value concatenate(Value v) {
-		if (v instanceof BooleanVal) {
-			return new BooleanVal(b & ((BooleanVal) v).getBoolean());
-		}
-		else if (v instanceof NoneVal) {
-			return this;
-		}
-		else {
-			log.warning("cannot concatenate " + this + " and " + v);
-			return ValueFactory.noneValue;
-		}
-	}
+    /**
+     * Returns 1
+     *
+     * @return 1
+     */
+    @Override
+    public int length() {
+        return 1;
+    }
 
-	/**
-	 * Compares the boolean to another value
-	 * 
-	 * @return usual ordering, or hashcode difference if the value is not a boolean
-	 */
-	@Override
-	public int compareTo(Value o) {
-		if (o instanceof BooleanVal) {
-			return (new Boolean(b)).compareTo(((BooleanVal) o).getBoolean());
-		}
-		else {
-			return hashCode() - o.hashCode();
-		}
-	}
+    /**
+     * If v is a BooleanVal, returns the conjunction of the two values. Else, returns
+     * none.
+     */
+    @Override
+    public Value concatenate(Value v) {
+        if (v instanceof BooleanVal) {
+            return new BooleanVal(b & ((BooleanVal) v).getBoolean());
+        } else if (v instanceof NoneVal) {
+            return this;
+        } else {
+            log.warning("cannot concatenate " + this + " and " + v);
+            return ValueFactory.noneValue;
+        }
+    }
 
-	/**
-	 * Returns false
-	 */
-	@Override
-	public boolean contains(Value subvalue) {
-		return false;
-	}
+    /**
+     * Compares the boolean to another value
+     *
+     * @return usual ordering, or hashcode difference if the value is not a boolean
+     */
+    @Override
+    public int compareTo(Value o) {
+        if (o instanceof BooleanVal) {
+            return (new Boolean(b)).compareTo(((BooleanVal) o).getBoolean());
+        } else {
+            return hashCode() - o.hashCode();
+        }
+    }
 
-	/**
-	 * Returns an empty list
-	 */
-	@Override
-	public Collection<Value> getSubValues() {
-		return new ArrayList<Value>();
-	}
+    /**
+     * Returns false
+     */
+    @Override
+    public boolean contains(Value subvalue) {
+        return false;
+    }
+
+    /**
+     * Returns an empty list
+     */
+    @Override
+    public Collection<Value> getSubValues() {
+        return new ArrayList<Value>();
+    }
 
 }

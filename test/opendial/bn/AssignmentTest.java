@@ -33,33 +33,30 @@ import opendial.datastructs.Assignment;
 import org.junit.Test;
 
 /**
- * 
- *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public class AssignmentTest {
 
-	// logger
-	final static Logger log = Logger.getLogger("OpenDial");
+    // logger
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	@Test
-	public void testAssignInterchance() {
-		Assignment a1 = new Assignment(new Assignment("Burglary", true),
-				"Earthquake", ValueFactory.create(false));
-		Assignment a1bis = new Assignment(new Assignment("Earthquake", false),
-				"Burglary", ValueFactory.create(true));
-		Assignment a2 = new Assignment(new Assignment("Burglary", false),
-				"Earthquake", ValueFactory.create(true));
-		Assignment a2bis = new Assignment(new Assignment("Earthquake", true),
-				"Burglary", ValueFactory.create(false));
-		assertFalse(a1.equals(a2));
-		assertFalse(a1.hashCode() == a2.hashCode());
-		assertFalse(a1bis.equals(a2bis));
-		assertFalse(a1bis.hashCode() == a2bis.hashCode());
-		assertFalse(a1.equals(a2bis));
-		assertFalse(a1.hashCode() == a2bis.hashCode());
-		assertFalse(a1bis.equals(a2));
-		assertFalse(a1bis.hashCode() == a2.hashCode());
-	}
+    @Test
+    public void testAssignInterchance() {
+        Assignment a1 = new Assignment(new Assignment("Burglary", true),
+                "Earthquake", ValueFactory.create(false));
+        Assignment a1bis = new Assignment(new Assignment("Earthquake", false),
+                "Burglary", ValueFactory.create(true));
+        Assignment a2 = new Assignment(new Assignment("Burglary", false),
+                "Earthquake", ValueFactory.create(true));
+        Assignment a2bis = new Assignment(new Assignment("Earthquake", true),
+                "Burglary", ValueFactory.create(false));
+        assertFalse(a1.equals(a2));
+        assertFalse(a1.hashCode() == a2.hashCode());
+        assertFalse(a1bis.equals(a2bis));
+        assertFalse(a1bis.hashCode() == a2bis.hashCode());
+        assertFalse(a1.equals(a2bis));
+        assertFalse(a1.hashCode() == a2bis.hashCode());
+        assertFalse(a1bis.equals(a2));
+        assertFalse(a1bis.hashCode() == a2.hashCode());
+    }
 }

@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <parameters>
-<variable id="theta_1">
-<distrib type="gaussian">
-<mean>27.7064</mean>
-<variance>76.7685</variance>
-</distrib>
-</variable>
-<variable id="theta_2">
-<distrib type="gaussian">
-<mean>-2.5415</mean>
-<variance>1119.0844</variance>
-</distrib>
-</variable>
-<variable id="theta_3">
-<distrib type="gaussian">
-<mean>33.9366</mean>
-<variance>546.0815</variance>
-</distrib>
-</variable>
-<variable id="theta_4">
-<distrib type="gaussian">
-<mean>4.3029</mean>
-<variance>106.8605</variance>
-</distrib>
-</variable>
-<variable id="theta_5">
-<distrib type="gaussian">
-<mean>4.6365</mean>
-<variance>211.1958</variance>
-</distrib>
-</variable>
-<variable id="theta_bloblo">
-<distrib type="dirichlet">
-<alpha>1.0</alpha>
-<alpha>3.0</alpha>
-</distrib>
-</variable>
-<variable id="theta_blabla">
-<distrib type="uniform">
-<min>-1</min>
-<max>2</max>
-</distrib>
-</variable>
+    <variable id="theta_1">
+        <distrib type="gaussian">
+            <mean>27.7064</mean>
+            <variance>76.7685</variance>
+        </distrib>
+    </variable>
+    <variable id="theta_2">
+        <distrib type="gaussian">
+            <mean>-2.5415</mean>
+            <variance>1119.0844</variance>
+        </distrib>
+    </variable>
+    <variable id="theta_3">
+        <distrib type="gaussian">
+            <mean>33.9366</mean>
+            <variance>546.0815</variance>
+        </distrib>
+    </variable>
+    <variable id="theta_4">
+        <distrib type="gaussian">
+            <mean>4.3029</mean>
+            <variance>106.8605</variance>
+        </distrib>
+    </variable>
+    <variable id="theta_5">
+        <distrib type="gaussian">
+            <mean>4.6365</mean>
+            <variance>211.1958</variance>
+        </distrib>
+    </variable>
+    <variable id="theta_bloblo">
+        <distrib type="dirichlet">
+            <alpha>1.0</alpha>
+            <alpha>3.0</alpha>
+        </distrib>
+    </variable>
+    <variable id="theta_blabla">
+        <distrib type="uniform">
+            <min>-1</min>
+            <max>2</max>
+        </distrib>
+    </variable>
 </parameters>

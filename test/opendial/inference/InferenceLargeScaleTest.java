@@ -44,85 +44,81 @@ import opendial.inference.exact.NaiveInference;
 import org.junit.Test;
 
 /**
- * 
- *
  * @author Pierre Lison (plison@ifi.uio.no)
- *
  */
 public class InferenceLargeScaleTest {
 
-	// logger
-	public final static Logger log = Logger.getLogger("OpenDial");
+    // logger
+    public final static Logger log = Logger.getLogger("OpenDial");
 
-	public static double PERCENT_COMPARISONS = 0.5;
+    public static double PERCENT_COMPARISONS = 0.5;
 
-	@Test
-	public void testNetwork() {
+    @Test
+    public void testNetwork() {
 
-		InferenceChecks inference = new InferenceChecks();
-		inference.includeNaive(true);
+        InferenceChecks inference = new InferenceChecks();
+        inference.includeNaive(true);
 
-		BNetwork bn = NetworkExamples.constructBasicNetwork2();
+        BNetwork bn = NetworkExamples.constructBasicNetwork2();
 
-		Set<Set<String>> queryVarsPowerset = generatePowerset(bn.getChanceNodeIds());
-		List<Assignment> evidencePowerset = generateEvidencePowerset(bn);
+        Set<Set<String>> queryVarsPowerset = generatePowerset(bn.getChanceNodeIds());
+        List<Assignment> evidencePowerset = generateEvidencePowerset(bn);
 
-		int nbErrors = 0;
-		for (Set<String> queryVars : queryVarsPowerset) {
-			if (!queryVars.isEmpty()) {
-				for (Assignment evidence : evidencePowerset) {
+        int nbErrors = 0;
+        for (Set<String> queryVars : queryVarsPowerset) {
+            if (!queryVars.isEmpty()) {
+                for (Assignment evidence : evidencePowerset) {
 
-					if ((new Random()).nextDouble() < PERCENT_COMPARISONS / 100.0) {
+                    if ((new Random()).nextDouble() < PERCENT_COMPARISONS / 100.0) {
 
-						try {
-							inference.checkProb(bn, queryVars, evidence);
-						}
-						catch (AssertionError e) {
-							nbErrors++;
-							if (nbErrors > 2) {
-								throw new AssertionError(
-										"more than 2 sampling errors");
-							}
-						}
-					}
-				}
-			}
-		}
-		inference.showPerformance();
-	}
+                        try {
+                            inference.checkProb(bn, queryVars, evidence);
+                        } catch (AssertionError e) {
+                            nbErrors++;
+                            if (nbErrors > 2) {
+                                throw new AssertionError(
+                                        "more than 2 sampling errors");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        inference.showPerformance();
+    }
 
-	private static <T> Set<Set<T>> generatePowerset(Set<T> fullSet) {
-		Set<Set<T>> sets = new HashSet<Set<T>>();
-		if (fullSet.isEmpty()) {
-			sets.add(new HashSet<T>());
-			return sets;
-		}
-		List<T> list = new ArrayList<T>(fullSet);
-		T head = list.get(0);
-		Set<T> rest = new HashSet<T>(list.subList(1, list.size()));
-		for (Set<T> set : generatePowerset(rest)) {
-			Set<T> newSet = new HashSet<T>();
-			newSet.add(head);
-			newSet.addAll(set);
-			sets.add(newSet);
-			sets.add(set);
-		}
-		return sets;
-	}
+    private static <T> Set<Set<T>> generatePowerset(Set<T> fullSet) {
+        Set<Set<T>> sets = new HashSet<Set<T>>();
+        if (fullSet.isEmpty()) {
+            sets.add(new HashSet<T>());
+            return sets;
+        }
+        List<T> list = new ArrayList<T>(fullSet);
+        T head = list.get(0);
+        Set<T> rest = new HashSet<T>(list.subList(1, list.size()));
+        for (Set<T> set : generatePowerset(rest)) {
+            Set<T> newSet = new HashSet<T>();
+            newSet.add(head);
+            newSet.addAll(set);
+            sets.add(newSet);
+            sets.add(set);
+        }
+        return sets;
+    }
 
-	private List<Assignment> generateEvidencePowerset(BNetwork bn) {
-		List<Assignment> allAssignments = new LinkedList<Assignment>();
+    private List<Assignment> generateEvidencePowerset(BNetwork bn) {
+        List<Assignment> allAssignments = new LinkedList<Assignment>();
 
-		Map<Assignment, Double> fullJoint = NaiveInference.getFullJoint(bn, false);
-		for (Assignment a : fullJoint.keySet()) {
-			Set<Set<Entry<String, Value>>> partialAssigns =
-					generatePowerset(a.getEntrySet());
-			for (Set<Entry<String, Value>> partial : partialAssigns) {
-				Assignment p = new Assignment(partial);
-				allAssignments.add(p);
-			}
-		}
-		return allAssignments;
-	}
+        Map<Assignment, Double> fullJoint = NaiveInference.getFullJoint(bn, false);
+        for (Assignment a : fullJoint.keySet()) {
+            Set<Set<Entry<String, Value>>> partialAssigns =
+                    generatePowerset(a.getEntrySet());
+            for (Set<Entry<String, Value>> partial : partialAssigns) {
+                Assignment p = new Assignment(partial);
+                allAssignments.add(p);
+            }
+        }
+        return allAssignments;
+    }
 
 }

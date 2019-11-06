@@ -44,133 +44,131 @@ import opendial.modules.AudioModule;
  * Panel employed to capture audio input through a press and hold button, accompanied
  * by a sound level meter. The captured sound is then sent to the dialogue system for
  * further processing by the speech recognition engine.
- * 
+ *
  * @author Pierre Lison (plison@ifi.uio.no)
  */
 @SuppressWarnings("serial")
 public class SpeechInputPanel extends JPanel implements MouseListener {
 
-	// logger
-	final static Logger log = Logger.getLogger("OpenDial");
+    // logger
+    final static Logger log = Logger.getLogger("OpenDial");
 
-	// the audio recorder
-	AudioModule recorder;
+    // the audio recorder
+    AudioModule recorder;
 
-	// the current volume
-	int volume;
+    // the current volume
+    int volume;
 
-	// the sound level meter;
-	JProgressBar slm;
+    // the sound level meter;
+    JProgressBar slm;
 
-	/**
-	 * Creates the speech input panel, composed of a press and hold button and a
-	 * sound level meter.
-	 * 
-	 * @param recorder the audiomodule the audiomodule associated with the panel
-	 */
-	public SpeechInputPanel(AudioModule recorder) {
-		this.recorder = recorder;
-		recorder.attachPanel(this);
-		setLayout(new BorderLayout());
+    /**
+     * Creates the speech input panel, composed of a press and hold button and a
+     * sound level meter.
+     *
+     * @param recorder the audiomodule the audiomodule associated with the panel
+     */
+    public SpeechInputPanel(AudioModule recorder) {
+        this.recorder = recorder;
+        recorder.attachPanel(this);
+        setLayout(new BorderLayout());
 
-		final JCheckBox checkbox = new JCheckBox("Voice Activity Detection");
-		add(checkbox, BorderLayout.LINE_START);
-		Container container = new Container();
-		container.setLayout(new FlowLayout());
-		container.add(new JLabel(""));
-		JButton button = new JButton(
-				"<html>&nbsp;&nbsp;Press & hold to record speech&nbsp;&nbsp;&nbsp;&nbsp;</html>");
-		button.addMouseListener(this);
-		container.add(button);
-		container.add(new JLabel(""));
-		add(container);
-		slm = new JProgressBar();
-		slm.setMaximum(2000);
-		slm.setBorderPainted(true);
-		slm.setString("System is talking...");
-		slm.setPreferredSize(new Dimension(200, 25));
-		add(slm, BorderLayout.LINE_END);
-		this.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
-		checkbox.addActionListener(a -> {
-			recorder.activateVAD(checkbox.isSelected());
-			button.setEnabled(!checkbox.isSelected());
-		});
+        final JCheckBox checkbox = new JCheckBox("Voice Activity Detection");
+        add(checkbox, BorderLayout.LINE_START);
+        Container container = new Container();
+        container.setLayout(new FlowLayout());
+        container.add(new JLabel(""));
+        JButton button = new JButton(
+                "<html>&nbsp;&nbsp;Press & hold to record speech&nbsp;&nbsp;&nbsp;&nbsp;</html>");
+        button.addMouseListener(this);
+        container.add(button);
+        container.add(new JLabel(""));
+        add(container);
+        slm = new JProgressBar();
+        slm.setMaximum(2000);
+        slm.setBorderPainted(true);
+        slm.setString("System is talking...");
+        slm.setPreferredSize(new Dimension(200, 25));
+        add(slm, BorderLayout.LINE_END);
+        this.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+        checkbox.addActionListener(a -> {
+            recorder.activateVAD(checkbox.isSelected());
+            button.setEnabled(!checkbox.isSelected());
+        });
 
-	}
+    }
 
-	/**
-	 * Starts the recording
-	 *
-	 * @param e mouse event (ignored)
-	 */
-	@Override
-	public void mousePressed(MouseEvent e) {
-		try {
-			recorder.startRecording();
-		}
-		catch (RuntimeException ex) {
-			log.warning(ex.toString());
-		}
-	}
+    /**
+     * Starts the recording
+     *
+     * @param e mouse event (ignored)
+     */
+    @Override
+    public void mousePressed(MouseEvent e) {
+        try {
+            recorder.startRecording();
+        } catch (RuntimeException ex) {
+            log.warning(ex.toString());
+        }
+    }
 
-	/**
-	 * Stops the recording, and trigger the dialogue system if it is above the
-	 * minimum recording time.
-	 *
-	 * @param e mouse event (ignored)
-	 */
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		try {
-			recorder.stopRecording();
-		}
-		catch (Exception f) {
-			f.printStackTrace();
-		}
-	}
+    /**
+     * Stops the recording, and trigger the dialogue system if it is above the
+     * minimum recording time.
+     *
+     * @param e mouse event (ignored)
+     */
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        try {
+            recorder.stopRecording();
+        } catch (Exception f) {
+            f.printStackTrace();
+        }
+    }
 
-	@Override
-	public void mouseExited(MouseEvent e) {
-	}
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
 
-	@Override
-	public void mouseEntered(MouseEvent e) {
-	}
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
 
-	@Override
-	public void mouseClicked(MouseEvent e) {
-	}
+    @Override
+    public void mouseClicked(MouseEvent e) {
+    }
 
-	/**
-	 * Updates the volume value in the meter.
-	 * 
-	 * @param currentVolume the new volume
-	 */
-	public void updateVolume(int currentVolume) {
-		if (Math.abs(currentVolume - volume) > 20) {
-			volume = currentVolume;
-			slm.setValue(volume);
-		}
-	}
+    /**
+     * Updates the volume value in the meter.
+     *
+     * @param currentVolume the new volume
+     */
+    public void updateVolume(int currentVolume) {
+        if (Math.abs(currentVolume - volume) > 20) {
+            volume = currentVolume;
+            slm.setValue(volume);
+        }
+    }
 
-	/**
-	 * Clears the volume in the meter
-	 */
-	public void clearVolume() {
-		if (volume != 0) {
-			volume = 0;
-			slm.setValue(0);
-		}
-	}
+    /**
+     * Clears the volume in the meter
+     */
+    public void clearVolume() {
+        if (volume != 0) {
+            volume = 0;
+            slm.setValue(0);
+        }
+    }
 
-	/**
-	 * Sets a string in the volume meter indicating that the system is currently
-	 * talking.
-	 * 
-	 * @param systemTalks whether the system currently talks or not
-	 */
-	public void setSystemTalking(boolean systemTalks) {
-		slm.setStringPainted(systemTalks);
-	}
+    /**
+     * Sets a string in the volume meter indicating that the system is currently
+     * talking.
+     *
+     * @param systemTalks whether the system currently talks or not
+     */
+    public void setSystemTalking(boolean systemTalks) {
+        slm.setStringPainted(systemTalks);
+    }
 
 }
