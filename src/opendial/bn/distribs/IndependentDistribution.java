@@ -42,13 +42,13 @@ import org.w3c.dom.Node;
  */
 public interface IndependentDistribution extends ProbDistribution {
 
-    public final static Logger log = Logger.getLogger("OpenDial");
+    Logger log = Logger.getLogger("OpenDial");
 
     /**
      * Returns an empty set
      */
     @Override
-    public default Set<String> getInputVariables() {
+    default Set<String> getInputVariables() {
         return Collections.emptySet();
     }
 
@@ -58,7 +58,7 @@ public interface IndependentDistribution extends ProbDistribution {
      * @param value the value for the random variable
      * @return the associated probability, if one exists.
      */
-    public double getProb(Value value);
+    double getProb(Value value);
 
     /**
      * Returns the probability P(value), if any is specified. Else, returns 0.0f.
@@ -66,7 +66,7 @@ public interface IndependentDistribution extends ProbDistribution {
      * @param value the value for the random variable (as a string)
      * @return the associated probability, if one exists.
      */
-    public default double getProb(String value) {
+    default double getProb(String value) {
         return getProb(ValueFactory.create(value));
     }
 
@@ -76,7 +76,7 @@ public interface IndependentDistribution extends ProbDistribution {
      * @param value the value for the random variable (as a boolean)
      * @return the associated probability, if one exists.
      */
-    public default double getProb(boolean value) {
+    default double getProb(boolean value) {
         return getProb(ValueFactory.create(value));
     }
 
@@ -86,7 +86,7 @@ public interface IndependentDistribution extends ProbDistribution {
      * @param value the value for the random variable (as a double)
      * @return the associated probability, if one exists.
      */
-    public default double getProb(double value) {
+    default double getProb(double value) {
         return getProb(ValueFactory.create(value));
     }
 
@@ -96,7 +96,7 @@ public interface IndependentDistribution extends ProbDistribution {
      * @param value the value for the random variable (as a double array)
      * @return the associated probability, if one exists.
      */
-    public default double getProb(double[] value) {
+    default double getProb(double[] value) {
         return getProb(ValueFactory.create(value));
     }
 
@@ -105,7 +105,7 @@ public interface IndependentDistribution extends ProbDistribution {
      *
      * @return the sampled value
      */
-    public Value sample();
+    Value sample();
 
     /**
      * Returns a set of possible values for the distribution. If the distribution is
@@ -114,7 +114,7 @@ public interface IndependentDistribution extends ProbDistribution {
      * @return the possible values for the distribution
      */
     @Override
-    public abstract Set<Value> getValues();
+    Set<Value> getValues();
 
     /**
      * Returns a continuous representation of the distribution.
@@ -122,14 +122,14 @@ public interface IndependentDistribution extends ProbDistribution {
      * @return the distribution in a continuous form be converted to a continuous
      * form
      */
-    public ContinuousDistribution toContinuous();
+    ContinuousDistribution toContinuous();
 
     /**
      * Returns a discrete representation of the distribution
      *
      * @return the distribution in a discrete form.
      */
-    public CategoricalTable toDiscrete();
+    CategoricalTable toDiscrete();
 
     /**
      * Returns the value with maximum probability (discrete case) or the mean value
@@ -138,7 +138,7 @@ public interface IndependentDistribution extends ProbDistribution {
      * @return the maximum-probability value (discrete) or the mean value
      * (continuous)
      */
-    public Value getBest();
+    Value getBest();
 
     /**
      * Generates a XML node that represents the distribution.
@@ -146,7 +146,7 @@ public interface IndependentDistribution extends ProbDistribution {
      * @param document the XML node to which the node will be attached
      * @return the corresponding XML node
      */
-    public Node generateXML(Document document);
+    Node generateXML(Document document);
 
     /**
      * Returns a copy of the distribution.
@@ -154,7 +154,7 @@ public interface IndependentDistribution extends ProbDistribution {
      * @return the copied distribution
      */
     @Override
-    public IndependentDistribution copy();
+    IndependentDistribution copy();
 
     /**
      * Returns itself.
@@ -162,7 +162,7 @@ public interface IndependentDistribution extends ProbDistribution {
      * @return the distribution itself.
      */
     @Override
-    public default IndependentDistribution getPosterior(Assignment condition) {
+    default IndependentDistribution getPosterior(Assignment condition) {
         return this;
     }
 
@@ -175,7 +175,7 @@ public interface IndependentDistribution extends ProbDistribution {
      * @return the resulting probability
      */
     @Override
-    public default double getProb(Assignment condition, Value head) {
+    default double getProb(Assignment condition, Value head) {
         return getProb(head);
     }
 
@@ -183,7 +183,7 @@ public interface IndependentDistribution extends ProbDistribution {
      * Returns a sample from the distribution (the condition is ignored).
      */
     @Override
-    public default Value sample(Assignment condition) {
+    default Value sample(Assignment condition) {
         return sample();
     }
 
@@ -191,7 +191,7 @@ public interface IndependentDistribution extends ProbDistribution {
      * Returns itself.
      */
     @Override
-    public default IndependentDistribution getProbDistrib(Assignment condition) {
+    default IndependentDistribution getProbDistrib(Assignment condition) {
         return this;
     }
 
