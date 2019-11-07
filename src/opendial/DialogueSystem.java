@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import opendial.bn.BNetwork;
@@ -140,6 +141,7 @@ public class DialogueSystem {
      * Starts the dialogue system and its modules.
      */
     public void startSystem() {
+        log.info("startSystem.");
         paused = false;
         for (Module module : new ArrayList<Module>(modules)) {
             try {
@@ -167,9 +169,11 @@ public class DialogueSystem {
      * @param domain the dialogue domain to employ
      */
     public void changeDomain(Domain domain) {
+        log.info("changeDomain. " + domain.toString());
         this.domain = domain;
         changeSettings(domain.getSettings());
         curState = domain.getInitialState().copy();
+        log.info("curState: " + curState.toString());
         curState.setParameters(domain.getParameters());
         if (!paused) {
             startSystem();
@@ -208,8 +212,9 @@ public class DialogueSystem {
         try {
             Constructor<T> constructor = module.getConstructor(DialogueSystem.class);
             attachModule(constructor.newInstance(this));
-            displayComment(
-                    "Module " + module.getSimpleName() + " successfully attached");
+            String msg = "Module " + module.getSimpleName() + " successfully attached";
+            displayComment(msg);
+            log.info(msg);
         } catch (InstantiationException | IllegalAccessException
                 | IllegalArgumentException | InvocationTargetException
                 | NoSuchMethodException | SecurityException e) {
@@ -280,12 +285,12 @@ public class DialogueSystem {
      * @param settings the new settings
      */
     public void changeSettings(Settings settings) {
-
+        log.info("changeSettings. " + settings.toString());
         this.settings.fillSettings(settings.getSpecifiedMapping());
-
+        log.info("after change : " + settings.toString());
         for (Class<Module> toAttach : settings.modules) {
             if (getModule(toAttach) == null) {
-                log.fine("Attaching module: " + toAttach.getSimpleName());
+                log.info("Attaching module: " + toAttach.getSimpleName());
                 attachModule(toAttach);
             }
         }
@@ -619,7 +624,7 @@ public class DialogueSystem {
      * @return the set of updated variables
      */
     private Set<String> update() {
-
+        log.info("update.");
         // set of variables that have been updated
         Map<String, Integer> updatedVars = new HashMap<String, Integer>();
 
@@ -635,6 +640,7 @@ public class DialogueSystem {
 
                 // applying the domain models
                 for (Model model : domain.getModels()) {
+                    log.info("model : " + model.toString());
                     if (model.isTriggered(curState, toProcess)) {
                         boolean change = model.trigger(curState);
                         if (change && model.isBlocking()) {
@@ -828,14 +834,11 @@ public class DialogueSystem {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
-        log.info("DialogueSystem start.");
+        log.fine("DialogueSystem start.");
         DialogueSystem system = new DialogueSystem();
         String domainFile = System.getProperty("domain");
         String dialogueFile = System.getProperty("dialogue");
         String simulatorFile = System.getProperty("simulator");
-        log.info("domainFile    : " + domainFile);
-        log.info("dialogueFile  : " + dialogueFile);
-        log.info("simulatorFile : " + simulatorFile);
         system.getSettings().fillSettings(System.getProperties());
         if (domainFile != null) {
             Domain domain;

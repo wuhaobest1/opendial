@@ -42,22 +42,22 @@ import opendial.templates.Template;
  */
 public class Model {
 
-    final static Logger log = Logger.getLogger("OpenDial");
+    private final static Logger log = Logger.getLogger("OpenDial");
 
     // identifier for the model
-    String id;
+    private String id;
 
     // whether triggering the model should block other models
-    boolean blocking = false;
+    private boolean blocking = false;
 
     // counter for the model identifier, if not explicitly given
-    public static int idCounter = 0;
+    private static int idCounter = 0;
 
     // triggers associated with the model
-    List<Template> triggers;
+    private List<Template> triggers;
 
     // collection of rules for the model
-    Collection<Rule> rules;
+    private Collection<Rule> rules;
 
     // ===================================
     // MODEL CONSTRUCTION
@@ -67,8 +67,8 @@ public class Model {
      * Creates a new model, with initially no trigger and an empty list of rules
      */
     public Model() {
-        triggers = new LinkedList<Template>();
-        rules = new LinkedList<Rule>();
+        triggers = new LinkedList<>();
+        rules = new LinkedList<>();
         id = "model" + idCounter;
         idCounter++;
     }
@@ -76,7 +76,7 @@ public class Model {
     public void start() {
     }
 
-    public void pause(boolean shouldBePaused) {
+    public void pause() {
     }
 
     /**
@@ -146,7 +146,7 @@ public class Model {
      * @return the list of rules
      */
     public List<Rule> getRules() {
-        return new ArrayList<Rule>(rules);
+        return new ArrayList<>(rules);
     }
 
     /**
@@ -239,16 +239,16 @@ public class Model {
      */
     @Override
     public String toString() {
-        String str = id;
-        str += " [triggers=";
+        StringBuilder str = new StringBuilder(id);
+        str.append(" [triggers=");
         for (Template trigger : triggers) {
-            str += "(" + trigger + ")" + " v ";
+            str.append("(").append(trigger).append(")").append(" v ");
         }
-        str = str.substring(0, str.length() - 3) + "] with " + rules.size()
-                + " rules: ";
+        str = new StringBuilder(str.substring(0, str.length() - 3) + "] with " + rules.size()
+                + " rules: ");
 
         for (Rule rule : rules) {
-            str += rule.getRuleId() + ",";
+            str.append(rule.getRuleId()).append(",");
         }
         return str.substring(0, str.length() - 1);
     }
