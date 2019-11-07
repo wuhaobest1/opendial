@@ -53,31 +53,31 @@ public class KernelDensityFunction implements DensityFunction {
     public final static Logger log = Logger.getLogger("OpenDial");
 
     // bandwidth for the kernel
-    final double[] bandwidths;
+    private final double[] bandwidths;
     // shorter bandwidth (for multivariate sampling)
-    final double[] samplingDeviation;
+    private final double[] samplingDeviation;
 
     // the kernel function
-    static final GaussianDensityFunction kernel =
+    private static final GaussianDensityFunction kernel =
             new GaussianDensityFunction(0.0, 1.0);
 
     // the points
-    final double[][] points;
+    private final double[][] points;
 
     // the sampler
-    static final Random sampler = new Random(Calendar.getInstance().getTimeInMillis()
+    private static final Random sampler = new Random(Calendar.getInstance().getTimeInMillis()
             + Thread.currentThread().getId());
 
     // whether the data points are bounded (if the sum of their values over the
     // dimensions must amount o 1.0).
-    final boolean isBounded;
+    private final boolean isBounded;
 
     /**
      * Creates a new kernel density function with the given points
      *
      * @param points the points
      */
-    public KernelDensityFunction(double[][] points) {
+    private KernelDensityFunction(double[][] points) {
         this.points = points;
         if (points.length == 0) {
             throw new RuntimeException("KDE must contain at least one point");
@@ -186,9 +186,8 @@ public class KernelDensityFunction implements DensityFunction {
     @Override
     public Map<double[], Double> discretise(int nbBuckets) {
         int nbToPick = Math.min(nbBuckets, points.length);
-        Map<double[], Double> vals = Arrays.stream(points).distinct().limit(nbToPick)
+        return Arrays.stream(points).distinct().limit(nbToPick)
                 .collect(Collectors.toMap(p -> p, p -> 1.0 / nbToPick));
-        return vals;
     }
 
     /**
@@ -198,8 +197,7 @@ public class KernelDensityFunction implements DensityFunction {
      */
     @Override
     public KernelDensityFunction copy() {
-        KernelDensityFunction copy = new KernelDensityFunction(points);
-        return copy;
+        return new KernelDensityFunction(points);
     }
 
     /**
@@ -209,19 +207,19 @@ public class KernelDensityFunction implements DensityFunction {
      */
     @Override
     public String toString() {
-        String s = "KDE(mean=[";
+        StringBuilder s = new StringBuilder("KDE(mean=[");
         double[] means = getMean();
         for (double mean : means) {
-            s += StringUtils.getShortForm(mean) + ", ";
+            s.append(StringUtils.getShortForm(mean)).append(", ");
         }
-        s = s.substring(0, s.length() - 2) + "]),std=";
+        s = new StringBuilder(s.substring(0, s.length() - 2) + "]),std=");
         double avgstd = 0.0;
         for (double std : getStandardDeviations()) {
             avgstd += std;
         }
-        s += StringUtils.getShortForm((avgstd / means.length));
-        s += ") with " + points.length + " kernels ";
-        return s;
+        s.append(StringUtils.getShortForm((avgstd / means.length)));
+        s.append(") with ").append(points.length).append(" kernels ");
+        return s.toString();
     }
 
     /**
@@ -252,9 +250,6 @@ public class KernelDensityFunction implements DensityFunction {
     @Override
     public double[] getMean() {
         double[] mean = new double[points[0].length];
-        for (int i = 0; i < mean.length; i++) {
-            mean[i] = 0.0;
-        }
         for (double[] point : points) {
             for (int i = 0; i < mean.length; i++) {
                 mean[i] += point[i];
@@ -273,9 +268,6 @@ public class KernelDensityFunction implements DensityFunction {
     public double[] getVariance() {
         double[] mean = getMean();
         double[] variance = new double[points[0].length];
-        for (int i = 0; i < variance.length; i++) {
-            variance[i] = 0.0;
-        }
         for (double[] point : points) {
             for (int i = 0; i < variance.length; i++) {
                 variance[i] += Math.pow(point[i] - mean[i], 2);
@@ -328,10 +320,7 @@ public class KernelDensityFunction implements DensityFunction {
         for (int j = 0; j < points[0].length; j++) {
             total += points[0][j];
         }
-        if (total > 0.99 && total < 1.01 && points[0].length > 1) {
-            return true;
-        }
-        return false;
+        return total > 0.99 && total < 1.01 && points[0].length > 1;
     }
 
     /**

@@ -23,14 +23,8 @@
 
 package opendial.bn.distribs.densityfunctions;
 
+import java.util.*;
 import java.util.logging.*;
-
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 import opendial.utils.MathUtils;
 
@@ -50,13 +44,13 @@ public class DirichletDensityFunction implements DensityFunction {
     public final static Logger log = Logger.getLogger("OpenDial");
 
     // hyper-parameters
-    final double[] alphas;
+    private final double[] alphas;
 
     // normalisation factor
-    final double C;
+    private final double C;
 
     // random number generator
-    static final Random rng = new Random(Calendar.getInstance().getTimeInMillis()
+    private static final Random rng = new Random(Calendar.getInstance().getTimeInMillis()
             + Thread.currentThread().getId());
 
     /**
@@ -69,8 +63,8 @@ public class DirichletDensityFunction implements DensityFunction {
         if (alphas.length < 2) {
             log.warning("must have at least 2 alphas");
         }
-        for (int i = 0; i < alphas.length; i++) {
-            if (alphas[i] <= 0) {
+        for (double alpha : alphas) {
+            if (alpha <= 0) {
                 log.warning(
                         "alphas of the Dirichlet distribution are not well formed");
             }
@@ -146,7 +140,7 @@ public class DirichletDensityFunction implements DensityFunction {
      */
     @Override
     public String toString() {
-        return "Dirichlet(" + Arrays.asList(alphas) + ")";
+        return "Dirichlet(" + Collections.singletonList(alphas) + ")";
     }
 
     /**
@@ -157,9 +151,9 @@ public class DirichletDensityFunction implements DensityFunction {
     private double calculateC() {
         double alphaSum = 0;
         double denominator = 1;
-        for (int i = 0; i < alphas.length; i++) {
-            alphaSum += alphas[i];
-            denominator *= MathUtils.gamma(alphas[i]);
+        for (double alpha : alphas) {
+            alphaSum += alpha;
+            denominator *= MathUtils.gamma(alpha);
         }
         double numerator = MathUtils.gamma(alphaSum);
         if (denominator != 0.0) {
@@ -227,7 +221,7 @@ public class DirichletDensityFunction implements DensityFunction {
      */
     @Override
     public Map<double[], Double> discretise(int nbBuckets) {
-        Map<double[], Double> table = new HashMap<double[], Double>();
+        Map<double[], Double> table = new HashMap<>();
         for (int i = 0; i < nbBuckets; i++) {
             table.put(sample(), 1.0 / nbBuckets);
         }
@@ -281,13 +275,13 @@ public class DirichletDensityFunction implements DensityFunction {
      */
     @Override
     public int hashCode() {
-        return -32 + Arrays.asList(alphas).hashCode();
+        return -32 + Collections.singletonList(alphas).hashCode();
     }
 
     private double getAlphaSum() {
         double sum = 0;
-        for (int j = 0; j < alphas.length; j++) {
-            sum += alphas[j];
+        for (double alpha : alphas) {
+            sum += alpha;
         }
         return sum;
     }
@@ -299,13 +293,13 @@ public class DirichletDensityFunction implements DensityFunction {
         Attr id = doc.createAttribute("type");
         id.setValue("dirichlet");
         distribElement.setAttributeNode(id);
-        for (int i = 0; i < alphas.length; i++) {
+        for (double alpha : alphas) {
             Element alphaElement = doc.createElement("alpha");
-            alphaElement.setTextContent("" + alphas[i]);
+            alphaElement.setTextContent("" + alpha);
             distribElement.appendChild(alphaElement);
         }
 
-        return Arrays.asList(distribElement);
+        return Collections.singletonList(distribElement);
     }
 
 }

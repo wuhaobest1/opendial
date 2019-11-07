@@ -23,13 +23,8 @@
 
 package opendial.bn.distribs.densityfunctions;
 
+import java.util.*;
 import java.util.logging.*;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 import opendial.bn.values.ValueFactory;
 
@@ -48,13 +43,13 @@ public class UniformDensityFunction implements DensityFunction {
     public final static Logger log = Logger.getLogger("OpenDial");
 
     // minimum threshold
-    final double minimum;
+    private final double minimum;
 
     // maximum threshold
-    final double maximum;
+    private final double maximum;
 
     // sampler
-    static final Random sampler = new Random();
+    private static final Random sampler = new Random();
 
     /**
      * Creates a new uniform density function with the given minimum and maximum
@@ -102,7 +97,7 @@ public class UniformDensityFunction implements DensityFunction {
      */
     @Override
     public Map<double[], Double> discretise(int nbBuckets) {
-        Map<double[], Double> values = new HashMap<double[], Double>(nbBuckets);
+        Map<double[], Double> values = new HashMap<>(nbBuckets);
         double step = (maximum - minimum) / nbBuckets;
         for (int i = 0; i < nbBuckets; i++) {
             double value = minimum + i * step + step / 2.0f;
@@ -207,7 +202,7 @@ public class UniformDensityFunction implements DensityFunction {
         maxEl.setTextContent("" + ValueFactory.create(maximum));
         distribElement.appendChild(maxEl);
 
-        return Arrays.asList(distribElement);
+        return Collections.singletonList(distribElement);
     }
 
 }

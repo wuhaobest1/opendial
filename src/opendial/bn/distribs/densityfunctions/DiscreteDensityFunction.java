@@ -52,16 +52,13 @@ public class DiscreteDensityFunction implements DensityFunction {
     public final static Logger log = Logger.getLogger("OpenDial");
 
     // the set of points for the density function
-    Map<double[], Double> points;
+    private Map<double[], Double> points;
 
     // the sampler
-    Random sampler;
+    private Random sampler;
 
     // minimum distance between points
-    double minDistance;
-
-    // the volume employed for the normalisation
-    double volume;
+    private double minDistance;
 
     /**
      * Creates a new discrete density function, given the set of points
@@ -69,7 +66,7 @@ public class DiscreteDensityFunction implements DensityFunction {
      * @param points a set of (value,prob) pairs
      */
     public DiscreteDensityFunction(Map<double[], Double> points) {
-        this.points = new HashMap<double[], Double>();
+        this.points = new HashMap<>();
         this.points.putAll(points);
         sampler = new Random();
 
@@ -77,7 +74,7 @@ public class DiscreteDensityFunction implements DensityFunction {
         this.minDistance = MathUtils.getMinEuclidianDistance(points.keySet());
 
         // and define the volume with a radius that is half this distance
-        this.volume = MathUtils.getVolume(minDistance / 2, getDimensions());
+        // the volume employed for the normalisation
     }
 
     /**
@@ -159,14 +156,14 @@ public class DiscreteDensityFunction implements DensityFunction {
      */
     @Override
     public String toString() {
-        String s = "Discrete(";
+        StringBuilder s = new StringBuilder("Discrete(");
         for (double[] point : points.keySet()) {
-            s += "(";
-            for (int i = 0; i < point.length; i++) {
-                s += StringUtils.getShortForm(point[i]) + ",";
+            s.append("(");
+            for (double v : point) {
+                s.append(StringUtils.getShortForm(v)).append(",");
             }
-            s = s.substring(0, s.length() - 1) + "):="
-                    + StringUtils.getShortForm(points.get(point));
+            s = new StringBuilder(s.substring(0, s.length() - 1) + "):="
+                    + StringUtils.getShortForm(points.get(point)));
         }
         return s + ")";
     }
@@ -233,15 +230,13 @@ public class DiscreteDensityFunction implements DensityFunction {
                     "Illegal dimensionality: " + x.length + "!=" + getDimensions());
         }
 
-        double cdf = points.keySet().stream().filter(v -> MathUtils.isLower(v, x))
+        return points.keySet().stream().filter(v -> MathUtils.isLower(v, x))
                 .mapToDouble(v -> points.get(v)).sum();
-
-        return cdf;
     }
 
     @Override
     public List<Element> generateXML(Document doc) {
-        List<Element> elList = new ArrayList<Element>();
+        List<Element> elList = new ArrayList<>();
 
         for (double[] a : points.keySet()) {
             Element valueNode = doc.createElement("value");

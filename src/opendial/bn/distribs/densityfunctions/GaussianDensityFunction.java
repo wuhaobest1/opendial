@@ -23,13 +23,8 @@
 
 package opendial.bn.distribs.densityfunctions;
 
+import java.util.*;
 import java.util.logging.*;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 import opendial.bn.values.ValueFactory;
 import opendial.utils.StringUtils;
@@ -51,17 +46,17 @@ public class GaussianDensityFunction implements DensityFunction {
     public final static Logger log = Logger.getLogger("OpenDial");
 
     // the mean of the Gaussian
-    final double[] mean;
+    private final double[] mean;
 
     // the variance of the Gaussian
     // NB: we assume a diagonal covariance
-    final double[] variance;
+    private final double[] variance;
 
     // the standard deviation of the Gaussian
-    final double[] stdDev;
+    private final double[] stdDev;
 
     // sampler object
-    static final Random sampler = new Random();
+    private static final Random sampler = new Random();
 
     /**
      * Creates a new density function with the given mean and variance vector. Only
@@ -78,7 +73,7 @@ public class GaussianDensityFunction implements DensityFunction {
         stdDev = new double[variance.length];
         for (int i = 0; i < variance.length; i++) {
             if (variance[i] < 0) {
-                log.warning("variance should not be negative, but is : " + variance);
+                log.warning("variance should not be negative, but is : " + Arrays.toString(variance));
             }
             stdDev[i] = Math.sqrt(variance[i]);
         }
@@ -178,7 +173,7 @@ public class GaussianDensityFunction implements DensityFunction {
             step[i] = (8 * stdDev[i]) / nbBuckets;
         }
 
-        Map<double[], Double> values = new HashMap<double[], Double>(nbBuckets);
+        Map<double[], Double> values = new HashMap<>(nbBuckets);
 
         double prevCdf = 0;
         for (int i = 0; i < nbBuckets; i++) {
@@ -246,7 +241,7 @@ public class GaussianDensityFunction implements DensityFunction {
      */
     @Override
     public int hashCode() {
-        return mean.hashCode() + variance.hashCode();
+        return Arrays.hashCode(mean) + Arrays.hashCode(variance);
     }
 
     /**
@@ -291,7 +286,7 @@ public class GaussianDensityFunction implements DensityFunction {
                         : "" + StringUtils.getShortForm(variance[0]));
         distribElement.appendChild(varianceEl);
 
-        return Arrays.asList(distribElement);
+        return Collections.singletonList(distribElement);
     }
 
 }
