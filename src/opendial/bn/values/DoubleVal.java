@@ -38,11 +38,11 @@ import opendial.utils.StringUtils;
 public final class DoubleVal implements Value {
 
     // logger
-    final static Logger log = Logger.getLogger("OpenDial");
+    private final static Logger log = Logger.getLogger("OpenDial");
 
     // the double
     final double d;
-    final int hashcode;
+    private final int hashcode;
 
     /**
      * Creates the double value (protected, use the ValueFactory instead)
@@ -53,8 +53,6 @@ public final class DoubleVal implements Value {
         this.d = d;
         hashcode = new Double(d).hashCode();
     }
-
-    ;
 
     /**
      * Returns the hashcode for the double
@@ -74,9 +72,8 @@ public final class DoubleVal implements Value {
      */
     @Override
     public boolean equals(Object o) {
-        boolean result = (o instanceof DoubleVal
+        return (o instanceof DoubleVal
                 && Math.abs(((DoubleVal) o).getDouble() - getDouble()) < 0.000001);
-        return result;
     }
 
     /**
@@ -154,8 +151,8 @@ public final class DoubleVal implements Value {
      * Returns false
      */
     @Override
-    public boolean contains(Value subvalue) {
-        return equals(subvalue);
+    public boolean contains(Value subValue) {
+        return equals(subValue);
     }
 
     /**
@@ -163,7 +160,7 @@ public final class DoubleVal implements Value {
      */
     @Override
     public Collection<Value> getSubValues() {
-        return new ArrayList<Value>();
+        return new ArrayList<>();
     }
 
 }

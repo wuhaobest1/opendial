@@ -23,15 +23,10 @@
 
 package opendial.bn.values;
 
-import java.util.logging.*;
-import java.util.stream.Collectors;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
-
 import opendial.utils.StringUtils;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Representation of an array of doubles.
@@ -40,12 +35,9 @@ import opendial.utils.StringUtils;
  */
 public final class ArrayVal implements Value {
 
-    // logger
-    final static Logger log = Logger.getLogger("OpenDial");
-
     // the array of doubles
-    final double[] array;
-    final int hashcode;
+    private final double[] array;
+    private final int hashcode;
 
     /**
      * Creates a new array of doubles
@@ -54,9 +46,7 @@ public final class ArrayVal implements Value {
      */
     public ArrayVal(double[] values) {
         this.array = new double[values.length];
-        for (int i = 0; i < array.length; i++) {
-            array[i] = values[i];
-        }
+        System.arraycopy(values, 0, array, 0, array.length);
         hashcode = Arrays.hashCode(array);
     }
 
@@ -86,7 +76,7 @@ public final class ArrayVal implements Value {
 
                     // if the difference is very small, assume 0
                     if (Math.abs(val1 - val2) > 0.0001) {
-                        return (new Double(val1).compareTo(new Double(val2)));
+                        return (Double.compare(val1, val2));
                     }
                 }
                 return 0;
@@ -109,9 +99,9 @@ public final class ArrayVal implements Value {
      * @return the vector
      */
     public Vector<Double> getVector() {
-        Vector<Double> vector = new Vector<Double>(array.length);
-        for (int i = 0; i < array.length; i++) {
-            vector.add(array[i]);
+        Vector<Double> vector = new Vector<>(array.length);
+        for (double v : array) {
+            vector.add(v);
         }
         return vector;
     }
@@ -153,7 +143,7 @@ public final class ArrayVal implements Value {
      */
     @Override
     public List<Value> getSubValues() {
-        return Arrays.stream(array).mapToObj(d -> new DoubleVal(d))
+        return Arrays.stream(array).mapToObj(DoubleVal::new)
                 .collect(Collectors.toList());
     }
 
@@ -166,20 +156,16 @@ public final class ArrayVal implements Value {
     @Override
     public Value concatenate(Value v) {
         if (v instanceof ArrayVal) {
-            double[] newvals =
+            double[] newValues =
                     new double[array.length + ((ArrayVal) v).getArray().length];
-            for (int i = 0; i < array.length; i++) {
-                newvals[i] = array[i];
-            }
-            for (int i = 0; i < ((ArrayVal) v).getArray().length; i++) {
-                newvals[array.length + i] = ((ArrayVal) v).getArray()[i];
-            }
-            return new ArrayVal(newvals);
+            System.arraycopy(array, 0, newValues, 0, array.length);
+            System.arraycopy(((ArrayVal) v).getArray(), 0, newValues, array.length, ((ArrayVal) v).getArray().length);
+            return new ArrayVal(newValues);
         } else if (v instanceof NoneVal) {
             return this;
         } else {
             Set<Value> corresponding =
-                    Arrays.stream(array).mapToObj(a -> ValueFactory.create(a))
+                    Arrays.stream(array).mapToObj(ValueFactory::create)
                             .collect(Collectors.toSet());
             return (new SetVal(corresponding)).concatenate(v);
         }
@@ -198,9 +184,9 @@ public final class ArrayVal implements Value {
      */
     @Override
     public String toString() {
-        String s = "[";
+        StringBuilder s = new StringBuilder("[");
         for (Double d : getVector()) {
-            s += StringUtils.getShortForm(d) + ",";
+            s.append(StringUtils.getShortForm(d)).append(",");
         }
         return s.substring(0, s.length() - 1) + "]";
     }

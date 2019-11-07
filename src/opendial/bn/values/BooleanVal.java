@@ -35,21 +35,19 @@ import java.util.logging.Logger;
 public final class BooleanVal implements Value {
 
     // logger
-    final static Logger log = Logger.getLogger("OpenDial");
+    private final static Logger log = Logger.getLogger("OpenDial");
 
     // the boolean
-    final boolean b;
+    private final boolean b;
 
     /**
      * Creates the boolean value (protected, use the ValueFactory to create it)
      *
      * @param b the boolean
      */
-    protected BooleanVal(boolean b) {
+    BooleanVal(boolean b) {
         this.b = b;
     }
-
-    ;
 
     /**
      * Returns the hashcode of the boolean
@@ -136,7 +134,7 @@ public final class BooleanVal implements Value {
     @Override
     public int compareTo(Value o) {
         if (o instanceof BooleanVal) {
-            return (new Boolean(b)).compareTo(((BooleanVal) o).getBoolean());
+            return Boolean.compare(b, ((BooleanVal) o).getBoolean());
         } else {
             return hashCode() - o.hashCode();
         }
@@ -146,7 +144,7 @@ public final class BooleanVal implements Value {
      * Returns false
      */
     @Override
-    public boolean contains(Value subvalue) {
+    public boolean contains(Value subValue) {
         return false;
     }
 
@@ -155,7 +153,7 @@ public final class BooleanVal implements Value {
      */
     @Override
     public Collection<Value> getSubValues() {
-        return new ArrayList<Value>();
+        return new ArrayList<>();
     }
 
 }

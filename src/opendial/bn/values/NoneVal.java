@@ -124,7 +124,7 @@ public final class NoneVal implements Value {
      */
     @Override
     public Collection<Value> getSubValues() {
-        return new ArrayList<Value>();
+        return new ArrayList<>();
     }
 
 }

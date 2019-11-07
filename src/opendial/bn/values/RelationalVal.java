@@ -24,7 +24,6 @@
 package opendial.bn.values;
 
 import java.util.Collection;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import opendial.datastructs.Graph;
@@ -37,15 +36,6 @@ import opendial.datastructs.Graph;
  * @author Pierre Lison
  */
 public class RelationalVal extends Graph<Value, String> implements Value {
-
-    final static Logger log = Logger.getLogger("OpenDial");
-
-    /**
-     * Creates an empty relational structure.
-     */
-    public RelationalVal() {
-        super();
-    }
 
     /**
      * Creates a relational structure from a string representation.
@@ -78,7 +68,7 @@ public class RelationalVal extends Graph<Value, String> implements Value {
      */
     @Override
     public Collection<Value> getSubValues() {
-        return getNodes().stream().map(n -> n.getContent())
+        return getNodes().stream().map(Node::getContent)
                 .collect(Collectors.toList());
     }
 
