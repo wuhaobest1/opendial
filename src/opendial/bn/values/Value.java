@@ -48,7 +48,7 @@ public interface Value extends Comparable<Value> {
      *
      * @return the value
      */
-    public Value copy();
+    Value copy();
 
     /**
      * Return true if the value contains the value given as argument
@@ -56,7 +56,7 @@ public interface Value extends Comparable<Value> {
      * @param subvalue the value to check for inclusion
      * @return true if the value is contained, false otherwise
      */
-    public boolean contains(Value subvalue);
+    boolean contains(Value subvalue);
 
     /**
      * If the value is a container for other values, returns the collection of
@@ -64,7 +64,7 @@ public interface Value extends Comparable<Value> {
      *
      * @return the collection of values inside the present value
      */
-    public Collection<Value> getSubValues();
+    Collection<Value> getSubValues();
 
     /**
      * Returns a value that is the concatenation of the two values
@@ -72,14 +72,14 @@ public interface Value extends Comparable<Value> {
      * @param value the value to concatenate with the current one
      * @return the concatenated result
      */
-    public Value concatenate(Value value);
+    Value concatenate(Value value);
 
     /**
      * Returns the length of the value
      *
      * @return the value length
      */
-    public int length();
+    int length();
 
     /**
      * Returns the hash code for the value
@@ -87,7 +87,7 @@ public interface Value extends Comparable<Value> {
      * @return the hash code
      */
     @Override
-    public int hashCode();
+    int hashCode();
 
     /**
      * Returns the string representation of the value
@@ -95,7 +95,7 @@ public interface Value extends Comparable<Value> {
      * @return the string representation
      */
     @Override
-    public String toString();
+    String toString();
 
     /**
      * Returns true if o and the current object are equal, and false otherwise
@@ -104,6 +104,6 @@ public interface Value extends Comparable<Value> {
      * @return true if this==o, false otherwise
      */
     @Override
-    public boolean equals(Object o);
+    boolean equals(Object o);
 
 }
