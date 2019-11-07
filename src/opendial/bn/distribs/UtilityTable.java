@@ -45,13 +45,13 @@ import opendial.utils.StringUtils;
 public class UtilityTable implements UtilityFunction {
 
     // logger
-    final static Logger log = Logger.getLogger("OpenDial");
+    private final static Logger log = Logger.getLogger("OpenDial");
 
     // mapping between assignments and estimates of the utility value
-    Map<Assignment, UtilityEstimate> table;
+    private Map<Assignment, UtilityEstimate> table;
 
     // the variables of the table
-    Set<String> variables;
+    private Set<String> variables;
 
     // ===================================
     // CONSTRUCTION METHODS
@@ -61,8 +61,8 @@ public class UtilityTable implements UtilityFunction {
      * Creates a new, empty empirical utility table
      */
     public UtilityTable() {
-        table = new HashMap<Assignment, UtilityEstimate>();
-        variables = new HashSet<String>();
+        table = new HashMap<>();
+        variables = new HashSet<>();
     }
 
     /**
@@ -140,8 +140,7 @@ public class UtilityTable implements UtilityFunction {
      * @return the (assignment,utility) table
      */
     public Map<Assignment, Double> getTable() {
-        Map<Assignment, Double> averageUtils =
-                new LinkedHashMap<Assignment, Double>();
+        Map<Assignment, Double> averageUtils = new LinkedHashMap<>();
         for (Assignment a : table.keySet()) {
             averageUtils.put(a, getUtil(a));
         }
@@ -155,9 +154,8 @@ public class UtilityTable implements UtilityFunction {
      * @param nbest the number of values to keep in the filtered table
      * @return the table of values, of size nbest
      */
-    public UtilityTable getNBest(int nbest) {
-        Map<Assignment, Double> filteredTable =
-                InferenceUtils.getNBest(getTable(), nbest);
+    private UtilityTable getNBest(int nbest) {
+        Map<Assignment, Double> filteredTable = InferenceUtils.getNBest(getTable(), nbest);
         return new UtilityTable(filteredTable);
     }
 
@@ -179,7 +177,7 @@ public class UtilityTable implements UtilityFunction {
      */
     public Map.Entry<Assignment, Double> getBest() {
         if (table.isEmpty()) {
-            Map<Assignment, Double> newTable = new HashMap<Assignment, Double>();
+            Map<Assignment, Double> newTable = new HashMap<>();
             newTable.put(new Assignment(), 0.0);
             return newTable.entrySet().iterator().next();
         }
@@ -230,10 +228,9 @@ public class UtilityTable implements UtilityFunction {
         Map<Assignment, Double> sortedTable =
                 InferenceUtils.getNBest(getTable(), table.size());
 
-        String str = "";
+        StringBuilder str = new StringBuilder();
         for (Entry<Assignment, Double> entry : sortedTable.entrySet()) {
-            str += "U(" + entry.getKey() + "):="
-                    + StringUtils.getShortForm(entry.getValue()) + "\n";
+            str.append("U(").append(entry.getKey()).append("):=").append(StringUtils.getShortForm(entry.getValue())).append("\n");
         }
         return (str.length() > 0) ? str.substring(0, str.length() - 1) : "";
     }
@@ -246,8 +243,7 @@ public class UtilityTable implements UtilityFunction {
      */
     @Override
     public void modifyVariableId(String nodeId, String newId) {
-        Map<Assignment, UtilityEstimate> utilities2 =
-                new HashMap<Assignment, UtilityEstimate>();
+        Map<Assignment, UtilityEstimate> utilities2 = new HashMap<>();
         for (Assignment a : table.keySet()) {
             Assignment b = new Assignment();
             for (String var : a.getVariables()) {
@@ -277,7 +273,7 @@ public class UtilityTable implements UtilityFunction {
          *
          * @param firstValue the first value
          */
-        public UtilityEstimate(double firstValue) {
+        UtilityEstimate(double firstValue) {
             update(firstValue);
         }
 
