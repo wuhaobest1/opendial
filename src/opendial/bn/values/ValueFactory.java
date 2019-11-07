@@ -42,21 +42,21 @@ import opendial.datastructs.Graph;
 public class ValueFactory {
 
     // logger
-    final static Logger log = Logger.getLogger("OpenDial");
+    private final static Logger log = Logger.getLogger("OpenDial");
 
     // none value (no need to recreate one everytime)
     static final NoneVal noneValue = new NoneVal();
 
     // pattern to find a double value
-    public static Pattern doublePattern =
+    private static Pattern doublePattern =
             Pattern.compile("[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?");
 
     // pattern to find an array of doubles
-    static Pattern arrayPattern =
+    private static Pattern arrayPattern =
             Pattern.compile("\\[([-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?,\\s*)*"
                     + "([-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?)\\]");
 
-    static Pattern setPattern = Pattern.compile(
+    private static Pattern setPattern = Pattern.compile(
             "[/\\w\\-_\\.\\^\\=\\s]*"
                     + "([\\[\\(][/\\w\\-_,\\.\\^\\=\\s\\(]+\\)*[\\]\\)])?",
             Pattern.UNICODE_CHARACTER_CLASS | Pattern.UNICODE_CASE);
@@ -89,7 +89,7 @@ public class ValueFactory {
         else {
             Matcher m2 = arrayPattern.matcher(str);
             if (m2.matches()) {
-                List<Double> subVals = new ArrayList<Double>();
+                List<Double> subVals = new ArrayList<>();
                 for (String subVal : str.substring(1, str.length() - 1).split(",")) {
                     subVals.add(Double.parseDouble(subVal));
                 }
@@ -103,7 +103,7 @@ public class ValueFactory {
                     }
                 }
 
-                LinkedList<Value> subVals = new LinkedList<Value>();
+                LinkedList<Value> subVals = new LinkedList<>();
                 Matcher m3 = setPattern.matcher(str.substring(1, str.length() - 1));
                 while (m3.find()) {
                     String subval = m3.group(0).trim();
