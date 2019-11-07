@@ -43,7 +43,7 @@ public interface DensityFunction {
      * @param x the (possibly multivariate) point
      * @return the density value for the point calculated.
      */
-    public double getDensity(double... x);
+    double getDensity(double... x);
 
     /**
      * Returns the mean of the density function. The size of the double array
@@ -51,7 +51,7 @@ public interface DensityFunction {
      *
      * @return the density mean.
      */
-    public double[] getMean();
+    double[] getMean();
 
     /**
      * Returns the variance of the density function. The size of the double array
@@ -59,7 +59,7 @@ public interface DensityFunction {
      *
      * @return the density variance
      */
-    public double[] getVariance();
+    double[] getVariance();
 
     /**
      * Returns a sampled value given the point. The size of the double array
@@ -67,14 +67,14 @@ public interface DensityFunction {
      *
      * @return the sampled value.
      */
-    public double[] sample();
+    double[] sample();
 
     /**
      * Returns the dimensionality of the density function.
      *
      * @return the dimensionality.
      */
-    public int getDimensions();
+    int getDimensions();
 
     /**
      * Returns a discretised version of the density function. The granularity of the
@@ -84,14 +84,14 @@ public interface DensityFunction {
      * @return a discretised probability distribution, mapping a collection of points
      * to a probability value
      */
-    public Map<double[], Double> discretise(int nbBuckets);
+    Map<double[], Double> discretise(int nbBuckets);
 
     /**
      * Returns a copy of the density function
      *
      * @return the copy
      */
-    public DensityFunction copy();
+    DensityFunction copy();
 
     /**
      * Returns the cumulative probability up to the given point x.
@@ -99,7 +99,7 @@ public interface DensityFunction {
      * @param x the (possibly multivariate) point x
      * @return the cumulative probability from 0 to x extracted
      */
-    public double getCDF(double... x);
+    double getCDF(double... x);
 
     /**
      * Returns the XML representation (as a list of XML elements) of the density
@@ -108,6 +108,6 @@ public interface DensityFunction {
      * @param doc the XML document for the node
      * @return the corresponding XML elements
      */
-    public List<Element> generateXML(Document doc);
+    List<Element> generateXML(Document doc);
 
 }
