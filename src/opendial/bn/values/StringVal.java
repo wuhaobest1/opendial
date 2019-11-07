@@ -38,24 +38,22 @@ import opendial.templates.Template;
 
 public final class StringVal implements Value {
 
-    final static Logger log = Logger.getLogger("OpenDial");
+    private final static Logger log = Logger.getLogger("OpenDial");
 
     // the string
-    final String str;
-    final int hashcode;
-    Template template;
+    private final String str;
+    private final int hashcode;
+    private Template template;
 
     /**
      * Creates a new string value (protected, use the ValueFactory instead)
      *
      * @param str the string
      */
-    public StringVal(String str) {
+    StringVal(String str) {
         this.str = str;
         hashcode = str.toLowerCase().hashCode();
     }
-
-    ;
 
     /**
      * Returns the hashcode for the string
@@ -77,9 +75,7 @@ public final class StringVal implements Value {
     public boolean equals(Object o) {
         if (o instanceof StringVal) {
             StringVal stringval = (StringVal) o;
-            if (stringval.str.equalsIgnoreCase(str)) {
-                return true;
-            }
+            return stringval.str.equalsIgnoreCase(str);
         }
         return false;
     }
@@ -142,7 +138,7 @@ public final class StringVal implements Value {
      */
     @Override
     public Collection<Value> getSubValues() {
-        return Arrays.stream(str.split(" ")).map(w -> ValueFactory.create(w))
+        return Arrays.stream(str.split(" ")).map(ValueFactory::create)
                 .collect(Collectors.toList());
     }
 
@@ -164,21 +160,21 @@ public final class StringVal implements Value {
     }
 
     /**
-     * Returns true if subvalue is a substring of the current StringVal, and false
+     * Returns true if subValue is a substring of the current StringVal, and false
      * otherwise
      *
-     * @return true is subvalue is a substring of the object, false otherwise
+     * @return true is subValue is a substring of the object, false otherwise
      */
     @Override
-    public boolean contains(Value subvalue) {
-        if (subvalue instanceof StringVal) {
-            StringVal stringval = (StringVal) subvalue;
+    public boolean contains(Value subValue) {
+        if (subValue instanceof StringVal) {
+            StringVal stringval = (StringVal) subValue;
             if (stringval.template == null) {
                 stringval.template = Template.create(stringval.str);
             }
             return stringval.template.partialmatch(str).isMatching();
         } else {
-            return subvalue.toString().contains(str);
+            return subValue.toString().contains(str);
         }
     }
 
