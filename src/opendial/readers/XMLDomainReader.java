@@ -90,7 +90,7 @@ public class XMLDomainReader {
      * @return the extracted dialogue domain
      */
     private static Domain extractDomain(String topDomainFile, boolean fullExtract) {
-
+        log.info("extractDomain : " + topDomainFile);
         // create a new, empty domain
         Domain domain = new Domain();
 
@@ -104,13 +104,12 @@ public class XMLDomainReader {
 
             Node mainNode = XMLUtils.getMainNode(doc);
 
-            String rootpath = f.getParent();
-
+            String rootPath = f.getParent();
+            log.info("rootPath is : " + rootPath);
             NodeList firstElements = mainNode.getChildNodes();
             for (int j = 0; j < firstElements.getLength(); j++) {
-
                 Node node = firstElements.item(j);
-                domain = extractPartialDomain(node, domain, rootpath, fullExtract);
+                domain = extractPartialDomain(node, domain, rootPath, fullExtract);
             }
         } catch (RuntimeException e) {
             if (fullExtract) {
@@ -126,20 +125,21 @@ public class XMLDomainReader {
      *
      * @param mainNode    main XML node
      * @param domain      dialogue domain
-     * @param rootpath    rooth path (necessary to handle references)
+     * @param rootPath    rooth path (necessary to handle references)
      * @param fullExtract whether to extract the full domain or only the files
      * @return the augmented dialogue domain
      */
     private static Domain extractPartialDomain(Node mainNode, Domain domain,
-                                               String rootpath, boolean fullExtract) {
+                                               String rootPath, boolean fullExtract) {
+
+        log.info("Main node name : " + mainNode.getNodeName());
 
         // extracting rule-based probabilistic model
         if (mainNode.getNodeName().equals("domain")) {
-
             NodeList firstElements = mainNode.getChildNodes();
             for (int j = 0; j < firstElements.getLength(); j++) {
                 Node node = firstElements.item(j);
-                domain = extractPartialDomain(node, domain, rootpath, fullExtract);
+                domain = extractPartialDomain(node, domain, rootPath, fullExtract);
             }
         }
 
@@ -148,18 +148,16 @@ public class XMLDomainReader {
             Properties settings = XMLUtils.extractMapping(mainNode);
             domain.getSettings().fillSettings(settings);
         }
+
         // extracting custom functions
         else if (fullExtract && mainNode.getNodeName().equals("function")
                 && mainNode.getAttributes().getNamedItem("name") != null) {
-            String name =
-                    mainNode.getAttributes().getNamedItem("name").getNodeValue();
+            String name = mainNode.getAttributes().getNamedItem("name").getNodeValue();
             String functionStr = mainNode.getTextContent().trim();
             try {
                 Class<?> clazz = Class.forName(functionStr);
                 @SuppressWarnings("unchecked")
-                Function<List<String>, Value> f =
-                        (Function<List<String>, Value>) clazz.newInstance();
-                domain.getSettings();
+                Function<List<String>, Value> f = (Function<List<String>, Value>) clazz.newInstance();
                 Settings.addFunction(name, f);
             } catch (Exception e) {
                 log.warning("cannot load function : " + e);
@@ -169,40 +167,38 @@ public class XMLDomainReader {
         // extracting initial state
         else if (fullExtract && mainNode.getNodeName().equals("initialstate")) {
             BNetwork state = XMLStateReader.getBayesianNetwork(mainNode);
+            log.info("state: " + state.toString());
             domain.setInitialState(new DialogueState(state));
-            // log.fine(state);
         }
 
         // extracting rule-based probabilistic model
         else if (fullExtract && mainNode.getNodeName().equals("model")) {
             Model model = createModel(mainNode);
-            // log.fine(model);
+            log.info("model： " + model.toString());
             domain.addModel(model);
         }
 
         // extracting parameters
         else if (fullExtract && mainNode.getNodeName().equals("parameters")) {
             BNetwork parameters = XMLStateReader.getBayesianNetwork(mainNode);
+            log.info("parameters: " + parameters.prettyPrint());
             domain.setParameters(parameters);
         }
 
         // extracting imported references
         else if (mainNode.getNodeName().equals("import") && mainNode.hasAttributes()
                 && mainNode.getAttributes().getNamedItem("href") != null) {
-
-            String fileName =
-                    mainNode.getAttributes().getNamedItem("href").getNodeValue();
-            String filepath = rootpath == null ? fileName : rootpath + File.separator + fileName;
+            String fileName = mainNode.getAttributes().getNamedItem("href").getNodeValue();
+            String filepath = rootPath == null ? fileName : rootPath + File.separator + fileName;
             domain.addImportedFiles(new File(filepath));
-            Document subdoc = XMLUtils.getXMLDocument(filepath);
-            domain = extractPartialDomain(XMLUtils.getMainNode(subdoc), domain,
-                    rootpath, fullExtract);
+            Document subDocument = XMLUtils.getXMLDocument(filepath);
+            domain = extractPartialDomain(XMLUtils.getMainNode(subDocument), domain,
+                    rootPath, fullExtract);
         } else if (fullExtract && XMLUtils.hasContent(mainNode)) {
             if (mainNode.getNodeName().equals("#text")) {
                 throw new RuntimeException("cannot insert free text in <domain>");
             }
-            throw new RuntimeException(
-                    "Invalid tag in <domain>: " + mainNode.getNodeName());
+            throw new RuntimeException("Invalid tag in <domain>: " + mainNode.getNodeName());
         }
 
         return domain;
