@@ -22,17 +22,8 @@
 
 package opendial.bn;
 
+import java.util.*;
 import java.util.logging.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
 import java.util.stream.Collectors;
 
 import opendial.bn.distribs.ProbDistribution;
@@ -50,19 +41,19 @@ import opendial.bn.nodes.UtilityNode;
 public class BNetwork {
 
     // logger
-    final static Logger log = Logger.getLogger("OpenDial");
+    private final static Logger log = Logger.getLogger("OpenDial");
 
     // the set of nodes for the network
-    Map<String, BNode> nodes;
+    private Map<String, BNode> nodes;
 
     // the chance nodes
-    Map<String, ChanceNode> chanceNodes;
+    private Map<String, ChanceNode> chanceNodes;
 
     // the utility nodes
-    Map<String, UtilityNode> utilityNodes;
+    private Map<String, UtilityNode> utilityNodes;
 
     // the action nodes
-    Map<String, ActionNode> actionNodes;
+    private Map<String, ActionNode> actionNodes;
 
     // ===================================
     // NETWORK CONSTRUCTION
@@ -72,10 +63,10 @@ public class BNetwork {
      * Constructs an empty network
      */
     public BNetwork() {
-        nodes = new HashMap<String, BNode>();
-        chanceNodes = new HashMap<String, ChanceNode>();
-        utilityNodes = new HashMap<String, UtilityNode>();
-        actionNodes = new HashMap<String, ActionNode>();
+        nodes = new HashMap<>();
+        chanceNodes = new HashMap<>();
+        utilityNodes = new HashMap<>();
+        actionNodes = new HashMap<>();
     }
 
     /**
@@ -127,7 +118,7 @@ public class BNetwork {
      *
      * @param newNodes the collection of nodes to add
      */
-    public void addNodes(Collection<BNode> newNodes) {
+    private void addNodes(Collection<BNode> newNodes) {
         for (BNode newNode : newNodes) {
             addNode(newNode);
         }
@@ -139,7 +130,7 @@ public class BNetwork {
      * @param network the network to include
      */
     public void addNetwork(BNetwork network) {
-        for (BNode node : new ArrayList<BNode>(network.getNodes())) {
+        for (BNode node : new ArrayList<>(network.getNodes())) {
             if (hasNode(node.getId())) {
                 removeNode(node.getId());
             }
@@ -179,8 +170,7 @@ public class BNetwork {
      */
     public BNode removeNode(String nodeId) {
         if (!nodes.containsKey(nodeId)) {
-            // log.warning("network does not contain a node with identifier " +
-            // nodeId);
+            log.warning("network does not contain a node with identifier " + nodeId);
         } else {
             BNode node = nodes.get(nodeId);
 
@@ -211,8 +201,8 @@ public class BNetwork {
      * @return the removed nodes
      */
     public List<BNode> removeNodes(Collection<String> valueNodeIds) {
-        List<BNode> removed = new ArrayList<BNode>();
-        for (String id : new ArrayList<String>(valueNodeIds)) {
+        List<BNode> removed = new ArrayList<>();
+        for (String id : new ArrayList<>(valueNodeIds)) {
             BNode n = removeNode(id);
             removed.add(n);
         }
@@ -233,8 +223,7 @@ public class BNetwork {
         if (node != null) {
             addNode(node);
         } else {
-            log.warning("node " + oldNodeId
-                    + " did not exist, cannot change its identifier");
+            log.warning("node " + oldNodeId + " did not exist, cannot change its identifier");
         }
     }
 
@@ -295,7 +284,7 @@ public class BNetwork {
     }
 
     public Collection<BNode> getNodes(Collection<String> ids) {
-        return nodes.keySet().stream().filter(k -> ids.contains(k))
+        return nodes.keySet().stream().filter(ids::contains)
                 .map(k -> nodes.get(k)).collect(Collectors.toSet());
     }
 
@@ -401,7 +390,7 @@ public class BNetwork {
      * @return the collection of identifiers of chance nodes
      */
     public <T extends ProbDistribution> Set<String> getNodeIds(Class<T> cls) {
-        Set<String> ids = new HashSet<String>();
+        Set<String> ids = new HashSet<>();
         for (ChanceNode cn : chanceNodes.values()) {
             if (cls.isInstance(cn.getDistrib())) {
                 ids.add(cn.getId());
@@ -539,7 +528,7 @@ public class BNetwork {
      * @return the ordered list of nodes
      */
     public List<BNode> getSortedNodes() {
-        List<BNode> nodesList = new ArrayList<BNode>(nodes.values());
+        List<BNode> nodesList = new ArrayList<>(nodes.values());
         Collections.sort(nodesList);
         return nodesList;
     }
@@ -550,7 +539,7 @@ public class BNetwork {
      * @return the ordered list of node identifiers.
      */
     public List<String> getSortedNodesIds() {
-        List<String> sorted = new ArrayList<String>();
+        List<String> sorted = new ArrayList<>();
         for (BNode n : getSortedNodes()) {
             sorted.add(n.getId());
         }
@@ -564,7 +553,7 @@ public class BNetwork {
      * @return the corresponding nodes
      */
     protected List<BNode> getNodes(Set<String> ids) {
-        List<BNode> subset = new ArrayList<BNode>();
+        List<BNode> subset = new ArrayList<>();
         for (String id : ids) {
             if (nodes.containsKey(id)) {
                 subset.add(nodes.get(id));
@@ -582,9 +571,9 @@ public class BNetwork {
      */
     public List<Set<String>> getCliques() {
 
-        List<Set<String>> cliques = new ArrayList<Set<String>>();
+        List<Set<String>> cliques = new ArrayList<>();
 
-        Stack<String> nodesToProcess = new Stack<String>();
+        Stack<String> nodesToProcess = new Stack<>();
         nodesToProcess.addAll(nodes.keySet());
         while (!nodesToProcess.isEmpty()) {
             String node = nodesToProcess.pop();
@@ -593,8 +582,7 @@ public class BNetwork {
             nodesToProcess.removeAll(newClique);
         }
 
-        Collections.sort(cliques, (s1, s2) -> s1.hashCode() - s2.hashCode());
-
+        cliques.sort(Comparator.comparingInt(Set::hashCode));
         return cliques;
     }
 
@@ -609,9 +597,9 @@ public class BNetwork {
      */
     public List<Set<String>> getCliques(Set<String> subsetIds) {
 
-        List<Set<String>> cliques = new ArrayList<Set<String>>();
+        List<Set<String>> cliques = new ArrayList<>();
 
-        Stack<String> nodesToProcess = new Stack<String>();
+        Stack<String> nodesToProcess = new Stack<>();
         nodesToProcess.addAll(nodes.keySet());
         nodesToProcess.retainAll(subsetIds);
         while (!nodesToProcess.isEmpty()) {
@@ -712,12 +700,12 @@ public class BNetwork {
      * @return the pretty print representation
      */
     public String prettyPrint() {
-        String s = "Nodes: " + nodes.keySet() + "\n";
-        s += "Edges: \n";
+        StringBuilder s = new StringBuilder("Nodes: " + nodes.keySet() + "\n");
+        s.append("Edges: \n");
         for (BNode node : nodes.values()) {
-            s += "\t" + node.getInputNodeIds() + "-->" + node.getId();
+            s.append("\t").append(node.getInputNodeIds()).append("-->").append(node.getId());
         }
-        return s;
+        return s.toString();
     }
 
 }
