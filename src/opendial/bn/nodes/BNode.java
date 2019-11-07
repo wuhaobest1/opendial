@@ -808,7 +808,7 @@ public abstract class BNode implements Comparable<BNode> {
      * outside the removeRelation method, to ensure consistency between the input and
      * output links.
      *
-     * @param node the output node to remove
+     * @param outputNodeId the output node to remove
      * @return true if a relation between the nodes existed, false otherwise
      */
     private boolean removeOutputNode_internal(String outputNodeId) {
@@ -827,10 +827,7 @@ public abstract class BNode implements Comparable<BNode> {
      * @return true if such a cycle exists, false otherwise
      */
     private boolean containsCycles(BNode inputNode) {
-        if (getDescendants().contains(inputNode)) {
-            return true;
-        }
-        return false;
+        return getDescendants().contains(inputNode);
     }
 
 }

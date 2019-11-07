@@ -43,7 +43,7 @@ import opendial.datastructs.Assignment;
 public class UtilityNode extends BNode {
 
     // logger
-    final static Logger log = Logger.getLogger("OpenDial");
+    private final static Logger log = Logger.getLogger("OpenDial");
 
     // the utility distribution
     protected UtilityFunction distrib;
@@ -154,7 +154,7 @@ public class UtilityNode extends BNode {
     @Override
     public Map<Assignment, Double> getFactor() {
 
-        Map<Assignment, Double> factor = new HashMap<Assignment, Double>();
+        Map<Assignment, Double> factor = new HashMap<>();
 
         Set<Assignment> combinations = getPossibleConditions();
         for (Assignment combination : combinations) {
@@ -175,8 +175,7 @@ public class UtilityNode extends BNode {
      */
     @Override
     public UtilityNode copy() {
-        UtilityNode copy = new UtilityNode(nodeId, distrib.copy());
-        return copy;
+        return new UtilityNode(nodeId, distrib.copy());
     }
 
     /**

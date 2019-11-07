@@ -43,13 +43,13 @@ import opendial.datastructs.Assignment;
 public class ActionNode extends BNode {
 
     // logger
-    final static Logger log = Logger.getLogger("OpenDial");
+    private final static Logger log = Logger.getLogger("OpenDial");
 
     // the list of values for the node
     private Set<Value> actionValues;
     private Value[] actionValuesAsArray;
 
-    Random sampler;
+    private Random sampler;
 
     // ===================================
     // NODE CONSTRUCTION
@@ -62,7 +62,7 @@ public class ActionNode extends BNode {
      */
     public ActionNode(String nodeId) {
         super(nodeId);
-        actionValues = new HashSet<Value>();
+        actionValues = new HashSet<>();
         sampler = new Random();
         actionValues.add(ValueFactory.none());
     }
@@ -75,7 +75,7 @@ public class ActionNode extends BNode {
      */
     public ActionNode(String nodeId, Set<Value> actionValues) {
         this(nodeId);
-        this.actionValues = new HashSet<Value>(actionValues);
+        this.actionValues = new HashSet<>(actionValues);
     }
 
     @Override
@@ -132,7 +132,7 @@ public class ActionNode extends BNode {
      */
     @Override
     public Map<Assignment, Double> getFactor() {
-        Map<Assignment, Double> factor = new HashMap<Assignment, Double>();
+        Map<Assignment, Double> factor = new HashMap<>();
         for (Value actionValue : actionValues) {
             factor.put(new Assignment(nodeId, actionValue),
                     1.0 / actionValues.size());
@@ -161,7 +161,7 @@ public class ActionNode extends BNode {
      */
     @Override
     public Set<Value> getValues() {
-        return new HashSet<Value>(actionValues);
+        return new HashSet<>(actionValues);
     }
 
     /**

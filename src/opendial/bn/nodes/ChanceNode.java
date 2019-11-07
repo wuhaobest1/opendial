@@ -46,7 +46,7 @@ import opendial.datastructs.Assignment;
 public class ChanceNode extends BNode {
 
     // logger
-    final static Logger log = Logger.getLogger("OpenDial");
+    private final static Logger log = Logger.getLogger("OpenDial");
 
     // the probability distribution for the node
     protected ProbDistribution distrib;
@@ -54,7 +54,7 @@ public class ChanceNode extends BNode {
     // the set of cached values for the node
     // NB: if the node has a continuous range, these values are based on
     // a discretisation procedure defined by the distribution
-    protected Set<Value> cachedValues;
+    private Set<Value> cachedValues;
 
     // ===================================
     // NODE CONSTRUCTION
@@ -281,7 +281,7 @@ public class ChanceNode extends BNode {
     @Override
     public Map<Assignment, Double> getFactor() {
 
-        Map<Assignment, Double> factor = new HashMap<Assignment, Double>();
+        Map<Assignment, Double> factor = new HashMap<>();
 
         Set<Assignment> combinations = getPossibleConditions();
         for (Assignment combination : combinations) {
@@ -309,7 +309,7 @@ public class ChanceNode extends BNode {
     public ChanceNode copy() {
         ChanceNode cn = new ChanceNode(nodeId, distrib.copy());
         if (cachedValues != null) {
-            cn.cachedValues = new HashSet<Value>(cachedValues);
+            cn.cachedValues = new HashSet<>(cachedValues);
         }
         return cn;
     }
@@ -328,8 +328,7 @@ public class ChanceNode extends BNode {
      */
     @Override
     public String toString() {
-        String str = distrib.toString();
-        return str;
+        return distrib.toString();
     }
 
     // ===================================
