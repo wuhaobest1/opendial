@@ -23,8 +23,6 @@
 
 package opendial.bn.values;
 
-import java.util.logging.*;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -37,20 +35,17 @@ import java.util.Set;
  */
 public final class SetVal implements Value {
 
-    // logger
-    final static Logger log = Logger.getLogger("OpenDial");
-
     // the set of values
-    final Set<Value> set;
-    final int hashcode;
+    private final Set<Value> set;
+    private final int hashcode;
 
     /**
      * Creates the list of values (protected, should be created via ValueFactory)
      *
      * @param values the values
      */
-    protected SetVal(Collection<Value> values) {
-        this.set = new LinkedHashSet<Value>();
+    SetVal(Collection<Value> values) {
+        this.set = new LinkedHashSet<>();
         for (Value v : values) {
             if (v instanceof SetVal) {
                 this.set.addAll(((SetVal) v).getSubValues());
@@ -61,18 +56,14 @@ public final class SetVal implements Value {
         hashcode = set.hashCode();
     }
 
-    ;
-
     /**
      * Creates the set of values (protected, should be created via ValueFactory)
      *
      * @param values the values
      */
-    protected SetVal(Value... values) {
+    SetVal(Value... values) {
         this(Arrays.asList(values));
     }
-
-    ;
 
     /**
      * Returns the hashcode for the list
@@ -143,13 +134,13 @@ public final class SetVal implements Value {
     @Override
     public Value concatenate(Value v) {
         if (v instanceof SetVal) {
-            Set<Value> newSet = new LinkedHashSet<Value>(set);
+            Set<Value> newSet = new LinkedHashSet<>(set);
             newSet.addAll(((SetVal) v).getSubValues());
             return new SetVal(newSet);
         } else if (v instanceof NoneVal) {
             return this;
         } else {
-            Set<Value> newSet = new LinkedHashSet<Value>(set);
+            Set<Value> newSet = new LinkedHashSet<>(set);
             newSet.add(v);
             return new SetVal(newSet);
         }
