@@ -44,14 +44,14 @@ public interface UtilityFunction {
      * @param input the value assignment for the input chance nodes
      * @return the associated utility
      */
-    public double getUtil(Assignment input);
+    double getUtil(Assignment input);
 
     /**
      * Creates a copy of the utility distribution
      *
      * @return the copy
      */
-    public UtilityFunction copy();
+    UtilityFunction copy();
 
     /**
      * Changes the variable label
@@ -59,6 +59,6 @@ public interface UtilityFunction {
      * @param oldId the old variable label
      * @param newId the new variable label
      */
-    public void modifyVariableId(String oldId, String newId);
+    void modifyVariableId(String oldId, String newId);
 
 }
