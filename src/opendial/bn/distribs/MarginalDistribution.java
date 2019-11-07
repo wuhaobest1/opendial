@@ -49,10 +49,10 @@ public class MarginalDistribution implements ProbDistribution {
     public final static Logger log = Logger.getLogger("OpenDial");
 
     // the conditional distribution P(X|Y1,...Yn, Z1,...Zm)
-    ProbDistribution condDistrib;
+    private ProbDistribution condDistrib;
 
     // the unconditional distribution P(Z1,...Zm)
-    MultivariateDistribution uncondDistrib;
+    private MultivariateDistribution uncondDistrib;
 
     /**
      * Creates a new marginal distribution given the two component distributions.
@@ -60,8 +60,8 @@ public class MarginalDistribution implements ProbDistribution {
      * @param condDistrib   the distribution P(X|Y1,...Yn, Z1,...Zm)
      * @param uncondDistrib the distributionP(Z1,...Zm)
      */
-    public MarginalDistribution(ProbDistribution condDistrib,
-                                MultivariateDistribution uncondDistrib) {
+    private MarginalDistribution(ProbDistribution condDistrib,
+                                 MultivariateDistribution uncondDistrib) {
         this.condDistrib = condDistrib;
         this.uncondDistrib = uncondDistrib;
     }
@@ -107,7 +107,7 @@ public class MarginalDistribution implements ProbDistribution {
      */
     @Override
     public Set<String> getInputVariables() {
-        Set<String> inputs = new HashSet<String>(condDistrib.getInputVariables());
+        Set<String> inputs = new HashSet<>(condDistrib.getInputVariables());
         inputs.removeAll(uncondDistrib.getVariables());
         return inputs;
     }

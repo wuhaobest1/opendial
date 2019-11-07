@@ -44,9 +44,6 @@ import opendial.utils.StringUtils;
  */
 public class UtilityTable implements UtilityFunction {
 
-    // logger
-    private final static Logger log = Logger.getLogger("OpenDial");
-
     // mapping between assignments and estimates of the utility value
     private Map<Assignment, UtilityEstimate> table;
 

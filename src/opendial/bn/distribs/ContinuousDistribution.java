@@ -51,13 +51,13 @@ public class ContinuousDistribution implements IndependentDistribution {
     public final static Logger log = Logger.getLogger("OpenDial");
 
     // the variable for the distribution
-    String variable;
+    private String variable;
 
     // density function for the distribution
-    DensityFunction function;
+    private DensityFunction function;
 
     // discrete equivalent of the distribution
-    CategoricalTable discreteCache;
+    private CategoricalTable discreteCache;
 
     // ===================================
     // DISTRIBUTION CONSTRUCTION
@@ -93,10 +93,9 @@ public class ContinuousDistribution implements IndependentDistribution {
      */
     @Override
     public Value sample() {
-        Value v = (function.getDimensions() > 1)
+        return (function.getDimensions() > 1)
                 ? ValueFactory.create(function.sample())
                 : ValueFactory.create(function.sample()[0]);
-        return v;
     }
 
     /**
@@ -218,7 +217,7 @@ public class ContinuousDistribution implements IndependentDistribution {
                 return function.getCDF(((ArrayVal) val).getArray());
             } else if (val instanceof DoubleVal) {
                 return function
-                        .getCDF(new double[]{((DoubleVal) val).getDouble()});
+                        .getCDF(((DoubleVal) val).getDouble());
             }
         } catch (RuntimeException e) {
             log.warning("exception: " + e);

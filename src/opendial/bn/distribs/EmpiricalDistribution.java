@@ -23,16 +23,8 @@
 
 package opendial.bn.distribs;
 
+import java.util.*;
 import java.util.logging.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 
 import opendial.bn.distribs.ConditionalTable.Builder;
 import opendial.bn.distribs.densityfunctions.KernelDensityFunction;
@@ -57,14 +49,14 @@ public class EmpiricalDistribution implements MultivariateDistribution {
     protected List<Assignment> samples;
 
     // random sampler
-    Random sampler;
+    private Random sampler;
 
     // cache for the discrete and continuous distributions
-    MultivariateTable discreteCache;
-    ContinuousDistribution continuousCache;
+    private MultivariateTable discreteCache;
+    private ContinuousDistribution continuousCache;
 
     // the names of the random variables
-    Set<String> variables;
+    private Set<String> variables;
 
     // ===================================
     // CONSTRUCTION METHODS
@@ -74,8 +66,8 @@ public class EmpiricalDistribution implements MultivariateDistribution {
      * Constructs an empirical distribution with an empty set of samples
      */
     public EmpiricalDistribution() {
-        this.samples = new ArrayList<Assignment>();
-        this.variables = new HashSet<String>();
+        this.samples = new ArrayList<>();
+        this.variables = new HashSet<>();
         sampler = new Random();
     }
 
@@ -132,8 +124,7 @@ public class EmpiricalDistribution implements MultivariateDistribution {
 
         if (!samples.isEmpty()) {
             int selection = sampler.nextInt(samples.size());
-            Assignment selected = samples.get(selection);
-            return selected;
+            return samples.get(selection);
         } else {
             log.warning("distribution has no samples");
             return new Assignment();
@@ -145,7 +136,7 @@ public class EmpiricalDistribution implements MultivariateDistribution {
      */
     @Override
     public Set<String> getVariables() {
-        return new HashSet<String>(variables);
+        return new HashSet<>(variables);
     }
 
     /**
@@ -173,11 +164,7 @@ public class EmpiricalDistribution implements MultivariateDistribution {
      */
     @Override
     public Set<Assignment> getValues() {
-        Set<Assignment> possible = new HashSet<Assignment>();
-        for (Assignment sample : samples) {
-            possible.add(sample);
-        }
-        return possible;
+        return new HashSet<>(samples);
     }
 
     /**
@@ -247,7 +234,7 @@ public class EmpiricalDistribution implements MultivariateDistribution {
      */
     @Override
     public IndependentDistribution getMarginal(String var) {
-        if (sample().getTrimmed(Arrays.asList(var)).containContinuousValues()
+        if (sample().getTrimmed(Collections.singletonList(var)).containContinuousValues()
                 && samples.stream().distinct().limit(5).count() == 5) {
             return createContinuous(var);
         } else {
@@ -287,7 +274,7 @@ public class EmpiricalDistribution implements MultivariateDistribution {
      * @param headVar the variable for which to create the distribution
      * @return the resulting table
      */
-    public IndependentDistribution createDiscrete(String headVar) {
+    private IndependentDistribution createDiscrete(String headVar) {
 
         CategoricalTable.Builder probs = new CategoricalTable.Builder(headVar);
 
@@ -307,9 +294,9 @@ public class EmpiricalDistribution implements MultivariateDistribution {
      * @param headVar the variable for which to create the distribution
      * @return the resulting continuous distribution
      */
-    public ContinuousDistribution createContinuous(String headVar) {
+    private ContinuousDistribution createContinuous(String headVar) {
 
-        List<double[]> values = new ArrayList<double[]>();
+        List<double[]> values = new ArrayList<>();
         for (Assignment a : samples) {
             Value v = a.getValue(headVar);
             if (v instanceof ArrayVal) {
@@ -336,13 +323,13 @@ public class EmpiricalDistribution implements MultivariateDistribution {
     public boolean pruneValues(double threshold) {
 
         Map<String, Map<Value, Integer>> frequencies =
-                new HashMap<String, Map<Value, Integer>>();
+                new HashMap<>();
 
         for (Assignment sample : samples) {
             for (String var : sample.getVariables()) {
                 Value val = sample.getValue(var);
                 if (!frequencies.containsKey(var)) {
-                    frequencies.put(var, new HashMap<Value, Integer>());
+                    frequencies.put(var, new HashMap<>());
                 }
                 Map<Value, Integer> valFreq = frequencies.get(var);
                 if (!valFreq.containsKey(val)) {
@@ -361,7 +348,6 @@ public class EmpiricalDistribution implements MultivariateDistribution {
                 if (frequencies.get(var).get(sample.getValue(var)) < minNumber) {
                     samples.remove(i);
                     changed = true;
-                    continue;
                 }
             }
         }
@@ -406,8 +392,7 @@ public class EmpiricalDistribution implements MultivariateDistribution {
      */
     @Override
     public EmpiricalDistribution copy() {
-        EmpiricalDistribution copy = new EmpiricalDistribution(samples);
-        return copy;
+        return new EmpiricalDistribution(samples);
     }
 
     /**
@@ -435,11 +420,7 @@ public class EmpiricalDistribution implements MultivariateDistribution {
         for (String var : getVariables()) {
             Assignment a = samples.get(0);
             if (a.containsVar(var) && a.containContinuousValues()) {
-                if (getVariables().size() == 1) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return getVariables().size() == 1;
             }
         }
         return false;

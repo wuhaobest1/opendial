@@ -23,14 +23,9 @@
 
 package opendial.bn.distribs;
 
+import java.util.*;
 import java.util.logging.*;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
 
 import opendial.bn.values.Value;
 import opendial.datastructs.Assignment;
@@ -47,16 +42,16 @@ import opendial.utils.StringUtils;
 public class MultivariateTable implements MultivariateDistribution {
 
     // logger
-    final static Logger log = Logger.getLogger("OpenDial");
+    private final static Logger log = Logger.getLogger("OpenDial");
 
     // the head variables
-    Set<String> headVars;
+    private Set<String> headVars;
 
     // the probability table
-    Map<Assignment, Double> table;
+    private Map<Assignment, Double> table;
 
     // probability intervals (used for binary search in sampling)
-    Intervals<Assignment> intervals;
+    private Intervals<Assignment> intervals;
 
     // sampler
     Random sampler;
@@ -85,8 +80,8 @@ public class MultivariateTable implements MultivariateDistribution {
      * @param headTable the univariate table.
      */
     public MultivariateTable(CategoricalTable headTable) {
-        this.headVars = new HashSet<String>(Arrays.asList(headTable.getVariable()));
-        this.table = new HashMap<Assignment, Double>();
+        this.headVars = new HashSet<>(Collections.singletonList(headTable.getVariable()));
+        this.table = new HashMap<>();
         String variable = headTable.getVariable();
         for (Value a : headTable.getValues()) {
             double prob = headTable.getProb(a);
@@ -101,7 +96,7 @@ public class MultivariateTable implements MultivariateDistribution {
      */
     public MultivariateTable(Assignment uniqueValue) {
         this.headVars = uniqueValue.getVariables();
-        this.table = new HashMap<Assignment, Double>();
+        this.table = new HashMap<>();
         this.table.put(uniqueValue, 1.0);
     }
 
@@ -110,8 +105,8 @@ public class MultivariateTable implements MultivariateDistribution {
      *
      * @param assign the value assignment
      */
-    public void extendRows(Assignment assign) {
-        Map<Assignment, Double> newTable = new HashMap<Assignment, Double>();
+    void extendRows(Assignment assign) {
+        Map<Assignment, Double> newTable = new HashMap<>();
         for (Assignment row : table.keySet()) {
             newTable.put(new Assignment(row, assign), table.get(row));
         }
@@ -192,7 +187,7 @@ public class MultivariateTable implements MultivariateDistribution {
     public Assignment sample() {
 
         if (intervals == null) {
-            intervals = new Intervals<Assignment>(table);
+            intervals = new Intervals<>(table);
         }
         if (intervals.isEmpty()) {
             log.warning("interval is empty, table: " + table);
@@ -209,7 +204,7 @@ public class MultivariateTable implements MultivariateDistribution {
      */
     @Override
     public Set<String> getVariables() {
-        return new HashSet<String>(headVars);
+        return new HashSet<>(headVars);
     }
 
     /**
@@ -276,7 +271,7 @@ public class MultivariateTable implements MultivariateDistribution {
      */
     @Override
     public void modifyVariableId(String oldVarId, String newVarId) {
-        Map<Assignment, Double> newTable = new HashMap<Assignment, Double>();
+        Map<Assignment, Double> newTable = new HashMap<>();
 
         for (Assignment head : table.keySet()) {
             Assignment newHead = head.copy();
@@ -315,13 +310,13 @@ public class MultivariateTable implements MultivariateDistribution {
         Map<Assignment, Double> sortedTable =
                 InferenceUtils.getNBest(table, Math.max(table.size(), 1));
 
-        String str = "";
+        StringBuilder str = new StringBuilder();
         for (Entry<Assignment, Double> entry : sortedTable.entrySet()) {
             String prob = StringUtils.getShortForm(entry.getValue());
-            str += "P(" + entry.getKey() + "):=" + prob + "\n";
+            str.append("P(").append(entry.getKey()).append("):=").append(prob).append("\n");
         }
 
-        return (str.length() > 0) ? str.substring(0, str.length() - 1) : str;
+        return (str.length() > 0) ? str.substring(0, str.length() - 1) : str.toString();
     }
 
     /**
@@ -332,7 +327,7 @@ public class MultivariateTable implements MultivariateDistribution {
     @Override
     public boolean pruneValues(double threshold) {
         boolean changed = false;
-        Map<Assignment, Double> newTable = new HashMap<Assignment, Double>();
+        Map<Assignment, Double> newTable = new HashMap<>();
         for (Assignment row : table.keySet()) {
             double prob = table.get(row);
             if (prob >= threshold) {
@@ -383,8 +378,8 @@ public class MultivariateTable implements MultivariateDistribution {
         Map<Assignment, Double> table;
 
         public Builder() {
-            table = new HashMap<Assignment, Double>(5);
-            headVars = new HashSet<String>();
+            table = new HashMap<>(5);
+            headVars = new HashSet<>();
         }
 
         /**
@@ -412,7 +407,7 @@ public class MultivariateTable implements MultivariateDistribution {
          * @param head the head assignment
          * @param prob the probability increment
          */
-        public void incrementRow(Assignment head, double prob) {
+        void incrementRow(Assignment head, double prob) {
             addRow(head, table.getOrDefault(head, 0.0) + prob);
         }
 

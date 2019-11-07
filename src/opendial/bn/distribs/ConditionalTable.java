@@ -59,10 +59,10 @@ public class ConditionalTable implements ProbDistribution {
     public final static Logger log = Logger.getLogger("OpenDial");
 
     // head variable
-    String headVar;
+    private String headVar;
 
     // conditional variables
-    protected Set<String> conditionalVars;
+    private Set<String> conditionalVars;
 
     // the probability table
     protected HashMap<Assignment, IndependentDistribution> table;
@@ -77,9 +77,9 @@ public class ConditionalTable implements ProbDistribution {
      * @param headVar the name of the random variable
      */
     public ConditionalTable(String headVar) {
-        table = new HashMap<Assignment, IndependentDistribution>();
+        table = new HashMap<>();
         this.headVar = headVar;
-        conditionalVars = new HashSet<String>();
+        conditionalVars = new HashSet<>();
     }
 
     /**
@@ -88,11 +88,11 @@ public class ConditionalTable implements ProbDistribution {
      * @param headVar  the name of the random variable
      * @param distribs the distribs (one for each conditional assignment)
      */
-    public ConditionalTable(String headVar,
-                            Map<Assignment, IndependentDistribution> distribs) {
-        table = new HashMap<Assignment, IndependentDistribution>();
+    private ConditionalTable(String headVar,
+                             Map<Assignment, IndependentDistribution> distribs) {
+        table = new HashMap<>();
         this.headVar = headVar;
-        conditionalVars = new HashSet<String>();
+        conditionalVars = new HashSet<>();
         for (Assignment condition : distribs.keySet()) {
             addDistrib(condition, distribs.get(condition));
         }
@@ -108,7 +108,7 @@ public class ConditionalTable implements ProbDistribution {
     @Override
     public void modifyVariableId(String oldVarId, String newVarId) {
 
-        for (Assignment condition : new ArrayList<Assignment>(table.keySet())) {
+        for (Assignment condition : new ArrayList<>(table.keySet())) {
             table.get(condition).modifyVariableId(oldVarId, newVarId);
             if (condition.containsVar(oldVarId)) {
                 IndependentDistribution distrib = table.remove(condition);
@@ -279,7 +279,7 @@ public class ConditionalTable implements ProbDistribution {
      */
     @Override
     public Set<Value> getValues() {
-        Set<Value> headRows = new HashSet<Value>();
+        Set<Value> headRows = new HashSet<>();
         for (Assignment condition : table.keySet()) {
             headRows.addAll(table.get(condition).getValues());
         }
@@ -342,20 +342,19 @@ public class ConditionalTable implements ProbDistribution {
      */
     @Override
     public String toString() {
-        String s = "";
+        StringBuilder s = new StringBuilder();
         for (Assignment condition : table.keySet()) {
             IndependentDistribution distrib = table.get(condition);
             for (Value head : distrib.getValues()) {
                 String prob = StringUtils.getShortForm(distrib.getProb(head));
                 if (condition.size() > 0) {
-                    s += "P(" + headVar + "=" + head + " | " + condition + "):="
-                            + prob + "\n";
+                    s.append("P(").append(headVar).append("=").append(head).append(" | ").append(condition).append("):=").append(prob).append("\n");
                 } else {
-                    s += "P(" + headVar + "=" + head + "):=" + prob + "\n";
+                    s.append("P(").append(headVar).append("=").append(head).append("):=").append(prob).append("\n");
                 }
             }
         }
-        return s;
+        return s.toString();
     }
 
     /**
@@ -404,7 +403,7 @@ public class ConditionalTable implements ProbDistribution {
          */
         public Builder(String headVar) {
             this.headVar = headVar;
-            table = new HashMap<Assignment, CategoricalTable.Builder>();
+            table = new HashMap<>();
         }
 
         /**
@@ -477,7 +476,7 @@ public class ConditionalTable implements ProbDistribution {
          * @param head      the head assignment
          * @param prob      the probability increment
          */
-        public void incrementRow(Assignment condition, Value head, double prob) {
+        void incrementRow(Assignment condition, Value head, double prob) {
             if (table.containsKey(condition)) {
                 table.get(condition).incrementRow(head, prob);
             } else {
@@ -585,7 +584,7 @@ public class ConditionalTable implements ProbDistribution {
          */
         public ConditionalTable build() {
             Map<Assignment, IndependentDistribution> table2 =
-                    new HashMap<Assignment, IndependentDistribution>();
+                    new HashMap<>();
             for (Assignment cond : table.keySet()) {
                 table2.put(cond, table.get(cond).build());
             }

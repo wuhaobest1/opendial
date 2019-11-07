@@ -46,12 +46,12 @@ public class SingleValueDistribution implements IndependentDistribution {
     /**
      * the variable label for the distribution
      */
-    String variable;
+    private String variable;
 
     /**
      * the variable value
      */
-    final Value value;
+    private final Value value;
 
     /**
      * Creates a new single-value distribution
@@ -142,7 +142,7 @@ public class SingleValueDistribution implements IndependentDistribution {
      */
     @Override
     public CategoricalTable toDiscrete() {
-        Map<Value, Double> map = new HashMap<Value, Double>();
+        Map<Value, Double> map = new HashMap<>();
         map.put(value, 1.0);
         return new CategoricalTable(variable, map);
     }

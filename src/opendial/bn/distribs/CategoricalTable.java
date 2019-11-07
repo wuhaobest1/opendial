@@ -23,14 +23,9 @@
 
 package opendial.bn.distribs;
 
+import java.util.*;
 import java.util.logging.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import opendial.bn.distribs.densityfunctions.DiscreteDensityFunction;
 import opendial.bn.values.ArrayVal;
@@ -60,16 +55,16 @@ import org.w3c.dom.Node;
 public class CategoricalTable implements IndependentDistribution {
 
     // logger
-    final static Logger log = Logger.getLogger("OpenDial");
+    private final static Logger log = Logger.getLogger("OpenDial");
 
     // the variable name
-    String variable;
+    private String variable;
 
     // the probability table
-    Map<Value, Double> table;
+    private Map<Value, Double> table;
 
     // probability intervals (used for binary search in sampling)
-    Intervals<Value> intervals;
+    private Intervals<Value> intervals;
 
     // ===================================
     // TABLE CONSTRUCTION
@@ -102,7 +97,7 @@ public class CategoricalTable implements IndependentDistribution {
         }
 
         CategoricalTable.Builder builder = new CategoricalTable.Builder(variable);
-        for (Value thisA : new HashSet<Value>(getValues())) {
+        for (Value thisA : new HashSet<>(getValues())) {
             for (Value otherA : other.getValues()) {
                 try {
                     Value concat = thisA.concatenate(otherA);
@@ -139,7 +134,7 @@ public class CategoricalTable implements IndependentDistribution {
      */
     @Override
     public boolean pruneValues(double threshold) {
-        Map<Value, Double> newTable = new HashMap<Value, Double>();
+        Map<Value, Double> newTable = new HashMap<>();
         boolean changed = false;
         for (Value row : table.keySet()) {
             double prob = table.get(row);
@@ -180,20 +175,15 @@ public class CategoricalTable implements IndependentDistribution {
             double toFind = ((DoubleVal) val).getDouble();
             Value closest = table.keySet().stream()
                     .filter(v -> v instanceof DoubleVal)
-                    .min((v1, v2) -> Double.compare(
-                            Math.abs(((DoubleVal) v1).getDouble() - toFind),
-                            Math.abs(((DoubleVal) v2).getDouble() - toFind)))
+                    .min(Comparator.comparingDouble(v -> Math.abs(((DoubleVal) v).getDouble() - toFind)))
                     .get();
             return getProb(closest);
         } else if (val instanceof ArrayVal && isContinuous()) {
             double[] toFind = ((ArrayVal) val).getArray();
             Value closest =
                     table.keySet().stream().filter(v -> v instanceof ArrayVal)
-                            .min((v1, v2) -> Double.compare(
-                                    MathUtils.getDistance(((ArrayVal) v1).getArray(),
-                                            toFind),
-                                    MathUtils.getDistance(((ArrayVal) v2).getArray(),
-                                            toFind)))
+                            .min(Comparator.comparingDouble(v -> MathUtils.getDistance(((ArrayVal) v).getArray(),
+                                    toFind)))
                             .get();
             return getProb(closest);
         }
@@ -222,15 +212,14 @@ public class CategoricalTable implements IndependentDistribution {
             if (table.isEmpty()) {
                 log.warning("creating intervals for an empty table");
             }
-            intervals = new Intervals<Value>(table);
+            intervals = new Intervals<>(table);
         }
         if (intervals.isEmpty()) {
             log.warning("interval is empty, table: " + table);
             return ValueFactory.none();
         }
 
-        Value sample = intervals.sample();
-        return sample;
+        return intervals.sample();
     }
 
     /**
@@ -243,7 +232,7 @@ public class CategoricalTable implements IndependentDistribution {
     public ContinuousDistribution toContinuous() {
 
         if (isContinuous()) {
-            Map<double[], Double> points = new HashMap<double[], Double>();
+            Map<double[], Double> points = new HashMap<>();
             for (Value v : getValues()) {
                 if (v instanceof ArrayVal) {
                     points.put(((ArrayVal) v).getArray(), getProb(v));
@@ -374,13 +363,13 @@ public class CategoricalTable implements IndependentDistribution {
         Map<Value, Double> sortedTable =
                 InferenceUtils.getNBest(table, Math.max(table.size(), 1));
 
-        String str = "";
+        StringBuilder str = new StringBuilder();
         for (Entry<Value, Double> entry : sortedTable.entrySet()) {
             String prob = StringUtils.getShortForm(entry.getValue());
-            str += "P(" + variable + "=" + entry.getKey() + "):=" + prob + "\n";
+            str.append("P(").append(variable).append("=").append(entry.getKey()).append("):=").append(prob).append("\n");
         }
 
-        return (str.length() > 0) ? str.substring(0, str.length() - 1) : str;
+        return (str.length() > 0) ? str.substring(0, str.length() - 1) : str.toString();
     }
 
     /**
@@ -411,7 +400,7 @@ public class CategoricalTable implements IndependentDistribution {
      */
     @Override
     public CategoricalTable copy() {
-        Map<Value, Double> newTable = new HashMap<Value, Double>();
+        Map<Value, Double> newTable = new HashMap<>();
         for (Value v : table.keySet()) {
             newTable.put(v, table.get(v));
         }
@@ -472,9 +461,7 @@ public class CategoricalTable implements IndependentDistribution {
                     return false;
                 }
             }
-            if (getValues().size() > 1) {
-                return true;
-            }
+            return getValues().size() > 1;
         }
         return false;
     }
@@ -507,7 +494,7 @@ public class CategoricalTable implements IndependentDistribution {
          * @param variable the name of the random variable
          */
         public Builder(String variable) {
-            table = new HashMap<Value, Double>(5);
+            table = new HashMap<>(5);
             this.variable = variable;
         }
 
@@ -577,7 +564,7 @@ public class CategoricalTable implements IndependentDistribution {
          * @param head the head assignment
          * @param prob the probability increment
          */
-        public void incrementRow(Value head, double prob) {
+        void incrementRow(Value head, double prob) {
             addRow(head, table.getOrDefault(head, 0.0) + prob);
         }
 
@@ -586,7 +573,7 @@ public class CategoricalTable implements IndependentDistribution {
          *
          * @param heads the mappings (head assignment, probability value)
          */
-        public void addRows(Map<Value, Double> heads) {
+        void addRows(Map<Value, Double> heads) {
             for (Value head : heads.keySet()) {
                 addRow(head, heads.get(head));
             }
@@ -671,7 +658,7 @@ public class CategoricalTable implements IndependentDistribution {
          * @return the values
          */
         public List<Value> getValues() {
-            return new ArrayList<Value>(table.keySet());
+            return new ArrayList<>(table.keySet());
         }
 
         /**
